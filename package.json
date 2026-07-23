@@ -1,0 +1,36 @@
+{
+  "name": "fallkard-forge",
+  "version": "0.1.0",
+  "description": "Mode B card format: a PNG that openly carries a real single-file build in declared text chunks. Forge, verify, and hatch. Zero dependencies.",
+  "type": "module",
+  "main": "./forge.mjs",
+  "exports": {
+    ".": "./forge.mjs"
+  },
+  "bin": {
+    "fallkard-forge": "./forge.mjs"
+  },
+  "scripts": {
+    "test": "node --test test.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "png",
+    "ztxt",
+    "text-chunk",
+    "single-file",
+    "provenance",
+    "sha256",
+    "card",
+    "fallkard",
+    "zero-dependency"
+  ],
+  "author": "AI-Native Solutions",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjgant80-hub/fallkard-forge.git"
+  }
+}

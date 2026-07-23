@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>fallkard reader · CARD-SPEC v0.1</title>
+<style>
+  :root{--bg:#0b0d12;--panel:#12151d;--line:#232838;--ink:#e8eaf0;--dim:#8b93a7;--ok:#4ade80;--bad:#f87171;--gold:#fbbf24;--acc:#a78bfa}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:19px;margin:0 0 2px;letter-spacing:.02em}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:20px}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--dim);cursor:pointer;transition:.15s;background:var(--panel)}
+  .drop:hover,.drop.over{border-color:var(--acc);color:var(--ink)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:0 0 12px;font-weight:600}
+  img#pic{width:100%;image-rendering:pixelated;border-radius:8px;background:#000;display:block}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .row:last-child{border-bottom:0}
+  .row b{font-weight:600;color:var(--dim);flex:0 0 auto}
+  .row span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;text-align:right;word-break:break-all;min-width:0}
+  .verdict{font-weight:700;padding:10px 12px;border-radius:8px;margin-bottom:12px;font-size:14px}
+  .verdict.ok{background:rgba(74,222,128,.12);color:var(--ok);border:1px solid rgba(74,222,128,.3)}
+  .verdict.bad{background:rgba(248,113,113,.12);color:var(--bad);border:1px solid rgba(248,113,113,.3)}
+  .tier{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .tier.common{background:#2a2f3d;color:#9aa3b8}.tier.uncommon{background:rgba(74,222,128,.15);color:var(--ok)}
+  .tier.rare{background:rgba(167,139,250,.16);color:var(--acc)}
+  .tier.holo{background:linear-gradient(90deg,#fbbf24,#a78bfa,#4ade80);color:#0b0d12}
+  ul.key{list-style:none;padding:0;margin:0;font-size:13px}
+  ul.key li{padding:6px 0;border-bottom:1px solid var(--line)}
+  ul.key li:last-child{border-bottom:0}
+  ul.key code{color:var(--acc);font-size:12px}
+  button{background:var(--acc);color:#0b0d12;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:13px}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  input[type=text]{width:100%;background:#0b0d12;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 11px;font-family:ui-monospace,monospace;font-size:12px}
+  iframe{width:100%;height:420px;border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:12px}
+  .muted{color:var(--dim);font-size:12px}
+  .warn{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--gold);padding:10px 12px;border-radius:8px;font-size:12.5px;margin-top:12px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>fallkard reader <span class="muted">· CARD-SPEC v0.1</span></h1>
+  <div class="sub">Drop a card. It decodes, verifies the seal, and prints the reading key. Nothing runs until you say so.</div>
+
+  <div class="drop" id="drop">drop a card .png here — or click to choose<input type="file" id="file" accept="image/png" hidden></div>
+
+  <div id="out" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>the eye</h2>
+        <img id="pic" alt="the card">
+        <div id="fluency" style="margin-top:14px">
+          <h2 style="margin-bottom:8px">fluency check</h2>
+          <div class="muted" style="margin-bottom:8px">Read the picture first. Predict its tags, then reveal.</div>
+          <input type="text" id="guess" placeholder="owl:high-left,rose:purple:5,geo:depth3">
+          <div style="margin-top:9px;display:flex;gap:8px">
+            <button id="reveal">reveal</button>
+            <button id="skip" class="ghost">skip</button>
+          </div>
+          <div id="score" class="muted" style="margin-top:9px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>the manifest</h2>
+        <div id="verdict" class="verdict"></div>
+        <div id="rows"></div>
+        <div id="keyblock" class="hidden" style="margin-top:14px">
+          <h2>the reading key — what this card claims</h2>
+          <ul class="key" id="key"></ul>
+        </div>
+        <div id="hatchblock" style="margin-top:14px"></div>
+      </div>
+    </div>
+    <div id="frame"></div>
+  </div>
+</div>
+
+<script>
+// ── CARD-SPEC v0.1 · the reading key. Tunable vocabulary, fixed mechanism. ──────────
+const KEY = {
+  owl:  (v) => `owl ${v.replace('-', ' ')} — witness weight: ${/high/.test(v) ? 'witness-heavy (strong κ)' : 'light witness'}; owl present ⇒ this build has a verify pass`,
+  rose: (v, n) => `roses ${v}${n ? ' ×' + n : ''} — solids firing: ${v.split('+').join(', ')}${n ? `; ${n} of 5 lifecycle stages held` : ''}`,
+  geo:  (v) => `background lattice ${v} — provenance depth ${String(v).replace(/\D/g, '') || '0'}`,
+  plasma: (v) => `${v} filaments — payload size band ${v}`,
+  wings: (v) => `${v} wings — ${/galaxy/.test(v) ? 'sovereign: fully local, zero dependencies' : 'dependent on an external service'}`,
+};
+const decodeTags = (tags) => (tags || '').split(',').map(s => s.trim()).filter(Boolean).map(t => {
+  const [k, a, b] = t.split(':');
+  return KEY[k] ? KEY[k](a || '', b || '') : `${k}: ${[a, b].filter(Boolean).join(':')} (unknown element — not in CARD-SPEC v0.1)`;
+});
+
+// ── PNG chunk reading (browser) ────────────────────────────────────────────────────
+const SIG = [0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a];
+function chunks(buf){
+  const b = new Uint8Array(buf), dv = new DataView(buf);
+  for (let i=0;i<8;i++) if (b[i]!==SIG[i]) throw new Error('not a PNG');
+  const out=[]; let off=8;
+  while (off+8<=b.length){
+    const len=dv.getUint32(off);
+    const type=String.fromCharCode(b[off+4],b[off+5],b[off+6],b[off+7]);
+    out.push({type,data:b.subarray(off+8,off+8+len)});
+    off+=12+len;
+    if(type==='IEND') break;
+  }
+  return out;
+}
+const latin1 = (u8) => Array.from(u8, c => String.fromCharCode(c)).join('');
+async function inflate(u8, fmt){
+  const ds = new DecompressionStream(fmt);
+  const buf = await new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer();
+  return new Uint8Array(buf);
+}
+async function textChunk(cs, keyword){
+  for (const c of cs){
+    if (c.type!=='tEXt' && c.type!=='zTXt') continue;
+    const nul = c.data.indexOf(0);
+    if (nul<0 || latin1(c.data.subarray(0,nul))!==keyword) continue;
+    if (c.type==='tEXt') return latin1(c.data.subarray(nul+1));
+    return latin1(await inflate(c.data.subarray(nul+2),'deflate'));   // zTXt = zlib
+  }
+  return null;
+}
+const sha256hex = async (u8) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',u8)))
+  .map(x=>x.toString(16).padStart(2,'0')).join('');
+
+// ── state + UI ─────────────────────────────────────────────────────────────────────
+let CURRENT = null;
+const $ = (id) => document.getElementById(id);
+
+async function load(file){
+  const buf = await file.arrayBuffer();
+  $('pic').src = URL.createObjectURL(file);
+  $('out').classList.remove('hidden');
+  $('frame').innerHTML=''; $('score').textContent=''; $('guess').value='';
+  $('fluency').classList.remove('hidden'); $('keyblock').classList.add('hidden');
+
+  let cs; try { cs = chunks(buf); } catch(e){ return fail('not a PNG'); }
+  const manifestRaw = await textChunk(cs,'konomi-manifest');
+  const payloadB64  = await textChunk(cs,'konomi-payload');
+
+  if (!manifestRaw){
+    // §7 fallback — chunks stripped by a platform. Verify by the visible seal instead.
+    return fail('no-manifest', 'This card carries no manifest chunk — a platform may have stripped it on upload. '
+      + 'Per CARD-SPEC §7, resolve the payload by the card\'s visible seal hash via a local manifest or fall-registry.');
+  }
+  let m; try { m = JSON.parse(manifestRaw); } catch { return fail('bad-manifest'); }
+  if (!payloadB64) return fail('no-payload','The manifest is present but the payload chunk is gone.', m);
+
+  const payload = Uint8Array.from(atob(payloadB64), c=>c.charCodeAt(0));
+  const actual = await sha256hex(payload);
+  const ok = actual === m.seal;
+  CURRENT = {m, payload, ok, actual};
+  render();
+}
+
+function fail(reason, note, m){
+  CURRENT = null;
+  $('verdict').className='verdict bad';
+  $('verdict').textContent = '✗ ' + reason.toUpperCase();
+  $('rows').innerHTML = m ? rowsHtml(m) : '';
+  $('hatchblock').innerHTML = note ? `<div class="warn">${note}</div>` : '';
+  $('fluency').classList.add('hidden');
+}
+
+const row = (k,v) => `<div class="row"><b>${k}</b><span>${v}</span></div>`;
+function rowsHtml(m, actual){
+  return row('seal', m.seal||'—')
+    + (actual && actual!==m.seal ? row('actual', actual) : '')
+    + row('parent', m.parent || '(root)')
+    + row('tags', m.tags || '(none)')
+    + row('forged', m.forged||'—')
+    + row('assessor_pass', String(m.assessor_pass))
+    + row('rarity', `<span class="tier ${m.rarity||'common'}">${m.rarity||'common'}</span>`);
+}
+
+function render(){
+  const {m, ok, actual} = CURRENT;
+  $('verdict').className = 'verdict ' + (ok?'ok':'bad');
+  $('verdict').textContent = ok ? '✓ VERIFIED — seal matches the payload' : '✗ SEAL MISMATCH — this card has been tampered with';
+  $('rows').innerHTML = rowsHtml(m, actual);
+  $('hatchblock').innerHTML = ok
+    ? `<button id="hatch">hatch the build</button> <span class="muted">opens sandboxed · never automatic</span>`
+    : `<div class="warn">Refusing to hatch: the payload does not match its seal.</div>`;
+  const h = $('hatch');
+  if (h) h.onclick = hatch;
+}
+
+function showKey(){
+  const items = decodeTags(CURRENT?.m.tags);
+  $('key').innerHTML = items.length
+    ? items.map(t=>`<li>${t}</li>`).join('')
+    : '<li class="muted">This card declares no composition tags.</li>';
+  $('keyblock').classList.remove('hidden');
+}
+
+// fluency game — guess the tags from the picture, then compare
+function scoreGuess(guess, actual){
+  const norm = s => new Set((s||'').toLowerCase().split(/[,\s]+/).map(x=>x.trim()).filter(Boolean));
+  const g = norm(guess), a = norm(actual);
+  if (!a.size) return null;
+  let hit = 0; for (const t of a) if (g.has(t)) hit++;
+  return {hit, total:a.size};
+}
+$('reveal').onclick = () => {
+  const s = scoreGuess($('guess').value, CURRENT?.m.tags);
+  $('score').textContent = !s ? 'This card declares no tags to check against.'
+    : s.hit===s.total ? `fluent — you read all ${s.total} elements correctly.`
+    : `${s.hit} of ${s.total} elements read correctly.`;
+  showKey();
+};
+$('skip').onclick = showKey;
+
+// hatch — explicit, user-initiated, sandboxed. Never runs on load.
+async function hatch(){
+  const html = new TextDecoder().decode(await inflate(CURRENT.payload,'gzip'));
+  const f = document.createElement('iframe');
+  f.setAttribute('sandbox','allow-scripts');   // no same-origin: the build cannot reach this page
+  f.srcdoc = html;
+  $('frame').innerHTML = '';
+  $('frame').appendChild(f);
+}
+
+// drop plumbing
+const d = $('drop');
+d.onclick = () => $('file').click();
+$('file').onchange = e => e.target.files[0] && load(e.target.files[0]);
+d.ondragover = e => { e.preventDefault(); d.classList.add('over'); };
+d.ondragleave = () => d.classList.remove('over');
+d.ondrop = e => { e.preventDefault(); d.classList.remove('over'); const f=e.dataTransfer.files[0]; if(f) load(f); };
+</script>
+</body>
+</html>
