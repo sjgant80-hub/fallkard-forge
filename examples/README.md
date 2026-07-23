@@ -3,8 +3,7 @@
 | File | What it is |
 |---|---|
 | `hello.html` | the demo build — the payload |
-| `card-blank.png` | the source card image, **placeholder art** (generated) |
-| `seal-000.png` | the genesis card: `card-blank.png` carrying `hello.html` · depth 0 |
+| `seal-000.png` | the genesis card: `hello.html`, art generated from its own tags · depth 0 |
 | `seal-001-quine.png` | **the quine** — a card carrying `reader.html`, the tool that reads cards · parent = genesis · depth 1 |
 
 ## The lineage
@@ -52,10 +51,12 @@ strings seal-000.png | grep konomi
 The image data is untouched: `seal-000.png` renders pixel-for-pixel identically to
 `card-blank.png`. Only two named text chunks were added before `IEND`.
 
-## A note on the art
+## The art is generated from the key
 
-`card-blank.png` is a **generated placeholder**, not the real card art. Layer 1 (THE EYE) and a
-composition that honestly encodes the reading key are still to come — and per `CARD-SPEC.md` §4,
-a card's tags must honestly describe both its picture and its payload. This example's tags
-describe the *format demo*, so treat them as illustrative of the mechanism rather than as a
-fluency exercise against real art.
+Both cards use : THE EYE is rendered from the same tag string written into the
+manifest, so the picture cannot contradict its declared reading key. Read the quine card —
+owl high-left (witness-heavy), one blue rose (VERIFY firing), a shallow depth-1 lattice, galaxy
+wings (zero-dep sovereign) — and that is an honest description of .
+
+Whether the tags honestly describe the *payload* is still a human judgement; only the
+picture-matches-tags half is mechanical. That is why no tool awards .

@@ -17,6 +17,7 @@ import {
   SPEC_VERSION, PAYLOAD_KEYWORD, MANIFEST_KEYWORD,
 } from './forge.mjs';
 import { loadDeck, walkDepths, auditDeck } from './lineage.mjs';
+import { renderCard, planFromTags, SOLID_COLOURS } from './art.mjs';
 
 // ── a genuine 8×8 RGB PNG, built from scratch so the suite needs no binary fixture
 function makePng(w = 8, h = 8) {
@@ -136,6 +137,54 @@ test('forge stamps the EARNED rarity, not a default', () => {
   assert.equal(forge({ build: BUILD, image: IMAGE, assessorPass: true, depth: 3, readingKeyHonest: true, forged: FORGED }).manifest.rarity, 'holo');
   // depth without a verify pass buys nothing
   assert.equal(forge({ build: BUILD, image: IMAGE, depth: 5, readingKeyHonest: true, forged: FORGED }).manifest.rarity, 'common');
+});
+
+// ── THE EYE · art generated from the reading key (CARD-SPEC §4) ─────────────────────
+const ART_TAGS = 'owl:high-left,rose:purple+red+blue:5,geo:depth3,plasma:9,wings:galaxy';
+
+test('art is deterministic — same tags + seal, same pixels', () => {
+  assert.ok(renderCard({ tags: ART_TAGS, seal: 'abc' }).equals(renderCard({ tags: ART_TAGS, seal: 'abc' })));
+});
+
+test('art is a well-formed PNG', () => {
+  const types = parseChunks(renderCard({ tags: ART_TAGS, seal: 'abc' })).map(c => c.type);
+  assert.deepEqual(types, ['IHDR', 'IDAT', 'IEND']);
+});
+
+test('every tag in the vocabulary measurably changes the picture', () => {
+  // A declared element that renders identically whether present or absent would make the
+  // reading key a lie by omission. This is the Layer-1 conformance rule.
+  const full = renderCard({ tags: ART_TAGS, seal: 's' });
+  for (const key of ['owl', 'rose', 'geo', 'plasma', 'wings']) {
+    const without = renderCard({ tags: ART_TAGS.split(',').filter(t => !t.startsWith(key + ':')).join(','), seal: 's' });
+    assert.ok(!full.equals(without), `dropping "${key}" must visibly change the art`);
+  }
+});
+
+test('owl position and rose count are read from the tags, not invented', () => {
+  const p = planFromTags(ART_TAGS);
+  assert.equal(p.owl.present, true); assert.equal(p.owl.high, true); assert.equal(p.owl.left, true);
+  assert.deepEqual(p.solids, ['purple', 'red', 'blue']);
+  assert.equal(p.roseCount, 5); assert.equal(p.depth, 3); assert.equal(p.filaments, 9); assert.equal(p.galaxy, true);
+  // moving the owl moves pixels
+  assert.ok(!renderCard({ tags: ART_TAGS, seal: 's' })
+    .equals(renderCard({ tags: ART_TAGS.replace('high-left', 'low-right'), seal: 's' })));
+});
+
+test('the seal varies the art without randomness', () => {
+  assert.ok(!renderCard({ tags: ART_TAGS, seal: 'one' }).equals(renderCard({ tags: ART_TAGS, seal: 'two' })));
+});
+
+test('a generated-art card still forges, verifies and hatches', () => {
+  const art = renderCard({ tags: ART_TAGS, seal: 'x' });
+  const { png } = forge({ build: BUILD, image: art, tags: ART_TAGS, forged: FORGED });
+  const r = read(png);
+  assert.equal(r.ok, true);
+  assert.equal(r.hatch(), BUILD);
+  // the generated picture survives forging untouched
+  const before = parseChunks(art).find(c => c.type === 'IDAT');
+  const after = parseChunks(png).find(c => c.type === 'IDAT');
+  assert.ok(after.data.equals(before.data));
 });
 
 // ── provenance · the depth walk (CARD-SPEC §5) ──────────────────────────────────────

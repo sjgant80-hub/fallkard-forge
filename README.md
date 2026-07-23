@@ -51,6 +51,19 @@ and a card whose payload fails its seal is inadmissible provenance. The tool wil
 `holo`: that needs an honest reading-key match, which is a fluency judgement no program can make,
 so it reports **holo-eligible** and leaves the award to a human.
 
+## THE EYE — art generated from the reading key
+
+```bash
+node art.mjs render --tags "owl:high-left,rose:purple+red+blue:5,geo:depth3,plasma:9,wings:galaxy" --out eye.png
+```
+
+With `--art`, the picture is rendered from the **same tag string** that goes into the manifest, so a
+card whose art contradicts its declared reading key cannot be produced. Owl position sets witness
+weight, rose colours name the solids firing, rose count the stages held, lattice depth the
+provenance, filaments the payload size band, galaxy wings sovereignty. Deterministic — the seal
+seeds the variation, so every card is unique and none of it is random. Every element measurably
+changes the pixels (asserted in the suite); an invisible element would be a key lying by omission.
+
 ## The quine
 
 `examples/seal-001-quine.png` carries `reader.html` — **a card that hatches the reader that reads
@@ -58,7 +71,7 @@ cards.** Its parent is the genesis card, so the deck proves it at depth 1. Const
 and constructed surface are the same object.
 
 ```bash
-npm test    # 15 assertions: round trip, pixel identity, tamper detection, reader conformance
+npm test    # 29 assertions: round trip, pixel identity, tamper detection, provenance, art, reader conformance
 ```
 
 ## What is guaranteed

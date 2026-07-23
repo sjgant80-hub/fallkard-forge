@@ -84,6 +84,25 @@ describe *both* the picture and the payload. A card whose picture claims one thi
 payload is another is a lie in a format whose entire premise is legibility. Such a card fails the
 fluency check and does not qualify for `holo` at any depth.
 
+### Generated art — integrity by construction
+
+That rule has two halves, and one of them can be enforced mechanically.
+
+1. **Do the tags describe the payload?** A human judgement. No tool can make it.
+2. **Does the picture match the tags?** Enforceable — if the picture is *generated from* them.
+
+`art.mjs` renders THE EYE from the same tag string that goes into the manifest (`forge --art`),
+seeded by the seal so each card is unique without being random. A card whose art contradicts its
+own declared reading key therefore cannot be produced at all. Integrity stops being a promise the
+forger keeps and becomes a property of the pipeline.
+
+**Layer-1 conformance rule:** *every element in the published vocabulary must measurably change
+the pixels.* An element that renders identically whether present or absent is a reading key lying
+by omission. This is asserted in `test.mjs` for all five elements.
+
+Hand-drawn art remains fully supported (`forge --image yours.png`) — it simply carries the human
+half of the guarantee rather than the mechanical one.
+
 ## 5 · Rarity — earned and verifiable
 
 ```
