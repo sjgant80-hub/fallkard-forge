@@ -1,0 +1,12 @@
+<!doctype html><meta charset=utf-8><title>hatched · fallkard demo</title>
+<body style="margin:0;font:16px/1.6 system-ui,sans-serif;background:#0b0d12;color:#e8eaf0;padding:32px">
+<h1 style="margin:0 0 6px">hatched ✓</h1>
+<p style="color:#8b93a7;margin:0 0 18px">This build travelled inside a PNG, in a declared text chunk. Nothing was hidden.</p>
+<div style="border:1px solid #232838;border-radius:10px;padding:16px;background:#12151d">
+<b>What just happened</b>
+<ol style="color:#8b93a7;margin:8px 0 0;padding-left:20px">
+<li>the reader listed the PNG chunks and found <code>konomi-payload</code></li>
+<li>it hashed the gzipped bytes and matched them against the manifest seal</li>
+<li>you clicked hatch — it gunzipped this file into a sandboxed iframe</li>
+</ol></div>
+<p style="color:#8b93a7;margin-top:18px">Read CARD-SPEC.md and you can forge your own.</p>
