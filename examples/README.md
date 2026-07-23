@@ -6,6 +6,16 @@
 | `seal-000.png` | the genesis card: `hello.html`, art generated from its own tags · depth 0 |
 | `seal-001-quine.png` | **the quine** — a card carrying `reader.html`, the tool that reads cards · parent = genesis · depth 1 |
 
+## Try it
+
+```bash
+node ../forge.mjs read seal-001-quine.png              # verify the seal
+node ../forge.mjs read seal-001-quine.png --hatch out.html
+```
+
+Or open `../reader.html` in a browser and drop a card onto it for the full reveal, including the
+fluency check: read the picture, predict the tags, then reveal.
+
 ## The lineage
 
 ```bash
@@ -23,40 +33,26 @@ Depth 1 is what this deck can honestly prove, so depth 1 is what it claims. Reac
 (depth ≥ 2) means actually forking a card and building on it — not minting filler to inflate a
 number. Manufacturing depth is the one thing the format is built to make visible.
 
-## Try it
-
-```bash
-node ../forge.mjs read seal-000.png            # verify the seal
-node ../forge.mjs read seal-000.png --hatch /tmp/out.html
-```
-
-Or open `../reader.html` in a browser and drop `seal-000.png` onto it — that gives you the full
-reveal, including the fluency check: read the picture, predict the tags, then reveal.
-
-This card's declared tags are:
-
-```
-owl:high-left,rose:purple+red+blue:5,geo:depth1,wings:galaxy
-```
-
 ## Prove nothing is hidden
 
-The payload is announced, not concealed — you can see it with ordinary tooling:
+The payload is announced, not concealed — ordinary tooling shows it:
 
 ```bash
-# the chunk keywords are plain text in the file
 strings seal-000.png | grep konomi
 ```
 
-The image data is untouched: `seal-000.png` renders pixel-for-pixel identically to
-`card-blank.png`. Only two named text chunks were added before `IEND`.
+Only two named text chunks are added, immediately before `IEND`. The image data (`IHDR`/`IDAT`)
+is copied through byte-identical, which the test suite asserts.
 
 ## The art is generated from the key
 
-Both cards use : THE EYE is rendered from the same tag string written into the
-manifest, so the picture cannot contradict its declared reading key. Read the quine card —
-owl high-left (witness-heavy), one blue rose (VERIFY firing), a shallow depth-1 lattice, galaxy
-wings (zero-dep sovereign) — and that is an honest description of .
+Both cards were forged with `--art`: THE EYE is rendered from the same tag string that is written
+into the manifest, so a card whose picture contradicts its declared reading key cannot be
+produced at all.
 
-Whether the tags honestly describe the *payload* is still a human judgement; only the
-picture-matches-tags half is mechanical. That is why no tool awards .
+Read the quine card and check it yourself — owl high-left (witness-heavy), one blue rose (VERIFY
+firing), a shallow depth-1 lattice, galaxy wings (zero-dep sovereign). That is an honest
+description of `reader.html`: a verifier, zero dependencies, one fork deep.
+
+Whether the tags honestly describe the *payload* remains a human judgement; only the
+picture-matches-tags half is mechanical. That is why no tool ever awards `holo`.
