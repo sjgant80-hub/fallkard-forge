@@ -4,7 +4,25 @@
 |---|---|
 | `hello.html` | the demo build — the payload |
 | `card-blank.png` | the source card image, **placeholder art** (generated) |
-| `seal-000.png` | the finished card: `card-blank.png` carrying `hello.html` |
+| `seal-000.png` | the genesis card: `card-blank.png` carrying `hello.html` · depth 0 |
+| `seal-001-quine.png` | **the quine** — a card carrying `reader.html`, the tool that reads cards · parent = genesis · depth 1 |
+
+## The lineage
+
+```bash
+node ../lineage.mjs audit .
+```
+
+```
+depth  status   claimed   provable   card
+1      linked   uncommon  uncommon   seal-001-quine.png
+0      root     uncommon  uncommon   seal-000.png
+✓ every claimed tier is backed by the deck
+```
+
+Depth 1 is what this deck can honestly prove, so depth 1 is what it claims. Reaching `rare`
+(depth ≥ 2) means actually forking a card and building on it — not minting filler to inflate a
+number. Manufacturing depth is the one thing the format is built to make visible.
 
 ## Try it
 

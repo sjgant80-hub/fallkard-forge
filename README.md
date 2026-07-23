@@ -41,6 +41,23 @@ Open `reader.html` in a browser and drop a card on it for the full reveal ritual
 **fluency check**: predict the tags from the picture alone, then reveal and see how you scored.
 
 ```bash
+# walk a deck's fork-lineage and check every claimed tier against what it can prove
+node lineage.mjs audit examples
+```
+
+The lineage walker computes depth from `parent` links and reports **overclaims** — any card
+asserting a tier the deck cannot show. An absent ancestor proves nothing, a cycle proves nothing,
+and a card whose payload fails its seal is inadmissible provenance. The tool will never *award*
+`holo`: that needs an honest reading-key match, which is a fluency judgement no program can make,
+so it reports **holo-eligible** and leaves the award to a human.
+
+## The quine
+
+`examples/seal-001-quine.png` carries `reader.html` — **a card that hatches the reader that reads
+cards.** Its parent is the genesis card, so the deck proves it at depth 1. Construction material
+and constructed surface are the same object.
+
+```bash
 npm test    # 15 assertions: round trip, pixel identity, tamper detection, reader conformance
 ```
 

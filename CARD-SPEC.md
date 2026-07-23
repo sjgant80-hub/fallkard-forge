@@ -97,6 +97,26 @@ Depth is walked from `parent` links across the card graph. Rarity is **computed,
 asserted** — `forge()` stamps the tier it can prove. Depth without a verify pass buys nothing.
 This is a real holo: openly special because it is checkable, not scarce because someone said so.
 
+**Depth must be PROVEN by a deck, not claimed by a card.** `lineage.mjs` walks the graph and
+reports what the deck can actually show:
+
+| status | meaning | depth earned |
+|---|---|---|
+| `root` | `parent: null` | 0 |
+| `linked` | parent present in the deck | parent + 1 |
+| `orphan` | parent declared but **absent** — the chain cannot be shown | **0** |
+| `cycle` | card reachable from itself | none (flagged) |
+| `broken-seal` | payload does not match its seal | none — inadmissible |
+
+An unprovable ancestor buys nothing. A card claiming a tier above what the deck proves is
+reported as an **overclaim** — the anti-polonium check at the provenance layer, since a card that
+says one thing and is another is precisely what this format exists to make impossible.
+
+**`holo` cannot be awarded by a tool.** Its fourth condition — an honest reading-key match — is a
+fluency judgement about whether the picture truly describes the payload, and no program can make
+it. A conformant tool may report a card as **holo-eligible** (verify pass + depth ≥ 3) and must
+leave the award to human attestation. `lineage.mjs` never returns `holo` as a provable tier.
+
 ## 6 · Hatching
 
 The reader **never auto-runs a payload.** Hatching is explicit and user-initiated, and the build

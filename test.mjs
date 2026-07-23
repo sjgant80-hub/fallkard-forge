@@ -8,12 +8,15 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { deflateSync } from 'node:zlib';
 import {
   forge, read, rarity, parseChunks, makeChunk, serialise, sha256,
   SPEC_VERSION, PAYLOAD_KEYWORD, MANIFEST_KEYWORD,
 } from './forge.mjs';
+import { loadDeck, walkDepths, auditDeck } from './lineage.mjs';
 
 // ── a genuine 8×8 RGB PNG, built from scratch so the suite needs no binary fixture
 function makePng(w = 8, h = 8) {
@@ -133,6 +136,127 @@ test('forge stamps the EARNED rarity, not a default', () => {
   assert.equal(forge({ build: BUILD, image: IMAGE, assessorPass: true, depth: 3, readingKeyHonest: true, forged: FORGED }).manifest.rarity, 'holo');
   // depth without a verify pass buys nothing
   assert.equal(forge({ build: BUILD, image: IMAGE, depth: 5, readingKeyHonest: true, forged: FORGED }).manifest.rarity, 'common');
+});
+
+// ── provenance · the depth walk (CARD-SPEC §5) ──────────────────────────────────────
+// Rarity must be EARNED. These decks are synthetic because the honest example deck only
+// reaches depth 1 — fabricating cards to manufacture depth is exactly what the format forbids.
+function deck(cards) {
+  const dir = mkdtempSync(join(tmpdir(), 'fallkard-'));
+  const seals = {};
+  for (const c of cards) {
+    const { png, manifest } = forge({
+      build: c.build || `<!doctype html><title>${c.name}</title>`,
+      image: IMAGE,
+      parent: c.parent ? (seals[c.parent] || c.parent) : null,
+      assessorPass: c.assessorPass !== false,
+      rarity: c.rarity,
+      forged: FORGED,
+    });
+    seals[c.name] = manifest.seal;
+    let bytes = png;
+    if (c.corrupt) {
+      // Falsify the CLAIMED seal, leaving the payload decodable — otherwise the chunk simply
+      // fails to inflate and the card is unreadable rather than mis-sealed, which is a
+      // different failure. This is the card that decodes fine and lies about its hash.
+      const cs = parseChunks(png);
+      const i = cs.findIndex(x => x.type === 'tEXt'
+        && x.data.toString('latin1', 0, x.data.indexOf(0)) === MANIFEST_KEYWORD);
+      const nul = cs[i].data.indexOf(0);
+      const m = JSON.parse(cs[i].data.toString('latin1', nul + 1));
+      m.seal = (m.seal[0] === '0' ? '1' : '0') + m.seal.slice(1);
+      cs[i] = { type: 'tEXt', data: Buffer.concat([
+        Buffer.from(MANIFEST_KEYWORD, 'latin1'), Buffer.from([0]),
+        Buffer.from(JSON.stringify(m), 'latin1')]) };
+      bytes = serialise(cs);
+    }
+    writeFileSync(join(dir, `${c.name}.png`), bytes);
+  }
+  return { dir, seals, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
+}
+
+test('depth is walked from parent links, root = 0', () => {
+  const d = deck([{ name: 'a' }, { name: 'b', parent: 'a' }, { name: 'c', parent: 'b' }, { name: 'e', parent: 'c' }]);
+  try {
+    const byName = Object.fromEntries(auditDeck(d.dir).rows.map(r => [r.name.replace('.png', ''), r]));
+    assert.equal(byName.a.depth, 0); assert.equal(byName.a.status, 'root');
+    assert.equal(byName.b.depth, 1); assert.equal(byName.c.depth, 2); assert.equal(byName.e.depth, 3);
+    assert.equal(byName.e.status, 'linked');
+  } finally { d.cleanup(); }
+});
+
+test('an absent ancestor proves nothing — orphans earn no depth', () => {
+  const d = deck([{ name: 'lonely', parent: 'f'.repeat(64) }]);
+  try {
+    const r = auditDeck(d.dir).rows[0];
+    assert.equal(r.status, 'orphan');
+    assert.equal(r.depth, 0, 'an unprovable chain must not grant depth');
+    assert.equal(r.provable, 'uncommon', 'only the verify pass counts, not the claimed ancestor');
+  } finally { d.cleanup(); }
+});
+
+test('rarity tiers are proven by the deck, not asserted by the card', () => {
+  const d = deck([{ name: 'a' }, { name: 'b', parent: 'a' }, { name: 'c', parent: 'b' }]);
+  try {
+    const byName = Object.fromEntries(auditDeck(d.dir).rows.map(r => [r.name.replace('.png', ''), r]));
+    assert.equal(byName.a.provable, 'uncommon');   // depth 0 + pass
+    assert.equal(byName.b.provable, 'uncommon');   // depth 1 — still not enough
+    assert.equal(byName.c.provable, 'rare');       // depth 2 + pass
+  } finally { d.cleanup(); }
+});
+
+test('an overclaimed tier is caught', () => {
+  const d = deck([{ name: 'liar', rarity: 'holo' }]);        // claims holo at depth 0
+  try {
+    const a = auditDeck(d.dir);
+    assert.equal(a.overclaims.length, 1);
+    assert.equal(a.overclaims[0].claimed, 'holo');
+    assert.equal(a.overclaims[0].provable, 'uncommon');
+  } finally { d.cleanup(); }
+});
+
+test('the tool never AWARDS holo — it only reports eligibility', () => {
+  const d = deck([{ name: 'a' }, { name: 'b', parent: 'a' }, { name: 'c', parent: 'b' }, { name: 'e', parent: 'c' }]);
+  try {
+    const e = auditDeck(d.dir).rows.find(r => r.name.startsWith('e'));
+    assert.equal(e.depth, 3);
+    assert.equal(e.holoEligible, true, 'mechanical half is satisfied');
+    assert.equal(e.provable, 'rare', 'holo needs an honest reading-key match — a fluency judgement no tool can make');
+  } finally { d.cleanup(); }
+});
+
+test('a broken seal is not admissible provenance', () => {
+  const d = deck([{ name: 'tampered', corrupt: true }]);
+  try {
+    const a = auditDeck(d.dir);
+    assert.equal(a.broken.length, 1);
+    assert.equal(a.broken[0].provable, 'common', 'a card that fails its seal earns nothing');
+  } finally { d.cleanup(); }
+});
+
+test('a lineage cycle is detected rather than looping forever', () => {
+  // hand-build the cycle: two cards naming each other, which forging alone cannot produce
+  const dir = mkdtempSync(join(tmpdir(), 'fallkard-cyc-'));
+  try {
+    const one = forge({ build: '<p>one', image: IMAGE, forged: FORGED });
+    const two = forge({ build: '<p>two', image: IMAGE, parent: one.manifest.seal, forged: FORGED });
+    const oneCycled = forge({ build: '<p>one', image: IMAGE, parent: two.manifest.seal, forged: FORGED });
+    writeFileSync(join(dir, 'one.png'), oneCycled.png);
+    writeFileSync(join(dir, 'two.png'), two.png);
+    const a = auditDeck(dir);
+    assert.ok(a.cycles.length >= 1, 'a card reachable from itself must be flagged');
+    for (const c of a.cycles) assert.equal(c.provable, 'common', 'a cycle proves no depth');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('the shipped example deck is honest — no overclaims, no cycles, no broken seals', () => {
+  const a = auditDeck(new URL('./examples', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
+  assert.equal(a.overclaims.length, 0);
+  assert.equal(a.cycles.length, 0);
+  assert.equal(a.broken.length, 0);
+  const quine = a.rows.find(r => r.name.includes('quine'));
+  assert.ok(quine, 'the quine card ships in the deck');
+  assert.equal(quine.depth, 1, 'the quine descends from the genesis card');
 });
 
 // ── reader conformance (CARD-SPEC §6 and §8) ────────────────────────────────────────
