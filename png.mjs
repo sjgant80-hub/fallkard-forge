@@ -4,7 +4,7 @@
 // Extracted so forge.mjs (which writes card chunks) and art.mjs (which writes a fresh raster)
 // can share it without importing each other. A circular import between those two deadlocks
 // under top-level await, and duplicating the chunk code would invite exactly the copy-paste
-// drift this estate pins against. One module, two consumers, no cycle.
+// drift that a single shared module avoids. One module, two consumers, no cycle.
 //
 // Zero dependencies.
 // ════════════════════════════════════════════════════════════════
