@@ -1,0 +1,42 @@
+name: gate
+
+# The card claims a tier that is supposed to be EARNED. That claim is only worth something if
+# somebody who is not the author can re-run the check on hardware the author does not own.
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ⚑ PINNED. An unpinned checker can change its rules between the run that passed and the run
+      # you are citing.
+      - name: Fetch witness @v0.2
+        run: git clone --depth 1 --branch v0.2 https://github.com/sjgant80-hub/witness.git .witness
+
+      - name: Tests must pass before anything is mutated
+        run: node card.test.mjs
+
+      - name: Mutation gate
+        run: node .witness/witness.mjs mutate card.mjs --cap 400 --baseline witness.card.baseline.json --test "node card.test.mjs" | tee gate.out
+
+      - name: Refuse anything short of clean
+        run: |
+          node -e "
+            const out = require('fs').readFileSync('gate.out','utf8');
+            const m = /\"clean\":\s*(true|false)/.exec(out);
+            if (!m) { console.error('the gate produced no verdict at all'); process.exit(1); }
+            if (m[1] !== 'true') { console.error('mutants survived — those lines are test-theatre'); process.exit(1); }
+            console.log('gate clean');
+          "
+
+      # ⚑ THE PAGE MUST CARRY THE KERNEL THAT WAS JUST GATED, or the gate is green about a file the
+      # Forge does not use — the most comfortable kind of lie.
+      - name: The shipped page must match the gated kernel
+        run: |
+          node build-page.mjs
+          git diff --exit-code index.html || (echo "index.html is stale — run node build-page.mjs and commit it" && exit 1)

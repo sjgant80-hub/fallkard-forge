@@ -1,0 +1,14 @@
+[
+  {
+    "line": 21,
+    "mutation": "< → <=",
+    "snippet": "for (let n = 0; n < 256; n++) {",
+    "reason": "Equivalent because the target is a typed array. This builds the CRC32 lookup table into a Uint32Array(256); running one extra iteration computes a 257th value and writes it to index 256, and an out-of-range write on a typed array is silently discarded rather than growing the array or throwing. Every index the table is ever read at (0-255, via a byte masked with 0xFF) holds the same value either way. The table's correctness is pinned directly by the standard CRC32 vector for \"123456789\" in section 3, which would fail immediately if any in-range entry were wrong."
+  },
+  {
+    "line": 38,
+    "mutation": "< → <=",
+    "snippet": "const bytes = (str) => { const u = new Uint8Array(str.length); for (let i = 0; i < str.len",
+    "reason": "Equivalent for the same reason, one layer along. The extra iteration reads str.charCodeAt(str.length), which is NaN, masks it to 0, and writes that to u[str.length] — one past the end of a Uint8Array sized to the string, so the write is discarded. The returned array's length is fixed at construction and is unaffected, so no caller can observe a difference. Round-tripping through bytes() and latin1() is asserted throughout sections 5 to 8."
+  }
+]

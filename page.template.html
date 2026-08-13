@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Forge · a picture that carries a real build</title>
+<meta name="description" content="Put a working build inside a PNG. It is still a picture — and anyone can open it and get the build back out. Runs entirely in your browser.">
+<style>
+ :root{--bg:#0b0a09;--panel:#151210;--line:#2c2721;--ink:#ece2cc;--dim:#a1988a;--faint:#6f675b;
+   --gold:#c9a227;--soft:#e6cd72;--ok:#5cb98a;--no:#e0616d;
+   --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+ @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fbf8f1;--panel:#fff;--line:#e4dcc9;
+   --ink:#22201c;--dim:#5e564a;--faint:#8b8272;--gold:#8a6a13;--soft:#6d5310}}
+ :root[data-theme="light"]{--bg:#fbf8f1;--panel:#fff;--line:#e4dcc9;--ink:#22201c;--dim:#5e564a;--faint:#8b8272;--gold:#8a6a13;--soft:#6d5310}
+ *{box-sizing:border-box}html,body{margin:0}
+ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+ .wrap{max-width:52rem;margin:0 auto;padding:0 1.2rem 5rem}
+ a{color:var(--soft)}
+ header{padding:3.2rem 0 1.4rem;text-align:center}
+ .kick{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 .7rem}
+ h1{font-family:var(--serif);font-size:clamp(2.1rem,7vw,3.4rem);margin:0 0 .5rem;font-weight:500;letter-spacing:.02em;
+   background:linear-gradient(180deg,#f6e8bd,var(--gold) 62%,#8a6c1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+ .lede{font-family:var(--serif);font-size:clamp(1rem,2.5vw,1.22rem);color:var(--dim);max-width:36rem;margin:0 auto;font-style:italic}
+ h2{font-family:var(--serif);font-size:1.35rem;color:var(--gold);margin:2.4rem 0 .3rem;font-weight:500}
+ .sub{color:var(--dim);margin:0 0 .9rem;font-size:.95rem}
+ .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.2rem}
+ label{display:block;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+   color:var(--faint);margin:.8rem 0 .3rem}
+ textarea,input,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;
+   padding:.6rem .7rem;color:var(--ink);font:inherit;font-size:.92rem}
+ textarea{font-family:var(--mono);font-size:.8rem;min-height:8rem;resize:vertical}
+ textarea:focus,input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px}
+ .row{display:flex;gap:.8rem;flex-wrap:wrap}.row>*{flex:1;min-width:9rem}
+ button{background:var(--gold);color:#191510;border:0;border-radius:8px;padding:.6rem 1.2rem;
+   font:inherit;font-weight:600;cursor:pointer;margin-top:1rem}
+ button:hover{background:var(--soft)}
+ button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+ button.ghost:hover{border-color:var(--gold)}
+ .out{margin-top:1.1rem;border-top:1px solid var(--line);padding-top:1rem;display:none}
+ .out.show{display:block}
+ .cardview{display:flex;gap:1.1rem;align-items:flex-start;flex-wrap:wrap}
+ .cardview img{width:180px;border-radius:10px;border:1px solid var(--line);background:#000}
+ .facts{flex:1;min-width:14rem}
+ .fact{display:flex;gap:.6rem;font-size:.86rem;padding:.22rem 0;border-bottom:1px solid var(--line)}
+ .fact b{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);min-width:6.5rem}
+ .fact span{color:var(--ink);word-break:break-all;font-family:var(--mono);font-size:.76rem}
+ .tier{display:inline-block;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+   border:1px solid currentColor;border-radius:5px;padding:.1rem .45rem}
+ .t-common{color:var(--faint)}.t-uncommon{color:var(--ok)}.t-rare{color:var(--soft)}.t-holo{color:#c58bd8}
+ .verdict{font-family:var(--mono);font-size:1.05rem;font-weight:700;padding:.5rem .9rem;border-radius:8px;
+   border:1px solid;display:inline-block}
+ .v-ok{color:var(--ok);border-color:#255c44;background:#0e1f18}
+ .v-no{color:var(--no);border-color:#5e2429;background:#210f11}
+ .note{border-left:3px solid var(--line);padding:.1rem 0 .1rem 1rem;color:var(--dim);margin:1.2rem 0;font-size:.94rem}
+ .note b{color:var(--ink)}
+ .note.warn{border-left-color:var(--gold)}
+ code{font-family:var(--mono);font-size:.85em;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:.05em .3em}
+ .drop{border:2px dashed var(--line);border-radius:12px;padding:1.6rem;text-align:center;color:var(--dim);cursor:pointer}
+ .drop:hover,.drop.over{border-color:var(--gold);color:var(--ink)}
+ footer{margin-top:3rem;padding-top:1.3rem;border-top:1px solid var(--line);color:var(--faint);font-size:.84rem;text-align:center}
+</style></head><body><div class="wrap">
+<header>
+ <p class="kick">Fall World · the Forge</p>
+ <h1>The card that IS the software</h1>
+ <p class="lede">Put a working build inside a picture. It stays a picture — you can post it, save it,
+ send it — and anyone who has it can open it and get the build back out.</p>
+</header>
+
+<h2>Forge one</h2>
+<p class="sub">Type anything below. It gets compressed, sealed with a hash, and tucked inside a real PNG.</p>
+<div class="panel">
+  <label for="build">the build — any text, or paste a whole HTML file</label>
+  <textarea id="build" spellcheck="false">&lt;!doctype html&gt;
+&lt;h1&gt;hello from inside a picture&lt;/h1&gt;
+&lt;p&gt;This whole file came out of a PNG.&lt;/p&gt;</textarea>
+  <div class="row">
+    <div><label for="tags">tags</label><input id="tags" value="owl:high-left,rose:blue:1" spellcheck="false"></div>
+    <div><label for="depth">how deep in a lineage</label>
+      <select id="depth"><option>0</option><option>1</option><option>2</option><option selected>3</option></select></div>
+  </div>
+  <div class="row">
+    <div><label for="assessor">did it pass the assessor</label>
+      <select id="assessor"><option value="yes" selected>yes</option><option value="no">no</option></select></div>
+    <div><label for="honest">reading key honest</label>
+      <select id="honest"><option value="yes" selected>yes</option><option value="no">no</option></select></div>
+  </div>
+  <button id="forge">Forge the card</button>
+  <button id="dl" class="ghost" style="display:none">Download the PNG</button>
+  <div class="out" id="forgeOut">
+    <div class="cardview">
+      <img id="preview" alt="the forged card">
+      <div class="facts" id="forgeFacts"></div>
+    </div>
+  </div>
+</div>
+
+<p class="note warn"><b>The tier is worked out, not chosen.</b> Passing the assessor is the floor —
+set it to <i>no</i> and the card comes out <code>common</code> however deep the lineage or how honest
+the key. That is the whole point of a card: you cannot claim a grade, only earn one.</p>
+
+<h2>Read one back</h2>
+<p class="sub">Drop the card you just downloaded — or any PNG — and see what it is really carrying.</p>
+<div class="panel">
+  <div class="drop" id="drop">Drop a PNG here, or click to choose one
+    <input type="file" id="file" accept="image/png" style="display:none"></div>
+  <div class="out" id="readOut">
+    <div id="verdictWrap"></div>
+    <div class="facts" id="readFacts" style="margin-top:1rem"></div>
+    <label for="recovered" id="recLabel" style="display:none">the build that came back out</label>
+    <textarea id="recovered" readonly style="display:none"></textarea>
+  </div>
+</div>
+
+<h2>Why it cannot be faked</h2>
+<p class="note"><b>The seal is a hash of the compressed build.</b> Change one byte of what is inside
+and the seal stops matching, and this page tells you so. Nobody has to be trusted — the check is
+re-run in front of you, on your own machine.</p>
+<p class="note"><b>It is still a real PNG.</b> The build rides in the text chunks every PNG is allowed
+to carry, so a picture viewer shows a picture and ignores the rest. Nothing is hidden or smuggled —
+the chunks are named, and the whole point is that anybody can look.</p>
+<p class="note"><b>Nothing leaves your browser.</b> Compressing, hashing and reading all happen here.
+There is no server to send it to.</p>
+
+<footer>
+ <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, which is mutation-gated
+ on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
+ <a href="https://github.com/sjgant80-hub/fallkard-forge">source</a></p>
+</footer>
+</div>
+<script type="module">
+/* __CARD_KERNEL__ */
+/* __END_CARD_KERNEL__ */
+
+const $ = s => document.querySelector(s);
+const TODAY = new Date().toISOString().slice(0, 10);
+
+// ── the two impure steps, from the browser itself ────────────────────────────────────────────────
+// The kernel takes no crypto and no compression on purpose, so it can be tested without either.
+// These are what the page hands it.
+async function gzip(u8) {
+  const cs = new CompressionStream('gzip');
+  const w = cs.writable.getWriter(); w.write(u8); w.close();
+  return new Uint8Array(await new Response(cs.readable).arrayBuffer());
+}
+async function gunzip(u8) {
+  const ds = new DecompressionStream('gzip');
+  const w = ds.writable.getWriter(); w.write(u8); w.close();
+  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+}
+const sha256hex = async (u8) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', u8)))
+  .map(b => b.toString(16).padStart(2, '0')).join('');
+const b64 = (u8) => btoa(Array.from(u8, c => String.fromCharCode(c)).join(''));
+const unb64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+// ── the artwork ──────────────────────────────────────────────────────────────────────────────────
+// Drawn from the tags so two different builds do not look identical. Canvas gives us a real PNG to
+// put the chunks into; the kernel never has to know how to draw.
+function drawCard(tags, seal) {
+  const c = document.createElement('canvas');
+  c.width = 440; c.height = 616;
+  const x = c.getContext('2d');
+  let h = 0; for (const ch of (tags + seal)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const hue = h % 360;
+  const g = x.createLinearGradient(0, 0, 0, 616);
+  g.addColorStop(0, `hsl(${hue} 45% 22%)`); g.addColorStop(1, `hsl(${(hue + 40) % 360} 40% 8%)`);
+  x.fillStyle = g; x.fillRect(0, 0, 440, 616);
+  x.strokeStyle = `hsl(${hue} 60% 60%)`; x.lineWidth = 3; x.strokeRect(14, 14, 412, 588);
+  for (let i = 0; i < 90; i++) {
+    const a = (h >> (i % 24)) % 360, r = 40 + ((h >> (i % 11)) % 200);
+    x.beginPath();
+    x.arc(220 + Math.cos(a) * r * .7, 300 + Math.sin(a) * r * .7, 1 + (i % 4), 0, 7);
+    x.fillStyle = `hsl(${(hue + i * 3) % 360} 70% ${45 + (i % 30)}%)`; x.fill();
+  }
+  x.fillStyle = '#f3e6c2'; x.font = '600 25px Georgia, serif';
+  x.fillText('konomi card', 34, 74);
+  x.font = '13px ui-monospace, monospace'; x.fillStyle = '#d9cba4';
+  x.fillText(seal.slice(0, 24), 34, 566);
+  x.fillText(tags.slice(0, 40), 34, 586);
+  return new Promise(res => c.toBlob(b => b.arrayBuffer().then(ab => res(new Uint8Array(ab))), 'image/png'));
+}
+
+const fact = (k, v) => `<div class="fact"><b>${k}</b><span>${v}</span></div>`;
+const tierChip = (t) => `<span class="tier t-${t}">${t}</span>`;
+
+// ── forge ────────────────────────────────────────────────────────────────────────────────────────
+let forged = null;
+$('#forge').addEventListener('click', async () => {
+  const text = $('#build').value;
+  const tags = $('#tags').value;
+  const opts = {
+    assessorPass: $('#assessor').value === 'yes',
+    depth: Number($('#depth').value),
+    readingKeyHonest: $('#honest').value === 'yes',
+  };
+  const payload = await gzip(new TextEncoder().encode(text));
+  const seal = await sha256hex(payload);
+  const manifest = manifestFor({ ...opts, seal, tags, forged: TODAY });
+  const art = await drawCard(tags, seal);
+  forged = embed(art, b64(payload), manifest);
+
+  const url = URL.createObjectURL(new Blob([forged], { type: 'image/png' }));
+  $('#preview').src = url;
+  $('#forgeFacts').innerHTML =
+    fact('tier', tierChip(manifest.rarity)) +
+    fact('seal', seal) +
+    fact('build', text.length + ' chars → ' + payload.length + ' bytes packed') +
+    fact('card', forged.length + ' bytes of PNG') +
+    fact('tags', manifest.tags || '(none)') +
+    fact('forged', manifest.forged);
+  $('#forgeOut').classList.add('show');
+  $('#dl').style.display = 'inline-block';
+});
+
+$('#dl').addEventListener('click', () => {
+  if (!forged) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([forged], { type: 'image/png' }));
+  a.download = 'konomi-card.png'; a.click();
+});
+
+// ── read ─────────────────────────────────────────────────────────────────────────────────────────
+const drop = $('#drop');
+drop.addEventListener('click', () => $('#file').click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) inspect(e.dataTransfer.files[0]); });
+$('#file').addEventListener('change', e => { if (e.target.files[0]) inspect(e.target.files[0]); });
+
+async function inspect(file) {
+  const u8 = new Uint8Array(await file.arrayBuffer());
+  $('#readOut').classList.add('show');
+  $('#recovered').style.display = 'none'; $('#recLabel').style.display = 'none';
+
+  let r;
+  try { r = read(u8); }
+  catch (e) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT A CARD</span>`;
+    $('#readFacts').innerHTML = fact('why', e.message);
+    return;
+  }
+  if (!r.isCard) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NO BUILD INSIDE</span>`;
+    $('#readFacts').innerHTML = fact('why', r.reason);
+    return;
+  }
+
+  // ⚑ THE SEAL IS RE-COMPUTED, NEVER READ BACK AND BELIEVED. Hashing the payload we actually found
+  // and comparing is the entire trust story; taking the manifest's word for it would prove nothing.
+  const payload = unb64(r.payloadB64);
+  const actual = await sha256hex(payload);
+  const authentic = actual === r.manifest.seal;
+
+  let text = '';
+  try { text = new TextDecoder().decode(await gunzip(payload)); }
+  catch { text = '(the payload is there but would not decompress)'; }
+
+  $('#verdictWrap').innerHTML = authentic
+    ? `<span class="verdict v-ok">AUTHENTIC</span>`
+    : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
+  $('#readFacts').innerHTML =
+    fact('tier', tierChip(r.manifest.rarity || 'common')) +
+    fact('claimed', r.manifest.seal) +
+    fact('actual', actual) +
+    fact('verdict', authentic
+      ? 'the build inside is exactly what was sealed'
+      : 'the build inside has been changed since it was sealed') +
+    fact('tags', r.manifest.tags || '(none)') +
+    fact('forged', r.manifest.forged || '(not stated)') +
+    fact('spec', 'v' + (r.manifest.v || '?'));
+  $('#recovered').value = text;
+  $('#recovered').style.display = 'block';
+  $('#recLabel').style.display = 'block';
+}
+</script>
+</body></html>
