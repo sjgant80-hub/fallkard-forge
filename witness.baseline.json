@@ -1,0 +1,92 @@
+[
+  {
+    "mutation": ">= → >",
+    "snippet": "const arg = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };",
+    "reason": "equivalent by position: argv.indexOf on a flag string can never return 0 — argv[0] is the node executable path, argv[1] the script, the command at 2, flags from 3. The >= exists as ordinary indexOf idiom."
+  },
+  {
+    "mutation": "> → >=",
+    "snippet": "const kw = nul > 0 ? c.data.toString('latin1', 0, nul) : '';",
+    "reason": "equivalent identity: at nul===0 the ternary arms coincide — a latin1 slice of length zero IS the empty string the other arm supplies."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "if (nul < 0) continue;",
+    "reason": "equivalent through the callers: readTextChunk is module-private and both call sites pass a non-empty keyword constant; a NUL at offset 0 denotes the empty keyword, which can never equal either constant, so skipping or scanning that chunk reads the same."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "for (let n = 0; n < 256; n++) {",
+    "reason": "typed-array OOB write is silently discarded: the extra iteration writes t[256], one past the end of a fixed-length Uint32Array — dropped by spec. crc32 only ever indexes the table with a byte (0–255)."
+  },
+  {
+    "mutation": ">= → >",
+    "snippet": "if (x < 0 || y < 0 || x >= c.w || y >= c.h || alpha <= 0) return;",
+    "reason": "equivalent by unreachability, measured: wing-star y spans cy ± (0.30·h + 13) ≈ [110, 506] on the 616-tall canvas, and every other generator (ground loop, rings, weave, roses, owl) is fixed interior geometry — no call site can present y ≥ h. The x edges ARE reachable and are pinned by the hunted seal k0."
+  },
+  {
+    "mutation": ">= → >",
+    "snippet": "const arg = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };",
+    "reason": "equivalent by position: argv.indexOf on a flag string can never return 0 — argv[0] is the node executable path, argv[1] the script, the command at 2, flags from 3. The >= exists as ordinary indexOf idiom."
+  },
+  {
+    "mutation": "<= → <",
+    "snippet": "if (x < 0 || y < 0 || x >= c.w || y >= c.h || alpha <= 0) return;",
+    "reason": "equivalent by arithmetic: the boundary case blends with alpha exactly 0, and px·(1−0)+rgb·0 leaves every channel byte-identical. The fast-out (or the loop bound) only skips work the maths already makes invisible."
+  },
+  {
+    "mutation": "<= → <",
+    "snippet": "for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) {",
+    "reason": "equivalent by arithmetic: the boundary case blends with alpha exactly 0, and px·(1−0)+rgb·0 leaves every channel byte-identical. The fast-out (or the loop bound) only skips work the maths already makes invisible."
+  },
+  {
+    "mutation": "<= → <",
+    "snippet": "for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) {",
+    "reason": "equivalent by arithmetic: the boundary case blends with alpha exactly 0, and px·(1−0)+rgb·0 leaves every channel byte-identical. The fast-out (or the loop bound) only skips work the maths already makes invisible."
+  },
+  {
+    "mutation": "<= → <",
+    "snippet": "if (d <= r) blend(c, Math.round(cx + x), Math.round(cy + y), rgb, alpha * (1 - d / r) ** 0",
+    "reason": "equivalent by arithmetic: the boundary case blends with alpha exactly 0, and px·(1−0)+rgb·0 leaves every channel byte-identical. The fast-out (or the loop bound) only skips work the maths already makes invisible."
+  },
+  {
+    "mutation": "> → >=",
+    "snippet": "const clamp255 = (v) => v < 0 ? 0 : v > 255 ? 255 : v | 0;",
+    "reason": "equivalent identity at the boundary: at v===255 both arms yield 255 (255|0 === 255), and at v===0 both arms yield 0 (0|0 === 0). The clamp only reshapes values strictly outside the byte range."
+  },
+  {
+    "mutation": "> → >=",
+    "snippet": "const i = (y * c.w + x) * 3, a = alpha > 1 ? 1 : alpha;",
+    "reason": "equivalent identity at the boundary: at alpha===1 the cap arm yields 1 and the pass-through arm yields the same 1."
+  },
+  {
+    "mutation": "> → >=",
+    "snippet": "if (rng() > 0.86) {                                  // a few brighter stars with flare",
+    "reason": "equivalent by representability: rng() returns h/2^32 for integer h, and 0.86·2^32 = 3693671628.8 is not an integer — rng() can never equal 0.86, so > and >= admit exactly the same set."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "const clamp255 = (v) => v < 0 ? 0 : v > 255 ? 255 : v | 0;",
+    "reason": "equivalent identity at the boundary: at v===255 both arms yield 255 (255|0 === 255), and at v===0 both arms yield 0 (0|0 === 0). The clamp only reshapes values strictly outside the byte range."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {",
+    "reason": "equivalent through the guard: the extra iteration calls blend at x===width or y===height, which the bounds guard rejects before any write. The pixels are identical."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {",
+    "reason": "equivalent through the guard: the extra iteration calls blend at x===width or y===height, which the bounds guard rejects before any write. The pixels are identical."
+  },
+  {
+    "mutation": "|| → &&",
+    "snippet": "if (x < 0 || y < 0 || x >= c.w || y >= c.h || alpha <= 0) return;",
+    "reason": "equivalent coupling of two unobservables: the flipped arm ANDs the y≥h edge (unreachable — see the y-edge entry) with the alpha≤0 fast-out (an arithmetic no-op). Neither half can move a pixel, together or alone."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "const tierIndex = (t) => { const i = TIER_ORDER.indexOf(String(t)); return i < 0 ? 0 : i; ",
+    "reason": "equivalent identity at the boundary: indexOf===0 means the tier is TIER_ORDER[0], and the fallback arm returns the same 0 the pass-through arm would."
+  }
+]
