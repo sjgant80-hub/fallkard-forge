@@ -163,6 +163,34 @@ the key. That is the whole point of a card: you cannot claim a grade, only earn 
   </div>
 </div>
 
+
+<h2>Fold one · <span style="opacity:.65">forgeupgrade</span></h2>
+<p class="note">A second cargo for the same forge. A structure is encoded as an origami
+<b>crease pattern</b>: a crown pole radiating out to a golden-angle ring of fold-points that the
+ground pole gathers in, twisting at &kappa;&nbsp;=&nbsp;0.618 as it collapses — and the center stays a
+<b>hole</b> the whole way, because a twist fold has no apex. Drag it between flat (possibility, creases
+latent) and folded (actual, collapsed). The fold motion is the teaching; the tier is earned from
+whether the pattern actually closes.</p>
+<div class="card">
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+    <svg id="foldSvg" viewBox="-1.25 -1.25 2.5 2.5" width="300" height="300" aria-label="the crease pattern"></svg>
+    <div style="flex:1;min-width:230px">
+      <div><label for="foldT">fold&nbsp;·&nbsp;t</label>
+        <input id="foldT" type="range" min="0" max="1" step="0.005" value="0" style="width:100%"></div>
+      <div id="foldReads" style="margin:.4rem 0;font-family:monospace"></div>
+      <div><label for="foldN">fold-points</label>
+        <input id="foldN" type="range" min="3" max="21" step="1" value="8" style="width:100%"></div>
+      <div style="display:flex;gap:.6rem;margin:.5rem 0">
+        <div style="flex:1"><label for="foldCrown">crown (transmits)</label><input id="foldCrown" value="the-estate"></div>
+        <div style="flex:1"><label for="foldGround">ground (weaves)</label><input id="foldGround" value="one-ecosystem"></div>
+      </div>
+      <button id="foldPlay" class="ghost" type="button">breathe</button>
+      <button id="foldMint" type="button">Fold it into a card</button>
+      <div class="facts" id="foldFacts" style="margin-top:.8rem"></div>
+    </div>
+  </div>
+</div>
+
 <h2>Why it cannot be faked</h2>
 <p class="note"><b>The seal is a hash of the compressed build.</b> Change one byte of what is inside
 and the seal stops matching, and this page tells you so. Nobody has to be trusted — the check is
@@ -172,11 +200,15 @@ to carry, so a picture viewer shows a picture and ignores the rest. Nothing is h
 the chunks are named, and the whole point is that anybody can look.</p>
 <p class="note"><b>Nothing leaves your browser.</b> Compressing, hashing and reading all happen here.
 There is no server to send it to.</p>
+<p class="note"><b>The fold teaches the structure, not its truth.</b> A crease pattern that closes earns
+its tier by geometry — the medium physically cannot draw an apex at the center. Whether the structure
+folded into it is TRUE is a separate question the card never claims to settle.</p>
 
 <footer>
- <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, which is mutation-gated
- on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
+ <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, and the fold logic from
+ <code>fold.mjs</code> — both mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
  <a href="https://github.com/sjgant80-hub/fallkard-forge">source</a></p>
+ <p>powered by fall·os · Konomi Architecture</p>
 </footer>
 </div>
 <script type="module">
@@ -323,5 +355,83 @@ async function inspect(file) {
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
 }
+
+/* __FOLD_KERNEL__ */
+/* __END_FOLD_KERNEL__ */
+
+// -- the fold lab (forgeupgrade) - every number below comes from the gated kernel --
+const shaStr = (str) => sha256hex(new TextEncoder().encode(str));
+const NS = 'http://www.w3.org/2000/svg';
+let foldGlyph = null;
+
+function rebuildGlyph() {
+  foldGlyph = makeGlyph({
+    n: Number($('#foldN').value),
+    crown: $('#foldCrown').value || 'transmit',
+    ground: $('#foldGround').value || 'weave',
+  });
+}
+
+async function drawFold() {
+  const t = Number($('#foldT').value);
+  const cp = creasePattern(foldGlyph, t);
+  const svg = $('#foldSvg');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const el = (name, attrs) => {
+    const e = document.createElementNS(NS, name);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    svg.appendChild(e); return e;
+  };
+  for (const p of cp.points) {
+    const len = Math.hypot(p.x, p.y) || 1;
+    const hx = (p.x / len) * cp.hole, hy = (p.y / len) * cp.hole;
+    el('line', { x1: hx, y1: hy, x2: p.x, y2: p.y,
+      stroke: p.kind === 'M' ? '#d4a017' : '#7f9cc9', 'stroke-width': 0.02,
+      'stroke-dasharray': p.kind === 'V' ? '0.05 0.035' : 'none', opacity: 0.9 });
+    el('circle', { cx: p.x, cy: p.y, r: 0.045, fill: p.kind === 'M' ? '#d4a017' : '#7f9cc9' });
+  }
+  el('circle', { cx: 0, cy: 0, r: cp.radius, fill: 'none', stroke: '#3a3630', 'stroke-width': 0.008 });
+  el('circle', { cx: 0, cy: 0, r: cp.hole, fill: 'none', stroke: '#8a857a', 'stroke-width': 0.014, 'stroke-dasharray': '0.03 0.03' });
+  $('#foldReads').textContent = cp.reads + ' · twist ' + cp.rotationDeg.toFixed(1) + '° · hole ' + cp.hole.toFixed(2);
+
+  const v = validGlyph(foldGlyph);
+  const sig = await foldSignature(foldGlyph, shaStr);
+  $('#foldFacts').innerHTML =
+    fact('fold-signature', sig) +
+    fact('folds', String(v.folds) + ' points · golden angle 137.5077640…°') +
+    fact('verdict', v.valid ? 'folds coherently — the tier is earned' : v.reasons[0]) +
+    fact('center', 'HOLE — apex-less by geometry, no crease can sit at the One');
+}
+
+$('#foldT').addEventListener('input', drawFold);
+for (const id of ['#foldN', '#foldCrown', '#foldGround']) {
+  $(id).addEventListener('input', () => { rebuildGlyph(); drawFold(); });
+}
+
+let breathing = null;
+$('#foldPlay').addEventListener('click', () => {
+  if (breathing) { clearInterval(breathing); breathing = null; $('#foldPlay').textContent = 'breathe'; return; }
+  let dir = 1;
+  $('#foldPlay').textContent = 'still';
+  breathing = setInterval(() => {
+    const el2 = $('#foldT');
+    let t = Number(el2.value) + dir * 0.012;
+    if (t >= 1) { t = 1; dir = -1; }
+    if (t <= 0) { t = 0; dir = 1; }
+    el2.value = String(t);
+    drawFold();
+  }, 40);
+});
+
+$('#foldMint').addEventListener('click', async () => {
+  const { payload, verdict } = await glyphPayload(foldGlyph, shaStr);
+  $('#build').value = payload;
+  $('#tags').value = 'wings:galaxy,geo:d' + Math.min(7, foldGlyph.ring.length % 8);
+  $('#assessor').value = verdict.valid ? 'yes' : 'no';   // the pass is EARNED from the fold, never chosen
+  document.querySelector('#forge').scrollIntoView({ behavior: 'smooth' });
+});
+
+rebuildGlyph();
+drawFold();
 </script>
 </body></html>

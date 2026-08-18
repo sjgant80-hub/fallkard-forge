@@ -163,6 +163,34 @@ the key. That is the whole point of a card: you cannot claim a grade, only earn 
   </div>
 </div>
 
+
+<h2>Fold one · <span style="opacity:.65">forgeupgrade</span></h2>
+<p class="note">A second cargo for the same forge. A structure is encoded as an origami
+<b>crease pattern</b>: a crown pole radiating out to a golden-angle ring of fold-points that the
+ground pole gathers in, twisting at &kappa;&nbsp;=&nbsp;0.618 as it collapses — and the center stays a
+<b>hole</b> the whole way, because a twist fold has no apex. Drag it between flat (possibility, creases
+latent) and folded (actual, collapsed). The fold motion is the teaching; the tier is earned from
+whether the pattern actually closes.</p>
+<div class="card">
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+    <svg id="foldSvg" viewBox="-1.25 -1.25 2.5 2.5" width="300" height="300" aria-label="the crease pattern"></svg>
+    <div style="flex:1;min-width:230px">
+      <div><label for="foldT">fold&nbsp;·&nbsp;t</label>
+        <input id="foldT" type="range" min="0" max="1" step="0.005" value="0" style="width:100%"></div>
+      <div id="foldReads" style="margin:.4rem 0;font-family:monospace"></div>
+      <div><label for="foldN">fold-points</label>
+        <input id="foldN" type="range" min="3" max="21" step="1" value="8" style="width:100%"></div>
+      <div style="display:flex;gap:.6rem;margin:.5rem 0">
+        <div style="flex:1"><label for="foldCrown">crown (transmits)</label><input id="foldCrown" value="the-estate"></div>
+        <div style="flex:1"><label for="foldGround">ground (weaves)</label><input id="foldGround" value="one-ecosystem"></div>
+      </div>
+      <button id="foldPlay" class="ghost" type="button">breathe</button>
+      <button id="foldMint" type="button">Fold it into a card</button>
+      <div class="facts" id="foldFacts" style="margin-top:.8rem"></div>
+    </div>
+  </div>
+</div>
+
 <h2>Why it cannot be faked</h2>
 <p class="note"><b>The seal is a hash of the compressed build.</b> Change one byte of what is inside
 and the seal stops matching, and this page tells you so. Nobody has to be trusted — the check is
@@ -172,11 +200,15 @@ to carry, so a picture viewer shows a picture and ignores the rest. Nothing is h
 the chunks are named, and the whole point is that anybody can look.</p>
 <p class="note"><b>Nothing leaves your browser.</b> Compressing, hashing and reading all happen here.
 There is no server to send it to.</p>
+<p class="note"><b>The fold teaches the structure, not its truth.</b> A crease pattern that closes earns
+its tier by geometry — the medium physically cannot draw an apex at the center. Whether the structure
+folded into it is TRUE is a separate question the card never claims to settle.</p>
 
 <footer>
- <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, which is mutation-gated
- on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
+ <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, and the fold logic from
+ <code>fold.mjs</code> — both mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
  <a href="https://github.com/sjgant80-hub/fallkard-forge">source</a></p>
+ <p>powered by fall·os · Konomi Architecture</p>
 </footer>
 </div>
 <script type="module">
@@ -515,5 +547,277 @@ async function inspect(file) {
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
 }
+
+/* __FOLD_KERNEL__ */
+// fallkard-forge · fold.mjs — FORGEUPGRADE: the fold-glyph payload type.
+//
+// A second compression medium for the forge. A structure is encoded as an origami
+// CREASE PATTERN: a crown (transmit pole) radiating out to a golden-angle ring of
+// fold-points that a ground (weave pole) gathers in, twisting at κ as it collapses,
+// with an apex-less HOLE at the center that is never a crease. The FOLD MOTION is
+// the teaching: t=0 is flat (possibility, creases latent), t=1 is folded (actual,
+// collapsed), and the whole thing is reversible.
+//
+// The medium enforces the meaning: a twist fold physically has no central crease,
+// so the encoding cannot misrepresent a structure as centralized. The tier is
+// EARNED from whether the pattern folds coherently — a fold that does not close
+// is common, however pretty.
+//
+// Pure and browser-safe: no I/O, no clock, no crypto of its own. Hashing is handed
+// in (Node: createHash; browser: crypto.subtle), same convention as card.mjs. The
+// glyph mints through the EXISTING forge — the crease-pattern JSON is the payload;
+// this module adds no second forge.
+
+const GOLDEN_ANGLE = 137.50776405003785;   // 360 · (1 − 1/φ)
+const KAPPA = 0.6180339887498949;          // 1/φ — the twist, and the possibility/actual crossing
+
+const num = (v, d) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
+const clampInt = (v, lo, hi, d) => {
+  const n = Math.trunc(num(v, d));
+  return Math.max(lo, Math.min(hi, Number.isFinite(n) ? n : d));
+};
+const str = (v, d) => (typeof v === 'string' && v.length ? v : d);
+
+// ── the crease pattern (the data model) ─────────────────────────────────────
+// Total on garbage: any input yields a well-formed glyph. Whether that glyph is
+// COHERENT is validGlyph's judgement, not a construction-time refusal.
+function makeGlyph(opts) {
+  const o = (opts && typeof opts === 'object') ? opts : {};
+  const n = clampInt(o.n, 3, 144, 8);
+  const depth = clampInt(o.depth, 0, 12, 0);
+  const ring = [];
+  for (let i = 0; i < n; i++) {
+    ring.push({
+      i,
+      theta: (i * GOLDEN_ANGLE) % 360,
+      kind: i % 2 === 0 ? 'M' : 'V',   // mountain/valley must alternate or the twist cannot collapse flat
+      depth,
+    });
+  }
+  return {
+    crown: str(o.crown, 'transmit'),
+    ground: str(o.ground, 'weave'),
+    ring,
+    center: 'HOLE',                    // apex-less BY CONSTRUCTION — never a crease
+    twist: num(o.twist, KAPPA),
+    depth,
+  };
+}
+
+// ── canonical form + fold-signature (the content address) ───────────────────
+function canonGlyph(glyph) {
+  const g = (glyph && typeof glyph === 'object') ? glyph : {};
+  const ring = Array.isArray(g.ring) ? g.ring : [];
+  const nodes = ring.map(r => {
+    const o = (r && typeof r === 'object') ? r : {};
+    const sub = (o.sub && typeof o.sub === 'object') ? '(' + canonGlyph(o.sub) + ')' : '';
+    return `${num(o.i, -1)}@${num(o.theta, -1).toFixed(9)}${String(o.kind)}${sub}`;
+  });
+  return [String(g.crown), String(g.ground), String(g.center), num(g.twist, -1).toFixed(12),
+    num(g.depth, -1), nodes.join(',')].join('|');
+}
+
+// sha: async (string) => hex. Node hands in createHash, the page hands in crypto.subtle.
+async function foldSignature(glyph, sha) {
+  if (typeof sha !== 'function') return null;
+  const hex = await sha(canonGlyph(glyph));
+  return typeof hex === 'string' ? hex.slice(0, 16) : null;
+}
+
+// ── the fold motion (the teaching — reversible, crosses κ) ──────────────────
+function foldState(glyph, t) {
+  const g = (glyph && typeof glyph === 'object') ? glyph : {};
+  const twist = num(g.twist, KAPPA);
+  const tt = Math.max(0, Math.min(1, num(t, 0)));
+  return {
+    t: tt,
+    collapse: tt,
+    twistDeg: tt * 360 * twist,
+    centerHole: 1 - tt,                                     // widest flat, tightest folded — NEVER a crease
+    reads: tt < twist ? 'possibility/flat' : 'actual/folded',
+  };
+}
+
+// ── the geometry the page draws (gated maths, dumb rendering) ───────────────
+// Unit coordinates, center at 0,0. The ring gathers toward the ground pole as t→1,
+// every point twists by the fold's rotation, and the hole tightens but never closes.
+function creasePattern(glyph, t) {
+  const g = (glyph && typeof glyph === 'object') ? glyph : makeGlyph();
+  const s = foldState(g, t);
+  const ring = Array.isArray(g.ring) ? g.ring : [];
+  const radius = 1 - 0.5 * s.t;                             // the gather
+  const hole = 0.15 + 0.35 * s.centerHole;                  // 0.5 flat → 0.15 folded, never 0
+  const points = ring.map(r => {
+    const o = (r && typeof r === 'object') ? r : { theta: 0, kind: 'M' };
+    const a = ((num(o.theta, 0) + s.twistDeg) * Math.PI) / 180;
+    return {
+      x: Math.cos(a) * radius,
+      y: Math.sin(a) * radius,
+      kind: o.kind === 'V' ? 'V' : 'M',
+      sub: !!(o.sub && typeof o.sub === 'object'),
+    };
+  });
+  return { hole, radius, rotationDeg: s.twistDeg, reads: s.reads, points };
+}
+
+// ── the assessor (the tier is earned, not chosen) ───────────────────────────
+// A coherent pattern: apex-less center, two distinct poles, κ strictly inside (0,1),
+// at least 3 fold-points on exact golden placement, kinds strictly alternating,
+// and every sub-glyph coherent in its own right (ψ(ψ): fold within fold, apex-less
+// at every level). Each failure is a sentence someone could act on.
+function validGlyph(glyph, _level = 0) {
+  const reasons = [];
+  if (!glyph || typeof glyph !== 'object') {
+    return { valid: false, reasons: ['not a glyph'], folds: 0, deepest: 0 };
+  }
+  if (glyph.center !== 'HOLE') {
+    reasons.push('the center must be a HOLE — a crease at the One is an apex, and a twist fold has none');
+  }
+  if (typeof glyph.crown !== 'string' || !glyph.crown) reasons.push('the crown (transmit pole) is missing');
+  if (typeof glyph.ground !== 'string' || !glyph.ground) reasons.push('the ground (weave pole) is missing');
+  if (typeof glyph.crown === 'string' && typeof glyph.ground === 'string' && glyph.crown === glyph.ground) {
+    reasons.push('crown and ground must be two poles, not one point twice');
+  }
+  const twist = glyph.twist;
+  if (typeof twist !== 'number' || !Number.isFinite(twist) || twist <= 0 || twist >= 1) {
+    reasons.push('the twist must sit strictly inside (0,1) — at 0 nothing turns, at 1 the fold shears');
+  }
+  const ring = Array.isArray(glyph.ring) ? glyph.ring : null;
+  let deepest = _level;
+  if (!ring || ring.length < 3) {
+    reasons.push('a twist needs at least 3 fold-points to close');
+  } else {
+    for (let i = 0; i < ring.length; i++) {
+      const node = ring[i];
+      if (!node || typeof node !== 'object') { reasons.push(`fold-point ${i} is not a fold-point`); continue; }
+      const want = (i * GOLDEN_ANGLE) % 360;
+      if (typeof node.theta !== 'number' || Math.abs(node.theta - want) > 1e-9) {
+        reasons.push(`fold-point ${i} is off the golden placement — the twist does not close`);
+      }
+      const wantKind = i % 2 === 0 ? 'M' : 'V';
+      if (node.kind !== wantKind) {
+        reasons.push(`fold-point ${i} breaks the mountain/valley alternation — the pattern cannot collapse flat`);
+      }
+      if (node.sub) {
+        if (_level >= 12) { reasons.push('sub-glyphs nest deeper than any fold could'); continue; }
+        const sub = validGlyph(node.sub, _level + 1);
+        deepest = Math.max(deepest, sub.deepest);
+        if (!sub.valid) reasons.push(`the sub-glyph at fold-point ${i} does not fold: ${sub.reasons[0]}`);
+      }
+    }
+  }
+  return { valid: reasons.length === 0, reasons, folds: ring ? ring.length : 0, deepest };
+}
+
+// ── the payload (mints through the EXISTING forge — no second forge) ────────
+// The returned string is the build payload for forge()/the page kernel. The card's
+// assessor-pass is EARNED from the verdict; a glyph that does not fold coherently
+// mints, but common — the forge's own tier rule, unchanged.
+async function glyphPayload(glyph, sha) {
+  const verdict = validGlyph(glyph);
+  return {
+    payload: JSON.stringify({
+      kind: 'fold-glyph',
+      v: 1,
+      glyph,
+      foldSignature: await foldSignature(glyph, sha),
+    }),
+    verdict,
+    assessorPass: verdict.valid,
+  };
+}
+
+// Read one back: parse a hatched payload, verify the fold-signature, re-judge.
+// Never throws — a garbage payload is {glyph: null, ok: false, reason}.
+async function readGlyphPayload(text, sha) {
+  let p;
+  try { p = JSON.parse(String(text)); } catch { return { glyph: null, ok: false, reason: 'not JSON' }; }
+  if (!p || typeof p !== 'object' || p.kind !== 'fold-glyph' || !p.glyph) {
+    return { glyph: null, ok: false, reason: 'not a fold-glyph payload' };
+  }
+  const expect = await foldSignature(p.glyph, sha);
+  if (expect !== null && p.foldSignature !== expect) {
+    return { glyph: p.glyph, ok: false, reason: 'fold-signature does not match the pattern — tampered' };
+  }
+  return { glyph: p.glyph, ok: true, reason: null, verdict: validGlyph(p.glyph) };
+}
+
+
+/* __END_FOLD_KERNEL__ */
+
+// -- the fold lab (forgeupgrade) - every number below comes from the gated kernel --
+const shaStr = (str) => sha256hex(new TextEncoder().encode(str));
+const NS = 'http://www.w3.org/2000/svg';
+let foldGlyph = null;
+
+function rebuildGlyph() {
+  foldGlyph = makeGlyph({
+    n: Number($('#foldN').value),
+    crown: $('#foldCrown').value || 'transmit',
+    ground: $('#foldGround').value || 'weave',
+  });
+}
+
+async function drawFold() {
+  const t = Number($('#foldT').value);
+  const cp = creasePattern(foldGlyph, t);
+  const svg = $('#foldSvg');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const el = (name, attrs) => {
+    const e = document.createElementNS(NS, name);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    svg.appendChild(e); return e;
+  };
+  for (const p of cp.points) {
+    const len = Math.hypot(p.x, p.y) || 1;
+    const hx = (p.x / len) * cp.hole, hy = (p.y / len) * cp.hole;
+    el('line', { x1: hx, y1: hy, x2: p.x, y2: p.y,
+      stroke: p.kind === 'M' ? '#d4a017' : '#7f9cc9', 'stroke-width': 0.02,
+      'stroke-dasharray': p.kind === 'V' ? '0.05 0.035' : 'none', opacity: 0.9 });
+    el('circle', { cx: p.x, cy: p.y, r: 0.045, fill: p.kind === 'M' ? '#d4a017' : '#7f9cc9' });
+  }
+  el('circle', { cx: 0, cy: 0, r: cp.radius, fill: 'none', stroke: '#3a3630', 'stroke-width': 0.008 });
+  el('circle', { cx: 0, cy: 0, r: cp.hole, fill: 'none', stroke: '#8a857a', 'stroke-width': 0.014, 'stroke-dasharray': '0.03 0.03' });
+  $('#foldReads').textContent = cp.reads + ' · twist ' + cp.rotationDeg.toFixed(1) + '° · hole ' + cp.hole.toFixed(2);
+
+  const v = validGlyph(foldGlyph);
+  const sig = await foldSignature(foldGlyph, shaStr);
+  $('#foldFacts').innerHTML =
+    fact('fold-signature', sig) +
+    fact('folds', String(v.folds) + ' points · golden angle 137.5077640…°') +
+    fact('verdict', v.valid ? 'folds coherently — the tier is earned' : v.reasons[0]) +
+    fact('center', 'HOLE — apex-less by geometry, no crease can sit at the One');
+}
+
+$('#foldT').addEventListener('input', drawFold);
+for (const id of ['#foldN', '#foldCrown', '#foldGround']) {
+  $(id).addEventListener('input', () => { rebuildGlyph(); drawFold(); });
+}
+
+let breathing = null;
+$('#foldPlay').addEventListener('click', () => {
+  if (breathing) { clearInterval(breathing); breathing = null; $('#foldPlay').textContent = 'breathe'; return; }
+  let dir = 1;
+  $('#foldPlay').textContent = 'still';
+  breathing = setInterval(() => {
+    const el2 = $('#foldT');
+    let t = Number(el2.value) + dir * 0.012;
+    if (t >= 1) { t = 1; dir = -1; }
+    if (t <= 0) { t = 0; dir = 1; }
+    el2.value = String(t);
+    drawFold();
+  }, 40);
+});
+
+$('#foldMint').addEventListener('click', async () => {
+  const { payload, verdict } = await glyphPayload(foldGlyph, shaStr);
+  $('#build').value = payload;
+  $('#tags').value = 'wings:galaxy,geo:d' + Math.min(7, foldGlyph.ring.length % 8);
+  $('#assessor').value = verdict.valid ? 'yes' : 'no';   // the pass is EARNED from the fold, never chosen
+  document.querySelector('#forge').scrollIntoView({ behavior: 'smooth' });
+});
+
+rebuildGlyph();
+drawFold();
 </script>
 </body></html>

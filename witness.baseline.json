@@ -88,5 +88,10 @@
     "mutation": "< → <=",
     "snippet": "const tierIndex = (t) => { const i = TIER_ORDER.indexOf(String(t)); return i < 0 ? 0 : i; ",
     "reason": "equivalent identity at the boundary: indexOf===0 means the tier is TIER_ORDER[0], and the fallback arm returns the same 0 the pass-through arm would."
+  },
+  {
+    "mutation": "< → <=",
+    "snippet": "const bytes = (str) => { const u = new Uint8Array(str.length); for (let i = 0; i < str.len",
+    "reason": "typed-array OOB write is silently discarded: <= reads charCodeAt(str.length) = NaN and writes it to u[str.length], one past the end of a fixed-length Uint8Array — dropped by spec. Every byte that matters is identical."
   }
 ]
