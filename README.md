@@ -1,5 +1,8 @@
 # fallkard-forge
 
+**LIVE: https://sjgant80-hub.github.io/fallkard-forge/** — forge a card, read one back, and fold a
+structure into a crease-pattern glyph, all in the browser, nothing leaves your machine.
+
 > An image that openly carries a real build. Four legible layers. Rarity by provenance.
 > **Nothing is hidden — the only barrier is fluency, and fluency is learnable.**
 
@@ -14,6 +17,24 @@ scanners is a non-goal and a non-feature.
 
 **The format is published in full: [`CARD-SPEC.md`](CARD-SPEC.md).** Learn it and you can read
 any card, verify it, and forge your own. That document *is* the initiation.
+
+## FORGEUPGRADE · the fold-glyph (a second cargo)
+
+The forge now carries a second payload type: a structure encoded as an origami **crease pattern**.
+A crown pole radiates out to a golden-angle ring of fold-points (137.5077640…° apart, mountain/valley
+strictly alternating) that the ground pole gathers in, twisting at **κ = 1/φ** as it collapses —
+and the center stays a **HOLE** the entire way, because a twist fold physically has no apex. The
+encoding cannot draw a boss node at the One; apex-lessness is geometry, not a caption.
+
+Drag the glyph on the live page between **flat** (t=0 — possibility, creases latent) and **folded**
+(t=1 — actual, collapsed). The reading crosses from possibility to actual at exactly κ. The fold
+motion is the teaching; flatten it and it returns.
+
+The glyph mints through the **same forge**: its crease-pattern JSON is the payload, sealed with a
+content-addressed **fold-signature**, and the assessor pass is **earned** from whether the pattern
+folds coherently — a fold that does not close mints common, however pretty. The kernel is
+[`fold.mjs`](fold.mjs), mutation-gated **1.0 clean with zero baseline entries**; the honest wire:
+the fold teaches the *structure*, not whether the structure is *true*.
 
 ## The four layers
 
