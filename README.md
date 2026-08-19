@@ -18,6 +18,18 @@ scanners is a non-goal and a non-feature.
 **The format is published in full: [`CARD-SPEC.md`](CARD-SPEC.md).** Learn it and you can read
 any card, verify it, and forge your own. That document *is* the initiation.
 
+## THE STUDIO · sovereign artifacts · the baby KCC
+
+The forge is now a **build-and-mint studio**: compose a sovereign single-file app from estate
+organs (or have a model write one with your own key, in your browser), watch it **run live in a
+sealed frame before it may mint**, then mint it as a **sovereign artifact** — the legit version of
+what NFTs pretended to be. The card CONTAINS the working build, its tier is EARNED by the
+sovereignty gate, and its lineage is Ed25519-signed per KCC-MINT-001 and verifiable entirely from
+the file. Every mint enters the estate'''s own **baby KCC** — the shared standard (same schema,
+same primes, same 510510), sovereign state (a hash-chained ledger that re-proves its own history,
+loopback-first), bridging to main KCC by R7 recognition, never merge. Internal value and
+provenance only; nothing here is money.
+
 ## FORGEUPGRADE · the fold-glyph (a second cargo)
 
 The forge now carries a second payload type: a structure encoded as an origami **crease pattern**.
