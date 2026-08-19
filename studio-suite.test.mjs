@@ -184,7 +184,7 @@ test('UNKNOWN ORGANS COME BACK NAMED, NEVER SWALLOWED — and garbage composes t
   const g = compose(null);
   assert.equal(validateComposition(g.html).ok, true, 'a bare shell is still a valid sovereign build');
   assert.equal(g.name, 'a sovereign build');
-  assert.equal(ORGANS.length, 3);
+  assert.equal(ORGANS.length, 7);
 });
 
 test('THE SOVEREIGNTY GATE REFUSES EACH ESCAPE WITH ITS OWN SENTENCE', () => {
@@ -303,4 +303,6 @@ test('THE COMPOSED BYTES ARE THE SPEC — pinned, so even a mutated ORGAN SCRIPT
   const bare = compose({ name: 'pin', organs: [] }).html;
   assert.equal((await sha(all3)).slice(0, 32), 'f231e4d107ccdf5da87354d7dd2e18a3', 'the full palette moved');
   assert.equal((await sha(bare)).slice(0, 32), 'fe228f1a700f972720c9bc233f5c4efc', 'the bare shell moved');
+  const full7 = compose({ name: 'pin', organs: ORGANS.map(g => g.id) }).html;
+  assert.equal((await sha(full7)).slice(0, 32), '0e7796d2f6692fdffc9020bf1ec2984d', 'the full seven-organ palette moved');
 });

@@ -14,6 +14,10 @@ export const ORGANS = [
   { id: 'oracle', name: 'the oracle', says: 'lay out the ways a decision could go — the fall-os t0 pattern, trimmed' },
   { id: 'notes', name: 'notes that stay', says: 'write things down; they persist on this machine and nowhere else' },
   { id: 'tally', name: 'the tally', says: 'count anything, keep the count — a sovereign scoreboard' },
+  { id: 'vault', name: 'the vault', says: 'lock a note with a password — AES-GCM, the konomium-vault pattern trimmed; only the password opens it' },
+  { id: 'seal', name: 'the seal', says: 'type anything and watch its fingerprint — content addressing, the forge\u2019s own trust story' },
+  { id: 'receipts', name: 'the receipts', says: 'a checklist where nothing checks without evidence — proof-of-play as a to-do list' },
+  { id: 'fold', name: 'the fold', says: 'a crease-pattern glyph that folds and unfolds — the forgeupgrade pattern, apex-less by geometry' },
 ];
 
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
@@ -92,6 +96,133 @@ const BODIES = {
     show();
   });
   show();
+})();`,
+  },
+  vault: {
+    html: `<section id="org-vault"><h2>the vault</h2>
+<p class="quiet">One note, locked with AES-GCM on this machine. The password never leaves the field, is never stored, and there is no reset \u2014 that is the point.</p>
+<input id="vpw" type="password" placeholder="password (there is no reset)">
+<textarea id="vtext" rows="4" placeholder="what goes in the vault"></textarea>
+<button id="vlock" type="button">lock it</button>
+<button id="vopen" type="button">open it</button>
+<div id="vstat" class="quiet"></div></section>`,
+    js: `(() => {
+  // the konomium-vault pattern, trimmed: PBKDF2 (100k, SHA-256) -> AES-GCM, salt+iv ride with the box
+  const K = 'studio-vault';
+  const st = document.getElementById('vstat');
+  const enc2 = new TextEncoder(), dec2 = new TextDecoder();
+  const b64v = (u) => btoa(String.fromCharCode(...u));
+  const unb64v = (x) => Uint8Array.from(atob(x), c => c.charCodeAt(0));
+  async function keyFrom(pw, salt) {
+    const base = await crypto.subtle.importKey('raw', enc2.encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  document.getElementById('vlock').addEventListener('click', async () => {
+    const pw = document.getElementById('vpw').value;
+    if (!pw) { st.textContent = 'a vault with no password is a box with no lid'; return; }
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await keyFrom(pw, salt);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc2.encode(document.getElementById('vtext').value)));
+    try { localStorage.setItem(K, JSON.stringify({ s: b64v(salt), i: b64v(iv), c: b64v(ct) })); st.textContent = 'locked \u00b7 ' + ct.length + ' encrypted bytes on this machine \u2014 only the password opens it'; }
+    catch { st.textContent = 'no storage here (sealed preview or private mode) \u2014 the lock worked, the keeping did not'; }
+    document.getElementById('vtext').value = '';
+  });
+  document.getElementById('vopen').addEventListener('click', async () => {
+    let box = null;
+    try { box = JSON.parse(localStorage.getItem(K) || 'null'); } catch {}
+    if (!box) { st.textContent = 'nothing locked yet'; return; }
+    try {
+      const key = await keyFrom(document.getElementById('vpw').value, unb64v(box.s));
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64v(box.i) }, key, unb64v(box.c));
+      document.getElementById('vtext').value = dec2.decode(pt);
+      st.textContent = 'open \u2014 the password fit';
+    } catch { st.textContent = 'that password does not open this vault \u2014 and nothing can'; }
+  });
+})();`,
+  },
+  seal: {
+    html: `<section id="org-seal"><h2>the seal</h2>
+<p class="quiet">Content addressing: the same words always make the same fingerprint, and one changed letter changes all of it. This is the whole trust story of a forged card.</p>
+<textarea id="sin" rows="3" placeholder="type anything \u2014 then change one letter and watch"></textarea>
+<div id="sout" class="quiet" style="word-break:break-all"></div></section>`,
+    js: `(() => {
+  const out = document.getElementById('sout');
+  let last = 0;
+  document.getElementById('sin').addEventListener('input', async (ev) => {
+    const stamp = ++last;
+    const u = new TextEncoder().encode(ev.target.value);
+    const h = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', u))).map(b => b.toString(16).padStart(2, '0')).join('');
+    if (stamp !== last) return; // a newer keystroke already owns the display
+    out.innerHTML = ev.target.value ? 'sha256 \u00b7 <b>' + h + '</b>' : '';
+  });
+})();`,
+  },
+  receipts: {
+    html: `<section id="org-receipts"><h2>the receipts</h2>
+<p class="quiet">Proof-of-play as a checklist: nothing gets ticked on your say-so \u2014 a box only checks when you write down what proves it.</p>
+<input id="rnew" placeholder="a thing to do">
+<button id="radd" type="button">add it</button>
+<div id="rlist"></div></section>`,
+    js: `(() => {
+  const K = 'studio-receipts';
+  const load2 = () => { try { return JSON.parse(localStorage.getItem(K) || '[]'); } catch { return []; } };
+  const keep = (items) => { try { localStorage.setItem(K, JSON.stringify(items)); } catch {} };
+  const escR = (x) => String(x).replace(/[<>&]/g, '');
+  function show() {
+    const items = load2();
+    document.getElementById('rlist').innerHTML = items.map((it, i) =>
+      '<p>' + (it.proof ? '\u2713 <b>' + escR(it.name) + '</b> <span class="quiet">\u2014 proven by: ' + escR(it.proof) + '</span>'
+        : '\u25cb <b>' + escR(it.name) + '</b> <button data-i="' + i + '" class="rprove" type="button">it is done \u2014 prove it</button>') + '</p>'
+    ).join('') || '<p class="quiet">nothing listed \u2014 and an empty list is honestly empty</p>';
+    for (const btn of document.querySelectorAll('.rprove')) btn.addEventListener('click', () => {
+      const why = prompt('What proves it? (a file, a number, a thing someone can check)');
+      if (!why || !why.trim()) { alert('no evidence, no tick \u2014 that is the whole point'); return; }
+      const items2 = load2(); items2[Number(btn.dataset.i)].proof = why.trim(); keep(items2); show();
+    });
+  }
+  document.getElementById('radd').addEventListener('click', () => {
+    const name = document.getElementById('rnew').value.trim();
+    if (!name) return;
+    const items = load2(); items.push({ name: name.slice(0, 80), proof: null }); keep(items);
+    document.getElementById('rnew').value = ''; show();
+  });
+  show();
+})();`,
+  },
+  fold: {
+    html: `<section id="org-fold"><h2>the fold</h2>
+<p class="quiet">A crease-pattern glyph \u2014 golden-angle ring, mountain and valley alternating, and the center stays a hole the whole way: a twist fold has no apex. Drag it between flat and folded.</p>
+<canvas id="fcv" width="280" height="280" style="display:block;margin:6px auto;border:1px solid #3a3630;border-radius:8px"></canvas>
+<input id="ft" type="range" min="0" max="1" step="0.005" value="0" style="width:100%">
+<div id="fread" class="quiet" style="text-align:center"></div></section>`,
+    js: `(() => {
+  // the forgeupgrade fold pattern, trimmed: 8 points at 137.50776405003785 degrees, kappa = 1/phi
+  const GA = 137.50776405003785, KAP = 0.6180339887498949, N = 8;
+  const cv = document.getElementById('fcv'), cx2 = cv.getContext('2d');
+  function draw2(t) {
+    cx2.clearRect(0, 0, 280, 280);
+    const R = 110 * (1 - 0.5 * t), hole = 110 * (0.15 + 0.35 * (1 - t)), twist = t * 360 * KAP;
+    cx2.strokeStyle = '#8a857a'; cx2.setLineDash([4, 4]);
+    cx2.beginPath(); cx2.arc(140, 140, hole, 0, 7); cx2.stroke();
+    cx2.setLineDash([]);
+    for (let i = 0; i < N; i++) {
+      const a = ((i * GA + twist) % 360) * Math.PI / 180;
+      const x = 140 + Math.cos(a) * R, y = 140 + Math.sin(a) * R;
+      const hx = 140 + Math.cos(a) * hole, hy = 140 + Math.sin(a) * hole;
+      cx2.strokeStyle = i % 2 === 0 ? '#d4a017' : '#7f9cc9';
+      cx2.setLineDash(i % 2 === 0 ? [] : [6, 4]);
+      cx2.beginPath(); cx2.moveTo(hx, hy); cx2.lineTo(x, y); cx2.stroke();
+      cx2.setLineDash([]);
+      cx2.fillStyle = i % 2 === 0 ? '#d4a017' : '#7f9cc9';
+      cx2.beginPath(); cx2.arc(x, y, 5, 0, 7); cx2.fill();
+    }
+    document.getElementById('fread').textContent =
+      (t < KAP ? 'possibility / flat' : 'actual / folded') + ' \u00b7 twist ' + (t * 360 * KAP).toFixed(1) + '\u00b0 \u00b7 the center is a hole, never a crease';
+  }
+  document.getElementById('ft').addEventListener('input', (ev) => draw2(Number(ev.target.value)));
+  draw2(0);
 })();`,
   },
 };
