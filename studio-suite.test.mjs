@@ -184,7 +184,7 @@ test('UNKNOWN ORGANS COME BACK NAMED, NEVER SWALLOWED — and garbage composes t
   const g = compose(null);
   assert.equal(validateComposition(g.html).ok, true, 'a bare shell is still a valid sovereign build');
   assert.equal(g.name, 'a sovereign build');
-  assert.equal(ORGANS.length, 7);
+  assert.equal(ORGANS.length, 8);
 });
 
 test('THE SOVEREIGNTY GATE REFUSES EACH ESCAPE WITH ITS OWN SENTENCE', () => {
@@ -192,7 +192,16 @@ test('THE SOVEREIGNTY GATE REFUSES EACH ESCAPE WITH ITS OWN SENTENCE', () => {
   assert.match(validateComposition(base.replace('<footer>composed', '<img src="https://cdn.evil/x.png"><footer>composed')).reasons.join(),
     /reaches for the outside world/);
   assert.match(validateComposition(base.replace('<script>', '<script>fetch("/x");')).reasons.join(),
+    /are sanctioned/, 'a relative fetch is not a sanctioned origin');
+  assert.match(validateComposition(base.replace('<script>', '<script>fetch("https://evil.example/x");')).reasons.join(),
+    /are sanctioned/);
+  assert.match(validateComposition(base.replace('<script>', '<script>fetch(url);')).reasons.join(),
+    /computed target/, 'a fetch the reader cannot see through is refused');
+  assert.match(validateComposition(base.replace('<script>', '<script>new WebSocket("wss://x");')).reasons.join(),
     /phones home/);
+  // the two sanctioned reaches pass — the user's machine, and the user's key
+  assert.equal(validateComposition(base.replace('<script>', "<script>fetch('http://localhost:11434/api/tags');")).ok, true);
+  assert.equal(validateComposition(base.replace('<script>', "<script>fetch('https://api.anthropic.com/v1/messages');")).ok, true);
   assert.match(validateComposition(base.replace('powered by fall·os · Konomi Architecture', 'powered by vibes')).reasons.join(),
     /architecture line is missing/);
   assert.match(validateComposition('<div>hi</div>').reasons.join(), /starts with/);
@@ -304,5 +313,5 @@ test('THE COMPOSED BYTES ARE THE SPEC — pinned, so even a mutated ORGAN SCRIPT
   assert.equal((await sha(all3)).slice(0, 32), 'f231e4d107ccdf5da87354d7dd2e18a3', 'the full palette moved');
   assert.equal((await sha(bare)).slice(0, 32), 'fe228f1a700f972720c9bc233f5c4efc', 'the bare shell moved');
   const full7 = compose({ name: 'pin', organs: ORGANS.map(g => g.id) }).html;
-  assert.equal((await sha(full7)).slice(0, 32), '0e7796d2f6692fdffc9020bf1ec2984d', 'the full seven-organ palette moved');
+  assert.equal((await sha(full7)).slice(0, 32), '0ef06d1c413959b5bc48e69a04373e0a', 'the full eight-organ palette moved');
 });

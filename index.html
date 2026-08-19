@@ -1217,6 +1217,7 @@ const ORGANS = [
   { id: 'seal', name: 'the seal', says: 'type anything and watch its fingerprint — content addressing, the forge\u2019s own trust story' },
   { id: 'receipts', name: 'the receipts', says: 'a checklist where nothing checks without evidence — proof-of-play as a to-do list' },
   { id: 'fold', name: 'the fold', says: 'a crease-pattern glyph that folds and unfolds — the forgeupgrade pattern, apex-less by geometry' },
+  { id: 'cascade', name: 'the cascade', says: 'ask a question and it climbs the ladder — free deterministic first, then your own model, then a rented one with your key. Every answer says where it ran and what it cost' },
 ];
 
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
@@ -1424,6 +1425,76 @@ const BODIES = {
   draw2(0);
 })();`,
   },
+  cascade: {
+    html: `<section id="org-cascade"><h2>the cascade</h2>
+<p class="quiet">The fall-os walk, trimmed: free deterministic code answers first; then a model you own
+(Ollama on your machine); then \u2014 only if you set a key \u2014 a rented frontier model. This build can
+reach exactly two places, both yours: <b>localhost:11434</b> (your machine) and <b>api.anthropic.com</b>
+(your key). Nothing else, and never without you pressing the button.</p>
+<textarea id="cq" rows="2" placeholder="ask \u2014 arithmetic answers free, on this machine"></textarea>
+<input id="ckey" type="password" placeholder="optional: sk-ant-\u2026 (kept in this browser only)">
+<button id="cask" type="button">ask the ladder</button>
+<div id="cwhere" class="quiet"></div>
+<div id="cout"></div></section>`,
+    js: `(() => {
+  const st = document.getElementById('cwhere'), out = document.getElementById('cout');
+  const K = 'studio-cascade-key';
+  try { const k = localStorage.getItem(K); if (k) document.getElementById('ckey').value = k; } catch {}
+  document.getElementById('cask').addEventListener('click', async () => {
+    const q = document.getElementById('cq').value.trim();
+    if (!q) { st.textContent = 'ask something real'; return; }
+    out.textContent = '';
+    // rung 1 \u00b7 T0: deterministic, free, never guesses
+    if (/^[\d\s+*/().-]+$/.test(q)) {
+      try {
+        const v = Function('"use strict";return (' + q + ')')();
+        out.textContent = String(v);
+        st.textContent = 'answered on this machine \u00b7 no model \u00b7 cost: nothing \u00b7 it computed, it did not guess';
+        return;
+      } catch { /* not arithmetic after all \u2014 climb */ }
+    }
+    // rung 2 \u00b7 your own model
+    st.textContent = 'trying the model you own (localhost:11434)\u2026';
+    try {
+      const res = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'qwen2.5:7b', prompt: q, stream: false, options: { temperature: 0 } }),
+        signal: AbortSignal.timeout ? AbortSignal.timeout(20000) : undefined,
+      });
+      if (res && res.ok) {
+        const j = await res.json();
+        const text = j && typeof j.response === 'string' ? j.response.trim() : '';
+        if (text) {
+          out.textContent = text;
+          st.textContent = 'answered by YOUR model \u00b7 your electricity \u00b7 cost: nothing \u00b7 nothing left this machine';
+          return;
+        }
+      }
+    } catch { /* not up, or the browser was not allowed in \u2014 said below if nothing else answers */ }
+    // rung 3 \u00b7 a rented model, your key, your choice
+    const key = document.getElementById('ckey').value.trim();
+    if (!key) {
+      st.textContent = 'nothing could answer: no model of yours was reachable (if Ollama runs, allow the browser in: OLLAMA_ORIGINS=*) and no key is set. Both are fixable \u2014 and both are yours.';
+      return;
+    }
+    try { localStorage.setItem(K, key); } catch {}
+    st.textContent = 'renting: your key, straight to Anthropic, nowhere else\u2026';
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': key,
+          'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 600,
+          messages: [{ role: 'user', content: q }] }),
+      });
+      if (!res.ok) { st.textContent = 'the rented model said no: HTTP ' + res.status + ' \u2014 check the key'; return; }
+      const j = await res.json();
+      out.textContent = ((j.content && j.content[0] && j.content[0].text) || '').trim();
+      st.textContent = 'answered by a RENTED model \u00b7 your key paid for it \u00b7 the same question on your own model would have cost nothing';
+    } catch (e2) { st.textContent = 'could not reach the rented model: ' + e2.message; }
+  });
+})();`,
+  },
 };
 
 /**
@@ -1471,7 +1542,24 @@ function validateComposition(html) {
   const reasons = [];
   if (!/^\s*<!doctype html>/i.test(s)) reasons.push('not a document — a build starts with <!doctype html>');
   if (/\b(?:src|href)\s*=\s*["']\s*(?:https?:)?\/\//i.test(s)) reasons.push('it reaches for the outside world — an external src/href breaks offline-forever');
-  if (/\bfetch\s*\(|XMLHttpRequest|WebSocket\s*\(/i.test(s)) reasons.push('it phones home — fetch/XHR/sockets have no place in a sovereign single file');
+  // The cascade exception, as a RULE not a hole: fetch is permitted only to a literal target the
+  // reader can see, and only to the two origins that are the user's own — their machine, or their
+  // key. A computed target, or any other origin, or any other network shape, is still refused.
+  if (/XMLHttpRequest|WebSocket\s*\(/i.test(s)) reasons.push('it phones home — XHR/sockets have no place in a sovereign single file');
+  const fetchCount = (s.match(/\bfetch\s*\(/g) || []).length;
+  { // no count guard: with zero fetches the checks below are vacuously quiet anyway
+    const literal = [...s.matchAll(/\bfetch\s*\(\s*(['"])([^'"]*)\1/g)];
+    if (literal.length !== fetchCount) {
+      reasons.push('a fetch with a computed target — the reader cannot see where it goes, so it is refused');
+    } else {
+      for (const m of literal) {
+        const url = m[2];
+        if (!(url.startsWith('http://localhost:11434/') || url.startsWith('https://api.anthropic.com/'))) {
+          reasons.push('it reaches "' + url.slice(0, 48) + '" — only your own machine (localhost:11434) and your own key (api.anthropic.com) are sanctioned');
+        }
+      }
+    }
+  }
   if (!/Konomi Architecture/.test(s)) reasons.push('the architecture line is missing — every estate build carries it');
   return { ok: reasons.length === 0, reasons };
 }
