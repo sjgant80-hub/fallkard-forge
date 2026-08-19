@@ -93,5 +93,10 @@
     "mutation": "< → <=",
     "snippet": "const bytes = (str) => { const u = new Uint8Array(str.length); for (let i = 0; i < str.len",
     "reason": "typed-array OOB write is silently discarded: <= reads charCodeAt(str.length) = NaN and writes it to u[str.length], one past the end of a fixed-length Uint8Array — dropped by spec. Every byte that matters is identical."
+  },
+  {
+    "mutation": ">= → >",
+    "snippet": "kcc_face_value: Number.isFinite(o.faceValue) && o.faceValue >= 0 ? o.faceValue : 0,",
+    "reason": "boundary identity: >= and > differ only at faceValue === 0, and both arms of the ternary then yield the same 0 (the value itself on one side, the sanitised default on the other). No input separates them."
   }
 ]

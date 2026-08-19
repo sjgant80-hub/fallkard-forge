@@ -191,6 +191,46 @@ whether the pattern actually closes.</p>
   </div>
 </div>
 
+
+<h2>Build one · <span style="opacity:.65">the studio</span></h2>
+<p class="note">Not a cloud IDE — its sovereign opposite: <b>you own the workshop and keep the outputs</b>.
+Compose a build from estate organs, or have a model write one with your own key; test it live in a sealed
+frame; then mint it as a <b>sovereign artifact</b> — the card CONTAINS the working build, its tier is
+EARNED, and its lineage is Ed25519-signed and verifiable from the file alone. The bound, stated plainly:
+web-native, single-file, local-first builds only.</p>
+<div class="card">
+  <div><label for="stName">name it</label><input id="stName" value="my little estate" spellcheck="false"></div>
+  <div id="stOrgans" style="margin:.6rem 0"></div>
+  <button id="stCompose" type="button">Compose it</button>
+  <span style="opacity:.5;margin:0 .6rem">or</span>
+  <div style="margin-top:.6rem">
+    <label for="stPrompt">have a model write it (your key, this browser, nowhere else)</label>
+    <textarea id="stPrompt" rows="2" spellcheck="false" placeholder="a single-file app that ..."></textarea>
+    <input id="stKey" placeholder="sk-ant-… (stored in this browser only)" spellcheck="false">
+    <button id="stGen" type="button" class="ghost">Generate it</button>
+  </div>
+  <div id="stStatus" class="note" style="margin-top:.6rem"></div>
+  <div id="stPreviewWrap" style="display:none">
+    <div class="note"><b>It runs before it mints.</b> This is the build, live, in a sealed frame — no
+    network, no storage of this page, nothing but itself.</div>
+    <iframe id="stPreview" sandbox="allow-scripts" style="width:100%;height:340px;border:1px solid var(--line,#3a3630);border-radius:8px;background:#0b0a0f"></iframe>
+    <button id="stMint" type="button">Mint it — own it</button>
+    <div class="facts" id="stMintFacts" style="margin-top:.8rem"></div>
+  </div>
+</div>
+
+<h2>The baby KCC · <span style="opacity:.65">shared standard, sovereign state</span></h2>
+<p class="note">This estate runs its own KCC ledger: the <b>standard</b> is KCC-MINT-001 (the same DNA as
+main KCC — same schema, same primes, same 510510); the <b>state</b> is its own, on this machine,
+loopback-first. Every mint above enters it. It bridges to main KCC by <b>recognition, not merge</b> —
+the R7 rule: same standard means they can talk, distinct state means they stay two things. Internal
+value and provenance only — the day this touches real money it is a separate, counselled build.</p>
+<div class="card">
+  <div class="facts" id="kccFacts"></div>
+  <button id="kccVerify" type="button" class="ghost">Re-prove the ledger</button>
+  <div id="kccOut" class="note"></div>
+</div>
+
 <h2>Why it cannot be faked</h2>
 <p class="note"><b>The seal is a hash of the compressed build.</b> Change one byte of what is inside
 and the seal stops matching, and this page tells you so. Nobody has to be trusted — the check is
@@ -354,6 +394,23 @@ async function inspect(file) {
   $('#recovered').value = text;
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
+
+  // a sovereign artifact rides beside the card manifest — verify every claim it makes, locally
+  try {
+    const chunksA = parseChunks(r.png || u8);
+    const bRaw = readText(chunksA, ARTIFACT_KEYWORD);
+    if (bRaw) {
+      const bundle = JSON.parse(bRaw);
+      const va = await verifyArtifact({
+        sealComputed: actual, bundle, verify: ed25519Verify,
+        assessorPass: !!(r.manifest && r.manifest.assessor_pass), depth: 0, readingKeyHonest: true,
+      }, rarity);
+      $('#readFacts').innerHTML += fact('artifact', (va.ok ? '\u2713 SOVEREIGN ARTIFACT — every claim verified from the file'
+          : '\u2717 artifact checks failed'))
+        + va.checks.map(c => fact((c.ok ? '\u2713 ' : '\u2717 ') + c.name, c.why)).join('')
+        + fact('kpid', (bundle.mint && bundle.mint.kpid) || '(none)');
+    }
+  } catch { /* no artifact riding on this card — it is a plain forge card, which is fine */ }
 }
 
 /* __FOLD_KERNEL__ */
@@ -433,5 +490,149 @@ $('#foldMint').addEventListener('click', async () => {
 
 rebuildGlyph();
 drawFold();
+
+/* __STUDIO_KERNEL__ */
+/* __END_STUDIO_KERNEL__ */
+
+// ── the studio: compose / generate → test live → mint as a sovereign artifact ──────────────────
+const utf8 = (str) => new TextEncoder().encode(str);
+
+// the builder identity: one Ed25519 keypair, made once, kept in this browser only
+async function builderIdentity() {
+  try {
+    const stored = localStorage.getItem('forge-studio-identity');
+    if (stored) {
+      const j = JSON.parse(stored);
+      const priv = await crypto.subtle.importKey('jwk', j.priv, { name: 'Ed25519' }, false, ['sign']);
+      return { pubB64: j.pubB64, sign: async (s2) => b64(new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, priv, utf8(s2)))) };
+    }
+    const kp = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+    const pubB64 = b64(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));
+    const privJwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
+    localStorage.setItem('forge-studio-identity', JSON.stringify({ pubB64, priv: privJwk }));
+    return { pubB64, sign: async (s2) => b64(new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, kp.privateKey, utf8(s2)))) };
+  } catch { return null; }  // no Ed25519 here: mints go out unsigned, and the verify SAYS so
+}
+const ed25519Verify = async (s2, sigB64, pubB64) => {
+  const un = (x) => Uint8Array.from(atob(x), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey('raw', un(pubB64), { name: 'Ed25519' }, false, ['verify']);
+  return crypto.subtle.verify({ name: 'Ed25519' }, key, un(sigB64), utf8(s2));
+};
+
+// the palette
+$('#stOrgans').innerHTML = ORGANS.map(g =>
+  `<label style="display:block;margin:.2rem 0"><input type="checkbox" value="${g.id}" ${g.id !== 'tally' ? 'checked' : ''}> <b>${g.name}</b> — ${g.says}</label>`).join('');
+
+let studioBuild = null;
+function showBuild(html, how) {
+  const v = validateComposition(html);
+  if (!v.ok) {
+    $('#stStatus').innerHTML = '<b>Refused before the frame:</b> ' + v.reasons.join(' · ');
+    $('#stPreviewWrap').style.display = 'none';
+    studioBuild = null;
+    return;
+  }
+  studioBuild = { html, how };
+  $('#stPreview').srcdoc = html;
+  $('#stStatus').textContent = how + ' — ' + html.length + ' chars, sovereignty gate passed';
+  $('#stPreviewWrap').style.display = 'block';
+  $('#stMintFacts').innerHTML = '';
+}
+
+$('#stCompose').addEventListener('click', () => {
+  const picked = [...document.querySelectorAll('#stOrgans input:checked')].map(i => i.value);
+  const r = compose({ name: $('#stName').value, organs: picked });
+  showBuild(r.html, 'composed from ' + (r.organs.join(' + ') || 'the bare shell'));
+});
+
+$('#stGen').addEventListener('click', async () => {
+  const key = $('#stKey').value.trim();
+  const want = $('#stPrompt').value.trim();
+  if (!key || !want) { $('#stStatus').textContent = 'the generator needs a prompt and your key — the key stays in this browser'; return; }
+  try { localStorage.setItem('forge-studio-key', key); } catch {}
+  $('#stStatus').textContent = 'asking the model — your key, straight to Anthropic, nowhere else…';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-5', max_tokens: 4096,
+        messages: [{ role: 'user', content:
+          'Write a complete single-file HTML app: ' + want
+          + '. HARD RULES: one file, no external resources of any kind (no CDN, no fonts, no images from URLs), '
+          + 'no fetch/XHR/WebSocket, works offline, dark background. End the <body> with this exact footer: '
+          + '<footer>generated in the Forge Studio · powered by fall·os · Konomi Architecture</footer>. '
+          + 'Reply with ONLY the HTML, starting <!doctype html>.' }],
+      }),
+    });
+    if (!res.ok) { $('#stStatus').textContent = 'the model said no: HTTP ' + res.status + ' — check the key'; return; }
+    const j = await res.json();
+    const text = ((j.content && j.content[0] && j.content[0].text) || '').replace(/^```html\s*/i, '').replace(/```\s*$/, '').trim();
+    showBuild(text, 'generated with your key');
+  } catch (e2) { $('#stStatus').textContent = 'could not reach the model: ' + e2.message; }
+});
+try { const k = localStorage.getItem('forge-studio-key'); if (k) $('#stKey').value = k; } catch {}
+
+// ── the baby KCC ledger: loopback-first, on this machine ──
+const shaStr2 = async (s2) => sha256hex(utf8(s2));
+function loadLedger() {
+  try { const j = JSON.parse(localStorage.getItem('babykcc-ledger') || 'null'); if (j && Array.isArray(j.entries)) return j; } catch {}
+  return makeLedger('this-estate');
+}
+let LEDGER = loadLedger();
+async function drawLedger() {
+  const v = await verifyLedger(LEDGER, shaStr2);
+  const face2 = bridgeFace(LEDGER);
+  $('#kccFacts').innerHTML =
+    fact('standard', 'KCC-MINT-001 · primorial 510510 · κ = 1/φ') +
+    fact('state', v.count + ' mint(s) · supply ' + v.supply + ' KCC · ' + (v.ok ? 're-proven just now' : 'BROKEN: ' + v.why)) +
+    fact('head', face2.head ? face2.head.slice(0, 24) + '…' : '(empty — nothing claimed, nothing to prove)') +
+    fact('bridge', 'loopback-first · R7 recognition to main KCC when live — same standard, distinct state');
+}
+$('#kccVerify').addEventListener('click', async () => {
+  const v = await verifyLedger(LEDGER, shaStr2);
+  $('#kccOut').textContent = v.why;
+  drawLedger();
+});
+drawLedger();
+
+// ── mint: the tested build becomes a sovereign artifact and enters the baby ledger ──
+$('#stMint').addEventListener('click', async () => {
+  if (!studioBuild) return;
+  const gate = validateComposition(studioBuild.html);
+  const name = $('#stName').value || 'a sovereign build';
+  const payload = await gzip(utf8(studioBuild.html));
+  const seal = await sha256hex(payload);
+  const id = await builderIdentity();
+  // the tier is EARNED: passing the sovereignty gate is the assessor here, depth 0, key honest
+  const opts = { assessorPass: gate.ok, depth: 0, readingKeyHonest: true };
+  let bundle = makeBundle({ ...opts, slug: name, name, seal, domain: studioBuild.how,
+    minterPubB64: id ? id.pubB64 : null, faceValue: 1, mintedAt: TODAY }, rarity);
+  if (id) bundle = await signBundle(bundle, id.sign);
+  const manifest = manifestFor({ ...opts, seal, tags: 'studio:' + studioBuild.how.slice(0, 30), forged: TODAY });
+  const art = await drawCard('studio:' + name, seal);
+  const carded = embed(art, b64(payload), manifest);
+  // ride the bundle beside the manifest, then re-serialise
+  const chunks2 = parseChunks(carded);
+  const iend2 = chunks2.findIndex(c => c.type === 'IEND');
+  chunks2.splice(iend2, 0, textChunk(ARTIFACT_KEYWORD, JSON.stringify(bundle)));
+  const artifactPng = serialise(chunks2);
+
+  const entered = await mint(LEDGER, bundle, TODAY, shaStr2);
+  if (entered.ok) { LEDGER = entered.ledger; try { localStorage.setItem('babykcc-ledger', JSON.stringify(LEDGER)); } catch {} drawLedger(); }
+
+  const url2 = URL.createObjectURL(new Blob([artifactPng], { type: 'image/png' }));
+  $('#stMintFacts').innerHTML =
+    fact('artifact', '<a href="' + url2 + '" download="' + bundle.slug + '.artifact.png">download it — it IS the build</a>') +
+    fact('kpid', bundle.mint.kpid) +
+    fact('tier', tierChip(bundle.tier) + ' — earned by the sovereignty gate, not chosen') +
+    fact('signed', bundle.mint.minter_sig_b64 ? 'Ed25519 · by this browser\u2019s builder identity' : 'unsigned — this browser has no Ed25519; the verify will say so') +
+    fact('ledger', entered.ok ? entered.why : 'not entered: ' + entered.why);
+});
 </script>
 </body></html>
