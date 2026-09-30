@@ -1,0 +1,11 @@
+{
+ "declared": true,
+ "name": "fallkard-forge",
+ "system": "A browser page and a zero-dependency Node tool that put a build inside a PNG, seal it, print the seal on the card, and read cards back — including stripped copies, matched against a deck kept in the visitor's own browser. One optional feature, the studio's generator, sends the visitor's own prompt with the visitor's own Anthropic key straight from their browser to Anthropic's API and shows the single-file app it writes. The page has no server and collects nothing.",
+ "ai": "generative",
+ "builtBy": "vendor",
+ "deployment": "saas",
+ "personalData": false,
+ "euOutput": true,
+ "generatesContent": true
+}

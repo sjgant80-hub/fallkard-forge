@@ -48,6 +48,13 @@ jobs:
       - name: The survival run's seal is exactly what its script writes
         run: node scripts/survive.mjs --check
 
+      - name: The basis — no untraced price, and this repository's own current compliance map
+        run: |
+          git clone --quiet https://github.com/sjgant80-hub/fallstack /tmp/fallstack && git -C /tmp/fallstack checkout --quiet 4eeb828
+          git clone --quiet https://github.com/sjgant80-hub/fall-euaiact /tmp/fall-euaiact && git -C /tmp/fall-euaiact checkout --quiet d522314
+          node /tmp/fallstack/tools/price-check.mjs .
+          node /tmp/fall-euaiact/tools/comply-build.mjs . --check
+
       # ⚑ THE PAGE MUST CARRY THE KERNEL THAT WAS JUST GATED, or the gate is green about a file the
       # Forge does not use — the most comfortable kind of lie. (The builder moved to scripts/ and this step
       # kept calling the old path, so the gate stood red from 2026-09-16 until the visible-seal change.)

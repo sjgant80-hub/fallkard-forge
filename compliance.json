@@ -1,0 +1,100 @@
+{
+ "ok": true,
+ "v": 1,
+ "system": "A browser page and a zero-dependency Node tool that put a build inside a PNG, seal it, print the seal on the card, and read cards back — including stripped copies, matched against a deck kept in the visitor's own browser. One optional feature, the studio's generator, sends the visitor's own prompt with the visitor's own Anthropic key straight from their browser to Anthropic's API and shows the single-file app it writes. The page has no server and collects nothing.",
+ "asOf": "2026-09-30",
+ "lawChecked": "2026-09-30",
+ "ai": "generative",
+ "deployment": "saas",
+ "annexIII": null,
+ "aiAct": {
+  "applies": true,
+  "role": "deployer (Art 3(4)) — it uses an AI system under its authority",
+  "tier": "limited"
+ },
+ "gdpr": {
+  "applies": false,
+  "why": "No personal data is processed, so no GDPR / UK GDPR duty arises from the build."
+ },
+ "items": [
+  {
+   "id": "aia-scope",
+   "regime": "EU AI Act",
+   "ref": "Art 2(1)(c)",
+   "title": "A UK company is in scope when its AI output is used in the EU",
+   "status": "unchanged",
+   "inForce": true,
+   "from": "2024-08-01",
+   "note": "Same.",
+   "quote": "providers and deployers of AI systems that have their place of establishment or are located in a third country, where the output produced by the AI system is used in the Union",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R1689",
+   "checked": "2026-09-29"
+  },
+  {
+   "id": "aia-provider",
+   "regime": "EU AI Act",
+   "ref": "Art 3(3) and 3(11)",
+   "title": "Building an AI system for your own use makes you its provider",
+   "status": "shared",
+   "inForce": true,
+   "from": "2024-08-01",
+   "note": "A seat product (Copilot, ChatGPT, Claude): the vendor is the provider of its assistant; the company is the deployer.",
+   "quote": "‘putting into service’ means the supply of an AI system for first use directly to the deployer or for own use in the Union for its intended purpose",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R1689",
+   "checked": "2026-09-29"
+  },
+  {
+   "id": "aia-4",
+   "regime": "EU AI Act",
+   "ref": "Art 4 (as replaced by Reg 2026/1744)",
+   "title": "AI literacy",
+   "status": "unchanged",
+   "inForce": true,
+   "from": "2025-02-02",
+   "note": "Same duty.",
+   "quote": "Providers and deployers of AI systems shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32026R1744",
+   "checked": "2026-09-29"
+  },
+  {
+   "id": "aia-50-2",
+   "regime": "EU AI Act",
+   "ref": "Art 50(2); Art 111(4) as added by Reg 2026/1744",
+   "title": "Mark AI-generated audio, image, video or text as artificially generated, in a machine-readable format",
+   "status": "removed",
+   "inForce": true,
+   "from": "2026-08-02",
+   "note": "The vendor, as provider, carries the marking duty for its outputs; the company does not strip the mark.",
+   "quote": "Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content, shall ensure that the outputs of the AI system are marked in a machine-readable format and detectable as artificially generated or manipulated.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R1689",
+   "checked": "2026-09-30"
+  },
+  {
+   "id": "aia-99",
+   "regime": "EU AI Act",
+   "ref": "Art 99(3), 99(4)",
+   "title": "Fines",
+   "status": "unchanged",
+   "inForce": true,
+   "from": "2025-08-02",
+   "note": "Same.",
+   "quote": "up to EUR 15 000 000 or, if the offender is an undertaking, up to 3 % of its total worldwide annual turnover for the preceding financial year, whichever is higher",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R1689",
+   "checked": "2026-09-29"
+  }
+ ],
+ "counts": {
+  "removed": 1,
+  "eased": 0,
+  "yours": 0,
+  "shared": 1,
+  "unchanged": 3
+ },
+ "applying": 5,
+ "inForce": 5,
+ "upcoming": [],
+ "blocking": [],
+ "build": "fallkard-forge",
+ "generatedBy": "fall-euaiact comply.mjs",
+ "lawSource": "https://github.com/sjgant80-hub/fall-euaiact/blob/main/law/law.json"
+}
