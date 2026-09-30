@@ -261,3 +261,20 @@ test('fuzz: the survival tally never throws', () => {
   const junk = [undefined, null, 0, '', 'x', [], {}, [null], [{}], { png: 5 }, [{ id: 'png' }]];
   for (const a of junk) for (const b of junk) for (const c of junk) assert.doesNotThrow(() => { tallySurvival(a, b, c); judgeSurvival(a); judgeSurvival({ ok: true, rows: a }); });
 });
+
+test('the committed survival run, re-derived from its raw reads by the kernel', async () => {
+  const { readFileSync } = await import('node:fs');
+  const pre = JSON.parse(readFileSync(new URL('./data/survive-prereg.json', import.meta.url), 'utf8'));
+  const run = JSON.parse(readFileSync(new URL('./data/survive.json', import.meta.url), 'utf8'));
+  const seals = run.cards.map((c) => c.seal);
+  assert.equal(seals.length, 64);
+  assert.ok(run.cards.every((c) => c.code === sealCode(c.seal)), 'every printed code is the kernel\'s');
+  const t = tallySurvival(seals, run.reads, pre.transforms);
+  assert.deepEqual(t.rows.map((r) => [r.id, r.exact, r.right, r.refused, r.wrong]), [
+    ['png', 64, 64, 0, 0], ['jpeg90', 64, 64, 0, 0], ['jpeg50', 64, 64, 0, 0], ['jpeg20', 64, 64, 0, 0], ['webp60', 64, 64, 0, 0],
+    ['png75', 64, 64, 0, 0], ['png50', 64, 64, 0, 0], ['jpeg75at50', 64, 64, 0, 0], ['jpeg60at60', 64, 64, 0, 0],
+    ['png35', 0, 0, 64, 0], ['png25', 0, 0, 64, 0], ['jpeg5', 64, 64, 0, 0],
+  ]);
+  const j = judgeSurvival(t);
+  assert.deepEqual(j.rules.map((r) => [r.id, r.pass]), [['stripped-exact', true], ['platform-ladder', true], ['never-wrong', true], ['third-size', false]]);
+});
