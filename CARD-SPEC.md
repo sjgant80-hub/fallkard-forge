@@ -154,6 +154,34 @@ verifies by hash even when the embedded bytes are gone.
 platform and must be measured, not assumed — which is exactly why the fallback is specified
 from the start rather than bolted on after the first stripped card.
 
+### 7.1 · The printed seal
+
+Until 2026-09-30 §7 named a visible seal but no card carried a readable one: the web forge printed 24 hex digits
+in 13px type, the Node forge printed nothing, and a stripped card could only be refused. This section is the
+visible seal, specified so a person, a vision model and a pixel reader can all read it back.
+
+**What is printed.** The first 80 bits of `seal`, as 16 symbols of Crockford base32
+(`0123456789ABCDEFGHJKMNPQRSTVWXYZ`), in four groups of four: `XXXX-XXXX-XXXX-XXXX`. Nothing else: never
+payload bytes, never anything hidden. It is printed in plain sight, like a serial number. §0 stands.
+
+**How it is printed.** A band on the 440×616 card at x 20, y 556, 400×36, paper `rgb(243,234,210)`. The 19 characters
+are drawn centred in it from the 5×7 dot font in `sealmark.mjs`, three pixels per dot, in ink `rgb(21,18,28)`. Every
+pair of the 32 symbols differs in at least five dots. A card of another size scales the band with it.
+
+**How it is read.** Case-blind; `O` reads as `0`, `I` and `L` as `1`; separators and spaces are ignored; an unreadable
+symbol is `?`. A pixel reader samples each of the 35 dot centres per symbol, thresholds halfway between that cell's
+darkest and lightest sample, and takes the nearest glyph if it is within two dots. Otherwise the symbol is `?`.
+
+**How it is resolved.** Against the holder's deck, by edit distance with `?` matching anything. It is accepted only
+when the nearest card is within 3 edits, no other card is within 3 more, and at most 4 symbols are `?`. Otherwise it
+is refused, never guessed. The build then comes from the deck's own copy and must match that card's full seal
+(§3), exactly as if the chunks had been there. **The picture only says which card; it never supplies what is inside.**
+
+**Why this alphabet, font and grouping.** A sealed read-back ([kar-pixel-cost](https://sjgant80-hub.github.io/kar-pixel-cost/#readback),
+2026-09-30) had a vision model transcribe 64 rendered texts blind. Every miss was one character, never a word:
+`O` for `0`, `C` for `c`, straightened quotes, an extra digit in a hex run, and a long run of one glyph miscounted.
+The alphabet, the case-folding and the groups of four remove those failure modes rather than hoping they do not happen.
+
 ## 8 · Conformance
 
 A conformant implementation must:

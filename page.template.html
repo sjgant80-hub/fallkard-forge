@@ -151,10 +151,13 @@ set it to <i>no</i> and the card comes out <code>common</code> however deep the 
 the key. That is the whole point of a card: you cannot claim a grade, only earn one.</p>
 
 <h2>Read one back</h2>
-<p class="sub">Drop the card you just downloaded — or any PNG — and see what it is really carrying.</p>
+<p class="sub">Drop the card you just downloaded — or any picture — and see what it is really carrying. Even a copy a
+platform stripped, or turned into a JPEG: if the card is in your deck, its printed seal finds it.</p>
 <div class="panel">
-  <div class="drop" id="drop">Drop a PNG here, or click to choose one
-    <input type="file" id="file" accept="image/png" style="display:none"></div>
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a card or picture to read">Drop a card or any picture here, or click to choose one
+    <input type="file" id="file" accept="image/*" style="display:none"></div>
+  <p class="note" style="margin:.8rem 0 0"><span id="deckCount">Your deck on this device is empty.</span>
+    <button id="deckForget" type="button" class="ghost" style="margin:.4rem 0 0;padding:.3rem .8rem;font-size:.8rem">Forget this device's deck</button></p>
   <div class="out" id="readOut">
     <div id="verdictWrap"></div>
     <div class="facts" id="readFacts" style="margin-top:1rem"></div>
@@ -231,6 +234,27 @@ value and provenance only — the day this touches real money it is a separate, 
   <div id="kccOut" class="note"></div>
 </div>
 
+<h2 id="printed-seal">The seal you can read</h2>
+<p class="sub">Post a card and the platform may strip its build out, or turn it into a JPEG. The picture survives. So
+every card now prints the first 80 bits of its seal on its face, in a band anyone can read.</p>
+<div class="panel">
+  <p class="note" style="margin-top:0"><b>Two people holding the same card is what makes a stripped copy whole.</b> The copy
+  keeps the printed seal; whoever holds the card keeps the build. Drop the stripped copy here, the page reads the
+  band off the pixels, finds the card in your deck, and re-checks the build against its full seal. The picture only
+  says <i>which</i> card it is. What comes out is always your own copy, verified.</p>
+  <p class="note"><b>Made to be read back exactly.</b> A sealed test had a vision model read 64 rendered texts
+  blind (<a href="https://sjgant80-hub.github.io/kar-pixel-cost/#readback">kar-pixel-cost</a>). Every miss was one
+  character, never a word: <code>O</code> read as <code>0</code>, <code>C</code> as <code>c</code>, a curly quote
+  straightened, an extra digit in a hex run, a long run miscounted. So the band uses Crockford base32, which has no
+  I, L, O or U and is read case-blind. It prints in groups of four, so there are no long runs. Its blocky 5&times;7
+  letters all differ from each other in at least five dots. A read is matched to your deck by edit distance: a slip is
+  corrected, and a read that could be two cards is refused, never guessed.</p>
+  <p class="note"><b>Nothing is hidden.</b> The band is printed in plain sight, like a serial number, and carries
+  only the seal. The build still rides in the named chunks, and the picture's own data is never used to smuggle
+  anything.</p>
+  <div id="surviveOut"></div>
+</div>
+
 <h2>Why it cannot be faked</h2>
 <p class="note"><b>The seal is a hash of the compressed build.</b> Change one byte of what is inside
 and the seal stops matching, and this page tells you so. Nobody has to be trusted — the check is
@@ -245,15 +269,17 @@ its tier by geometry — the medium physically cannot draw an apex at the center
 folded into it is TRUE is a separate question the card never claims to settle.</p>
 
 <footer>
- <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, and the fold logic from
- <code>fold.mjs</code> — both mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
+ <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, the printed seal from
+ <code>sealmark.mjs</code>, and the fold logic from <code>fold.mjs</code>, all mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
  <a href="https://github.com/sjgant80-hub/fallkard-forge">source</a></p>
- <p>powered by fall·os · Konomi Architecture</p>
+ <p>Powered by the Konomi architecture, created by Thomas Frumkin.</p>
 </footer>
 </div>
 <script type="module">
 /* __CARD_KERNEL__ */
 /* __END_CARD_KERNEL__ */
+/* __SEALMARK_KERNEL__ */
+/* __END_SEALMARK_KERNEL__ */
 
 const $ = s => document.querySelector(s);
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -298,9 +324,36 @@ function drawCard(tags, seal) {
   x.fillStyle = '#f3e6c2'; x.font = '600 25px Georgia, serif';
   x.fillText('konomi card', 34, 74);
   x.font = '13px ui-monospace, monospace'; x.fillStyle = '#d9cba4';
-  x.fillText(seal.slice(0, 24), 34, 566);
-  x.fillText(tags.slice(0, 40), 34, 586);
+  x.fillText(tags.slice(0, 40), 34, 540);
+  // THE VISIBLE SEAL (CARD-SPEC §7.1): the seal's code, printed in plain sight by the gated sealmark
+  // kernel — so a copy whose chunks a platform stripped can still be matched to the card it is.
+  const code = sealCode(seal);
+  if (code) paintBand((bx, by, bw, bh, rgb) => { x.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; x.fillRect(bx, by, bw, bh); }, code, 440, 616);
   return new Promise(res => c.toBlob(b => b.arrayBuffer().then(ab => res(new Uint8Array(ab))), 'image/png'));
+}
+
+// ── the deck: the cards this device holds, so a stripped copy can be matched back to one ─────────
+// Two people holding the same card is what makes a stripped copy whole again: the picture carries the
+// printed seal, the deck carries the build. Kept in this browser only (its own database name, so it
+// never collides with any other page on this origin).
+const DECK_DB = 'fallkard-forge-deck', DECK_VERSION = 1;
+function deckOpen() {
+  return new Promise((ok, no) => {
+    const q = indexedDB.open(DECK_DB, DECK_VERSION);
+    q.onupgradeneeded = () => { if (!q.result.objectStoreNames.contains('cards')) q.result.createObjectStore('cards', { keyPath: 'seal' }); };
+    q.onsuccess = () => ok(q.result); q.onerror = () => no(q.error);
+  });
+}
+async function deckTx(mode, fn) {
+  const db = await deckOpen();
+  return new Promise((ok, no) => { const t = db.transaction('cards', mode); const r = fn(t.objectStore('cards')); t.oncomplete = () => ok(r && r.result); t.onerror = () => no(t.error); });
+}
+async function deckAdd(entry) { try { await deckTx('readwrite', (s) => s.put(entry)); } catch { /* no storage here — the deck just stays empty */ } await deckShow(); }
+async function deckAll() { try { return (await deckTx('readonly', (s) => s.getAll())) || []; } catch { return []; } }
+async function deckClear() { try { await deckTx('readwrite', (s) => s.clear()); } catch {} await deckShow(); }
+async function deckShow() {
+  const n = (await deckAll()).length, el = document.getElementById('deckCount');
+  if (el) el.textContent = n === 0 ? 'Your deck on this device is empty — forge a card, or drop one with its build inside, and it is kept here.' : 'Your deck on this device: ' + n + ' card' + (n === 1 ? '' : 's') + '. A stripped copy of any of them resolves from its picture.';
 }
 
 const fact = (k, v) => `<div class="fact"><b>${k}</b><span>${v}</span></div>`;
@@ -321,12 +374,14 @@ $('#forge').addEventListener('click', async () => {
   const manifest = manifestFor({ ...opts, seal, tags, forged: TODAY });
   const art = await drawCard(tags, seal);
   forged = embed(art, b64(payload), manifest);
+  await deckAdd({ seal, payloadB64: b64(payload), manifest, added: TODAY });
 
   const url = URL.createObjectURL(new Blob([forged], { type: 'image/png' }));
   $('#preview').src = url;
   $('#forgeFacts').innerHTML =
     fact('tier', tierChip(manifest.rarity)) +
     fact('seal', seal) +
+    fact('printed', sealCode(seal) + ' — the first 80 bits of the seal, on the card face') +
     fact('build', text.length + ' chars → ' + payload.length + ' bytes packed') +
     fact('card', forged.length + ' bytes of PNG') +
     fact('tags', manifest.tags || '(none)') +
@@ -345,10 +400,11 @@ $('#dl').addEventListener('click', () => {
 // ── read ─────────────────────────────────────────────────────────────────────────────────────────
 const drop = $('#drop');
 drop.addEventListener('click', () => $('#file').click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#file').click(); } });
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) inspect(e.dataTransfer.files[0]); });
-$('#file').addEventListener('change', e => { if (e.target.files[0]) inspect(e.target.files[0]); });
+$('#file').addEventListener('change', e => { if (e.target.files[0]) inspect(e.target.files[0]); e.target.value = ''; });
 
 async function inspect(file) {
   const u8 = new Uint8Array(await file.arrayBuffer());
@@ -357,16 +413,8 @@ async function inspect(file) {
 
   let r;
   try { r = read(u8); }
-  catch (e) {
-    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT A CARD</span>`;
-    $('#readFacts').innerHTML = fact('why', e.message);
-    return;
-  }
-  if (!r.isCard) {
-    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NO BUILD INSIDE</span>`;
-    $('#readFacts').innerHTML = fact('why', r.reason);
-    return;
-  }
+  catch (e) { return fromPicture(file, e.message); }        // a JPEG, a WebP — whatever a platform made of it
+  if (!r.isCard) return fromPicture(file, r.reason);          // a PNG with its chunks stripped
 
   // ⚑ THE SEAL IS RE-COMPUTED, NEVER READ BACK AND BELIEVED. Hashing the payload we actually found
   // and comparing is the entire trust story; taking the manifest's word for it would prove nothing.
@@ -394,6 +442,7 @@ async function inspect(file) {
   $('#recovered').value = text;
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
+  if (authentic) await deckAdd({ seal: actual, payloadB64: r.payloadB64, manifest: r.manifest, added: TODAY });
 
   // a sovereign artifact rides beside the card manifest — verify every claim it makes, locally
   try {
@@ -412,6 +461,110 @@ async function inspect(file) {
     }
   } catch { /* no artifact riding on this card — it is a plain forge card, which is fine */ }
 }
+
+// ── the fallback (CARD-SPEC §7.1): no chunks left, so read the printed seal off the picture ──────
+// The pixels are sampled, the gated kernel reads the band, and the read is resolved against the deck
+// this device holds. The build that comes back is the deck's own copy, and its seal is re-computed
+// here like any other — the picture only says WHICH card it is, never what is inside it.
+async function readPicture(blob) {
+  let bmp;
+  try { bmp = await createImageBitmap(blob); } catch { return { ok: false, stage: 'image', why: 'the file is not an image this browser can open' }; }
+  const cv = document.createElement('canvas'); cv.width = bmp.width; cv.height = bmp.height;
+  const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, 0, 0);
+  const w = cv.width, h = cv.height, d = cx.getImageData(0, 0, w, h).data;
+  const luma = (px, py) => { const xx = Math.floor(px), yy = Math.floor(py); if (xx < 0 || yy < 0 || xx >= w || yy >= h) return undefined; const i = (yy * w + xx) * 4; return 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]; };
+  const band = readBand(luma, w, h);
+  const deck = await deckAll();
+  const res = resolveCode(band.read, deck.map((e) => e.seal));
+  if (!res.ok) return { ok: false, stage: 'resolve', why: res.why, band, deckSize: deck.length, width: w, height: h };
+  const entry = deck[res.index], payload = unb64(entry.payloadB64), actual = await sha256hex(payload);
+  return { ok: true, band, res, entry, payload, actual, authentic: actual === entry.seal, deckSize: deck.length, width: w, height: h };
+}
+
+async function fromPicture(file, whyNoChunksRaw) {
+  const whyNoChunks = /signature/i.test(whyNoChunksRaw)
+    ? 'this copy is no longer a PNG (' + (file.type || 'another format') + ') — whatever re-encoded it dropped the chunks'
+    : whyNoChunksRaw;
+  const p = await readPicture(file);
+  if (!p.ok && p.stage === 'resolve' && p.deckSize === 0) p.why = 'your deck on this device is empty';
+  const size = p.width ? p.width + '&times;' + p.height + ' px' : '';
+  if (!p.ok && p.stage === 'image') {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT A CARD</span>`;
+    $('#readFacts').innerHTML = fact('why', p.why);
+    return;
+  }
+  if (!p.ok && p.band.unknown === 16) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NO BUILD INSIDE</span>`;
+    $('#readFacts').innerHTML = fact('why', whyNoChunks) + fact('printed seal', 'none could be read on this picture') + fact('picture', size);
+    return;
+  }
+  if (!p.ok) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT IN YOUR DECK</span>`;
+    $('#readFacts').innerHTML = fact('chunks', 'gone — ' + whyNoChunks) + fact('printed seal', p.band.read) + fact('why', p.why)
+      + fact('your deck', p.deckSize + ' card' + (p.deckSize === 1 ? '' : 's') + ' on this device')
+      + fact('what now', 'Anyone who holds this card can open it. Drop the original card — the one with its build inside — to add it to your deck, then drop this copy again.')
+      + fact('picture', size);
+    return;
+  }
+  let text = '';
+  try { text = new TextDecoder().decode(await gunzip(p.payload)); } catch { text = '(the payload is there but would not decompress)'; }
+  $('#verdictWrap').innerHTML = p.authentic ? `<span class="verdict v-ok">RESOLVED FROM ITS PRINTED SEAL</span>` : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
+  $('#readFacts').innerHTML =
+    fact('chunks', 'gone — ' + whyNoChunks) +
+    fact('printed seal', p.band.read + ' — read off the picture') +
+    fact('corrected', p.res.edits + ' edit' + (p.res.edits === 1 ? '' : 's') + ', ' + p.res.unknown + ' unreadable symbol' + (p.res.unknown === 1 ? '' : 's')) +
+    fact('card', p.entry.seal) +
+    fact('actual', p.actual) +
+    fact('verdict', p.authentic ? 'the build from your deck is exactly what this card sealed' : 'the copy in your deck no longer matches its seal') +
+    fact('tier', tierChip((p.entry.manifest && p.entry.manifest.rarity) || 'common')) +
+    fact('picture', size);
+  $('#recovered').value = text;
+  $('#recovered').style.display = 'block';
+  $('#recLabel').style.display = 'block';
+}
+
+$('#deckForget').addEventListener('click', () => deckClear());
+deckShow();
+
+// ── does the printed seal survive? — the sealed run, tallied here by the same gated kernel ───────────
+/* __SURVIVE_DATA__ */
+/* __END_SURVIVE_DATA__ */
+{
+  const el = document.getElementById('surviveOut');
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (el && SURVIVE) {
+    const P = SURVIVE.prereg, R = SURVIVE.run;
+    const ruleText = (id) => esc(P.rules.find((r) => r.id === id).rule);
+    if (!R) {
+      el.innerHTML = '<p class="note warn"><b>Sealed, not yet run.</b> Before any card is damaged, these ' + P.rules.length + ' rules are fixed: '
+        + P.rules.map((r) => esc(r.rule)).join('; ') + '. The result lands here whichever way it goes.</p>';
+    } else {
+      const t = tallySurvival(R.seals, R.reads, P.transforms), j = judgeSurvival(t);
+      const label = Object.fromEntries(P.transforms.map((x) => [x.id, x.label]));
+      el.innerHTML = '<p class="note warn"><b>The sealed run: ' + j.passed + ' of ' + j.of + ' rules held.</b> ' + P.n + ' fresh cards were forged by this page and kept in its deck. Each picture was pushed through '
+        + P.transforms.length + ' kinds of damage with ' + esc(R.browser || 'the browser') + '’s own encoders, which strip the chunks as any re-encode does. Each result was read back by this page’s own reader. The rules were sealed in <code>' + esc(R.sealedIn) + '</code> before the run.</p>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"><th style="padding:.35rem .4rem">damage</th><th>read exactly</th><th>right card</th><th>refused</th><th>wrong card</th><th>unreadable / card</th></tr></thead><tbody>'
+        + t.rows.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(label[r.id]) + (r.realistic ? '' : ' <span style="color:var(--faint)">(edge)</span>') + '</td><td>' + r.exact + '/' + r.n + '</td><td>' + r.right + '/' + r.n + '</td><td>' + r.refused + '</td><td style="color:' + (r.wrong ? 'var(--no)' : 'inherit') + '">' + r.wrong + '</td><td>' + r.meanUnknown + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + '<div style="overflow-x:auto;margin-top:.8rem"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"><th style="padding:.35rem .4rem">sealed rule</th><th>result</th><th></th><th>predicted</th></tr></thead><tbody>'
+        + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + ruleText(r.id) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + '<p class="note"><b>Not measured here:</b> ' + esc(P.notMeasured) + '</p>';
+    }
+  }
+}
+
+// A handle for the survival run (tools/survive.mjs) — the SAME forge and reader a person uses, driven by
+// a script, so what is measured is this page and not a copy of it. It adds nothing a page visitor can't do.
+window.fallkardForge = {
+  async forge(text, tags = 'owl:high-left,rose:blue:1') {
+    const payload = await gzip(new TextEncoder().encode(text));
+    const seal = await sha256hex(payload);
+    const manifest = manifestFor({ assessorPass: true, depth: 0, readingKeyHonest: true, seal, tags, forged: TODAY });
+    return { seal, png: embed(await drawCard(tags, seal), b64(payload), manifest), payloadB64: b64(payload), manifest };
+  },
+  readPicture, deckAdd, deckAll, deckClear, sealCode,
+};
 
 /* __FOLD_KERNEL__ */
 /* __END_FOLD_KERNEL__ */

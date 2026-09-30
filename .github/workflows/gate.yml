@@ -34,9 +34,24 @@ jobs:
             console.log('gate clean');
           "
 
+      # THE VISIBLE SEAL (CARD-SPEC §7.1) — sealmark.mjs draws the band on every card and reads it back off a
+      # stripped one. Gated by its own pinned witness; nothing baselined.
+      - name: Fetch witness @v0.6
+        run: git clone --depth 1 --branch v0.6 https://github.com/sjgant80-hub/witness.git .witness6
+
+      - name: The visible seal — tests, then the mutation gate
+        run: |
+          node --test sealmark.test.mjs
+          node .witness6/witness.mjs mutate sealmark.mjs --timeout 60000 --cap 400 --test node --test sealmark.test.mjs | tee sealmark.out
+          grep -q '"clean": true' sealmark.out || { echo "::error::mutants survived in sealmark.mjs"; exit 1; }
+
+      - name: The survival run's seal is exactly what its script writes
+        run: node scripts/survive.mjs --check
+
       # ⚑ THE PAGE MUST CARRY THE KERNEL THAT WAS JUST GATED, or the gate is green about a file the
-      # Forge does not use — the most comfortable kind of lie.
+      # Forge does not use — the most comfortable kind of lie. (The builder moved to scripts/ and this step
+      # kept calling the old path, so the gate stood red from 2026-09-16 until the visible-seal change.)
       - name: The shipped page must match the gated kernel
         run: |
-          node build-page.mjs
-          git diff --exit-code index.html || (echo "index.html is stale — run node build-page.mjs and commit it" && exit 1)
+          node scripts/build-page.mjs
+          git diff --exit-code index.html README.md || (echo "index.html or README.md is stale — run node scripts/build-page.mjs and commit it" && exit 1)

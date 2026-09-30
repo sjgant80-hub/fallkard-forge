@@ -1,0 +1,144 @@
+{
+ "kind": "fallkard-forge-survive-prereg",
+ "v": 1,
+ "written": "2026-09-30",
+ "statement": "Sealed, committed and pushed before the run. A card posted to a platform can lose its chunks and be recompressed or shrunk; CARD-SPEC §7.1 says the printed seal still finds the card in the holder's deck. This fixes, in advance, the cards, the damage, the reader, the bars, and a prediction. The result is published whichever way it lands.",
+ "question": "Once a card has lost its chunks and its picture has been recompressed or shrunk, does the printed seal still resolve to the right card in the deck — and never to the wrong one?",
+ "pilot": "During development one card was pushed through seven transforms (stripped PNG; JPEG 90, 50 and 20; WebP 60; half size as PNG and as JPEG 75) and read back exactly in all seven. That pilot is why this ladder goes further, down to a quarter size and JPEG quality 5: to find where it breaks.",
+ "cards": {
+  "n": 64,
+  "seed": 20260930,
+  "payload": "a small HTML build per card, its text drawn from a seeded PRNG (mulberry32) so every card and every seal is fresh and reproducible",
+  "tags": "owl:high-left,rose:blue:1",
+  "forge": "the page's own forge (the same code as the Forge-one button)"
+ },
+ "deck": "all 64 cards, in the page's own deck",
+ "transforms": [
+  {
+   "id": "png",
+   "label": "stripped PNG, full size",
+   "type": "image/png",
+   "quality": null,
+   "scale": 1,
+   "realistic": true
+  },
+  {
+   "id": "jpeg90",
+   "label": "JPEG quality 90",
+   "type": "image/jpeg",
+   "quality": 0.9,
+   "scale": 1,
+   "realistic": true
+  },
+  {
+   "id": "jpeg50",
+   "label": "JPEG quality 50",
+   "type": "image/jpeg",
+   "quality": 0.5,
+   "scale": 1,
+   "realistic": true
+  },
+  {
+   "id": "jpeg20",
+   "label": "JPEG quality 20",
+   "type": "image/jpeg",
+   "quality": 0.2,
+   "scale": 1,
+   "realistic": true
+  },
+  {
+   "id": "webp60",
+   "label": "WebP quality 60",
+   "type": "image/webp",
+   "quality": 0.6,
+   "scale": 1,
+   "realistic": true
+  },
+  {
+   "id": "png75",
+   "label": "PNG at 75% size",
+   "type": "image/png",
+   "quality": null,
+   "scale": 0.75,
+   "realistic": true
+  },
+  {
+   "id": "png50",
+   "label": "PNG at 50% size",
+   "type": "image/png",
+   "quality": null,
+   "scale": 0.5,
+   "realistic": true
+  },
+  {
+   "id": "jpeg75at50",
+   "label": "JPEG 75 at 50% size",
+   "type": "image/jpeg",
+   "quality": 0.75,
+   "scale": 0.5,
+   "realistic": true
+  },
+  {
+   "id": "jpeg60at60",
+   "label": "JPEG 60 at 60% size",
+   "type": "image/jpeg",
+   "quality": 0.6,
+   "scale": 0.6,
+   "realistic": true
+  },
+  {
+   "id": "png35",
+   "label": "PNG at 35% size",
+   "type": "image/png",
+   "quality": null,
+   "scale": 0.35,
+   "realistic": false
+  },
+  {
+   "id": "png25",
+   "label": "PNG at 25% size",
+   "type": "image/png",
+   "quality": null,
+   "scale": 0.25,
+   "realistic": false
+  },
+  {
+   "id": "jpeg5",
+   "label": "JPEG quality 5",
+   "type": "image/jpeg",
+   "quality": 0.05,
+   "scale": 1,
+   "realistic": false
+  }
+ ],
+ "how": "createImageBitmap of the forged PNG, drawn onto a canvas of round(size × scale) with imageSmoothingQuality high, then canvas.toBlob(type, quality) — Chrome's own encoders stand in for a platform's. Any re-encode drops the chunks. The result is read by the page's own readPicture (the gated readBand, then resolveCode against the deck with its defaults: at most 3 edits, a margin of 3, at most 4 unreadable symbols).",
+ "rules": [
+  {
+   "id": "stripped-exact",
+   "rule": "every stripped full-size PNG reads back exactly — no edit and no unreadable symbol — 64 of 64"
+  },
+  {
+   "id": "platform-ladder",
+   "rule": "under every realistic transform (the first nine), all 64 cards resolve to the right card"
+  },
+  {
+   "id": "never-wrong",
+   "rule": "under all twelve transforms, not one read resolves to the wrong card"
+  },
+  {
+   "id": "third-size",
+   "rule": "at 35% size, at least 90% of the 64 cards still resolve to the right card"
+  }
+ ],
+ "alsoReported": "for every transform: how many reads were exact, how many resolved right, wrong or were refused, and the mean unreadable symbols. The 25% and JPEG-5 rungs are there to find the edge and judge nothing.",
+ "predictions": {
+  "said": "before the run, by Kar",
+  "stripped-exact": "pass",
+  "platform-ladder": "pass",
+  "never-wrong": "pass — a doubtful read is refused, not guessed",
+  "third-size": "FAIL — at 35% a dot is about one pixel, and I expect whole glyphs to smear",
+  "png25": "mostly refused, none wrong",
+  "jpeg5": "most still resolve: the band is two tones in big blocks, which is what JPEG keeps best"
+ },
+ "notMeasured": "real platforms (Discord, X, WhatsApp and the rest) — Chrome's encoders stand in for them, and each platform still has to be tried for real; and a vision model reading the band, which is a paid run and waits for Simon's key."
+}

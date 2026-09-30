@@ -20,6 +20,7 @@ import { deflateSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { serialise } from './png.mjs';
+import { sealCode, paintBand } from './sealmark.mjs';
 
 // the five solids → their colours (CARD-SPEC §4: rose colour set = which solids fire)
 export const SOLID_COLOURS = {
@@ -195,6 +196,13 @@ export function renderCard({ tags, seal = '', width = 440, height = 616 }) {
     }
     for (let i = 0; i < 9; i++) line(c, ox, oy + 6 + i, ox - 5 + i * 0.6, oy + 15 + i, [232, 236, 250], 0.5);
   }
+
+  // THE VISIBLE SEAL · CARD-SPEC §7.1 — the seal's code printed in plain sight, so a card whose chunks
+  // a platform stripped still resolves from its picture. Only a real seal has a code; nothing is hidden.
+  const code = sealCode(seal);
+  if (code) paintBand((x, y, w, h, rgb) => {
+    for (let yy = Math.round(y); yy < Math.round(y + h); yy++) for (let xx = Math.round(x); xx < Math.round(x + w); xx++) blend(c, xx, yy, rgb, 1);
+  }, code, width, height);
 
   return encodePng(c);
 }

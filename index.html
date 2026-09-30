@@ -151,10 +151,13 @@ set it to <i>no</i> and the card comes out <code>common</code> however deep the 
 the key. That is the whole point of a card: you cannot claim a grade, only earn one.</p>
 
 <h2>Read one back</h2>
-<p class="sub">Drop the card you just downloaded — or any PNG — and see what it is really carrying.</p>
+<p class="sub">Drop the card you just downloaded — or any picture — and see what it is really carrying. Even a copy a
+platform stripped, or turned into a JPEG: if the card is in your deck, its printed seal finds it.</p>
 <div class="panel">
-  <div class="drop" id="drop">Drop a PNG here, or click to choose one
-    <input type="file" id="file" accept="image/png" style="display:none"></div>
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a card or picture to read">Drop a card or any picture here, or click to choose one
+    <input type="file" id="file" accept="image/*" style="display:none"></div>
+  <p class="note" style="margin:.8rem 0 0"><span id="deckCount">Your deck on this device is empty.</span>
+    <button id="deckForget" type="button" class="ghost" style="margin:.4rem 0 0;padding:.3rem .8rem;font-size:.8rem">Forget this device's deck</button></p>
   <div class="out" id="readOut">
     <div id="verdictWrap"></div>
     <div class="facts" id="readFacts" style="margin-top:1rem"></div>
@@ -231,6 +234,27 @@ value and provenance only — the day this touches real money it is a separate, 
   <div id="kccOut" class="note"></div>
 </div>
 
+<h2 id="printed-seal">The seal you can read</h2>
+<p class="sub">Post a card and the platform may strip its build out, or turn it into a JPEG. The picture survives. So
+every card now prints the first 80 bits of its seal on its face, in a band anyone can read.</p>
+<div class="panel">
+  <p class="note" style="margin-top:0"><b>Two people holding the same card is what makes a stripped copy whole.</b> The copy
+  keeps the printed seal; whoever holds the card keeps the build. Drop the stripped copy here, the page reads the
+  band off the pixels, finds the card in your deck, and re-checks the build against its full seal. The picture only
+  says <i>which</i> card it is. What comes out is always your own copy, verified.</p>
+  <p class="note"><b>Made to be read back exactly.</b> A sealed test had a vision model read 64 rendered texts
+  blind (<a href="https://sjgant80-hub.github.io/kar-pixel-cost/#readback">kar-pixel-cost</a>). Every miss was one
+  character, never a word: <code>O</code> read as <code>0</code>, <code>C</code> as <code>c</code>, a curly quote
+  straightened, an extra digit in a hex run, a long run miscounted. So the band uses Crockford base32, which has no
+  I, L, O or U and is read case-blind. It prints in groups of four, so there are no long runs. Its blocky 5&times;7
+  letters all differ from each other in at least five dots. A read is matched to your deck by edit distance: a slip is
+  corrected, and a read that could be two cards is refused, never guessed.</p>
+  <p class="note"><b>Nothing is hidden.</b> The band is printed in plain sight, like a serial number, and carries
+  only the seal. The build still rides in the named chunks, and the picture's own data is never used to smuggle
+  anything.</p>
+  <div id="surviveOut"></div>
+</div>
+
 <h2>Why it cannot be faked</h2>
 <p class="note"><b>The seal is a hash of the compressed build.</b> Change one byte of what is inside
 and the seal stops matching, and this page tells you so. Nobody has to be trusted — the check is
@@ -245,10 +269,10 @@ its tier by geometry — the medium physically cannot draw an apex at the center
 folded into it is TRUE is a separate question the card never claims to settle.</p>
 
 <footer>
- <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, and the fold logic from
- <code>fold.mjs</code> — both mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
+ <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, the printed seal from
+ <code>sealmark.mjs</code>, and the fold logic from <code>fold.mjs</code>, all mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
  <a href="https://github.com/sjgant80-hub/fallkard-forge">source</a></p>
- <p>powered by fall·os · Konomi Architecture</p>
+ <p>Powered by the Konomi architecture, created by Thomas Frumkin.</p>
 </footer>
 </div>
 <script type="module">
@@ -446,6 +470,264 @@ function read(png) {
 
 
 /* __END_CARD_KERNEL__ */
+/* __SEALMARK_KERNEL__ */
+// ── sealmark.mjs ──
+const { ALPHABET, sealCode, normalizeCode, resolveCode, bandLayout, paintBand, readBand, BAND_PAPER, BAND_INK, tallySurvival, judgeSurvival } = (() => {
+// ════════════════════════════════════════════════════════════════════════════════════════════════
+// sealmark.mjs · THE VISIBLE SEAL — CARD-SPEC §7.1
+//
+// A platform that strips a card's chunks leaves only the picture. CARD-SPEC §7 says a stripped card
+// "still verifies by hash": the seal printed on its face resolves the payload from a deck the holder
+// already has. This module is that printed seal, made so a person, a vision model and a few lines of
+// pixel sampling can all read it back.
+//
+// It is PRINTED IN PLAIN SIGHT, like a serial number. It carries the first 80 bits of the seal and
+// nothing else — never payload, never hidden bits. Mode B stands: nothing about a card is concealed.
+//
+// The design comes from a measurement. kar-pixel-cost's sealed read-back (2026-09-30) had a vision
+// model transcribe 64 rendered texts blind: every miss was a character slip, never a word — O read as
+// 0, C read as c, curly quotes read straight, an extra 0 in a hex run, and a 98-long run of one glyph
+// read as 104 of another. So:
+//   · the alphabet is Crockford base32 — no I, L, O or U, read case-blind, with O→0 and I/L→1 folded
+//     back on reading: the look-alikes that broke exactness cannot occur in a code;
+//   · the code is printed in groups of four — no long runs to miscount;
+//   · the glyphs are a blocky 5×7 bitmap font whose every pair differs in at least MIN_GLYPH_DISTANCE
+//     dots, so a read with two damaged dots in a glyph still lands on the right symbol;
+//   · a read is resolved against the holder's deck by edit distance, so a slip is corrected, and a
+//     read that could be two cards is refused rather than guessed.
+//
+// Pure: no I/O, no clock, no crypto, no canvas. Drawing and pixel sampling are handed in, the same
+// convention as card.mjs — the Node forge paints into its raster, the page into a canvas.
+// ════════════════════════════════════════════════════════════════════════════════════════════════
+
+const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+const CODE_SYMBOLS = 16;                   // 16 × 5 bits = the first 80 bits of the seal
+const GROUP = 4;
+const GLYPH_W = 5, GLYPH_H = 7, ADVANCE = 6;
+const MIN_GLYPH_DISTANCE = 5;
+
+// the 5×7 font: '#' is ink. Every pair of the 32 differs in ≥ MIN_GLYPH_DISTANCE dots (asserted).
+const GLYPHS = {
+  '0': ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.'],
+  '1': ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'],
+  '2': ['.###.', '#...#', '....#', '...#.', '..#..', '.#...', '#####'],
+  '3': ['####.', '....#', '....#', '.###.', '....#', '....#', '####.'],
+  '4': ['...#.', '..##.', '.#.#.', '#..#.', '#####', '...#.', '...#.'],
+  '5': ['#####', '#....', '####.', '....#', '....#', '#...#', '.###.'],
+  '6': ['..##.', '.#...', '#....', '####.', '#...#', '#...#', '.###.'],
+  '7': ['#####', '....#', '...#.', '..#..', '.#...', '.#...', '.#...'],
+  '8': ['.###.', '#...#', '#...#', '.###.', '#...#', '#...#', '.###.'],
+  '9': ['.###.', '#...#', '#...#', '.####', '....#', '...#.', '.##..'],
+  'A': ['..#..', '.#.#.', '#...#', '#...#', '#####', '#...#', '#...#'],
+  'B': ['####.', '#...#', '#..#.', '###..', '#..#.', '#...#', '####.'],
+  'C': ['.####', '#....', '#....', '#....', '#....', '#....', '.####'],
+  'D': ['###..', '#..#.', '#...#', '#...#', '#...#', '#..#.', '###..'],
+  'E': ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
+  'F': ['#####', '#....', '#....', '###..', '#....', '#....', '#....'],
+  'G': ['.####', '#....', '#....', '#.###', '#...#', '#...#', '.###.'],
+  'H': ['#...#', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
+  'J': ['..###', '...#.', '...#.', '...#.', '...#.', '#..#.', '.##..'],
+  'K': ['#...#', '#..#.', '#.#..', '##...', '#.#..', '#..#.', '#...#'],
+  'M': ['#...#', '##.##', '#.#.#', '#.#.#', '#...#', '#...#', '#...#'],
+  'N': ['#...#', '##..#', '##..#', '#.#.#', '#..##', '#..##', '#...#'],
+  'P': ['####.', '#...#', '#...#', '#...#', '####.', '#....', '#....'],
+  'Q': ['.###.', '#...#', '#...#', '#...#', '#.#.#', '#..#.', '.##.#'],
+  'R': ['####.', '#...#', '#...#', '####.', '#.#..', '#..#.', '#...#'],
+  'S': ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'],
+  'T': ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'],
+  'V': ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'],
+  'W': ['#...#', '#...#', '#...#', '#.#.#', '#.#.#', '##.##', '#...#'],
+  'X': ['#...#', '#...#', '.#.#.', '..#..', '.#.#.', '#...#', '#...#'],
+  'Y': ['#...#', '#...#', '.#.#.', '..#..', '..#..', '..#..', '..#..'],
+  'Z': ['#####', '....#', '...#.', '..#..', '.#...', '#....', '#####'],
+  '-': ['.....', '.....', '.....', '#####', '.....', '.....', '.....'],
+};
+
+const isStr = (v) => typeof v === 'string';
+const inkOf = (g) => GLYPHS[g].join('');
+// every dot of a glyph as [row, column], in reading order — one list, so no loop bound can drift
+const DOTS = Array.from({ length: GLYPH_H * GLYPH_W }, (_, i) => [Math.floor(i / GLYPH_W), i % GLYPH_W]);
+const hamming = (a, b) => [...a].reduce((d, ch, i) => d + (ch === b[i] ? 0 : 1), 0);
+
+// glyphDistance(a, b) — how many of the 35 dots differ between two glyphs.
+function glyphDistance(a, b) {
+  if (!isStr(a) || !isStr(b) || !GLYPHS[a] || !GLYPHS[b]) return null;
+  return hamming(inkOf(a), inkOf(b));
+}
+
+// sealCode(sealHex) — the printed code: the first 80 bits of the seal in Crockford base32, grouped
+// 'XXXX-XXXX-XXXX-XXXX'. Anything that is not at least 20 hex digits has no code.
+function sealCode(sealHex) {
+  if (!isStr(sealHex) || !/^[0-9a-fA-F]{20}/.test(sealHex)) return null;
+  const bits = sealHex.slice(0, 20).split('').map((h) => parseInt(h, 16).toString(2).padStart(4, '0')).join('');
+  let out = '';
+  for (let i = 0; i < CODE_SYMBOLS; i++) {
+    if (i && i % GROUP === 0) out += '-';
+    out += ALPHABET[parseInt(bits.slice(i * 5, i * 5 + 5), 2)];
+  }
+  return out;
+}
+
+// normalizeCode(text) — what a read means: case-blind, O→0, I and L→1, separators and spaces dropped.
+// '?' stands for a symbol that could not be read and is kept. Any other character makes it no code.
+function normalizeCode(text) {
+  if (!isStr(text)) return null;
+  const s = text.toUpperCase().replace(/[\s\-_.·]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+  for (const ch of s) if (ch !== '?' && !ALPHABET.includes(ch)) return null;
+  return s;
+}
+
+// readDistance(read, code) — edits between a read and a card's code; a '?' in the read matches any
+// symbol for free, because it says only that the symbol was not seen.
+function readDistance(read, code) {
+  if (!isStr(read) || !isStr(code)) return null;
+  let prev = Array.from({ length: code.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= read.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= code.length; j++) {
+      const same = read[i - 1] === '?' || read[i - 1] === code[j - 1];
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (same ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[code.length];
+}
+
+// resolveCode(text, seals, opts) — which card in the deck this read is. Accepted only when the nearest
+// card is within maxEdits AND no other card is within margin of it, and when enough was seen.
+function resolveCode(text, seals, opts = {}) {
+  const o = opts && typeof opts === 'object' ? opts : {};
+  const maxEdits = Number.isInteger(o.maxEdits) ? o.maxEdits : 3;
+  const margin = Number.isInteger(o.margin) ? o.margin : 3;
+  const maxUnknown = Number.isInteger(o.maxUnknown) ? o.maxUnknown : 4;
+  const read = normalizeCode(text);
+  if (read === null || read.length === 0) return { ok: false, why: 'the read is not a seal code' };
+  const unknown = read.split('').filter((c) => c === '?').length;
+  if (unknown > maxUnknown) return { ok: false, why: 'too little of the seal could be read', read };
+  if (!Array.isArray(seals)) return { ok: false, why: 'no deck to resolve against', read };
+  const scored = [];
+  seals.forEach((seal, index) => {
+    const code = sealCode(seal);
+    if (code !== null) scored.push({ index, seal, edits: readDistance(read, code.replace(/-/g, '')) });
+  });
+  if (scored.length === 0) return { ok: false, why: 'no card in the deck has a seal', read };
+  scored.sort((a, b) => a.edits - b.edits);
+  const best = scored[0], next = scored[1];
+  if (best.edits > maxEdits) return { ok: false, why: 'no card in the deck is within ' + maxEdits + ' edits of the read', read, nearest: best.edits };
+  if (next && next.edits - best.edits < margin) return { ok: false, why: 'the read could be more than one card', read };
+  return { ok: true, index: best.index, seal: best.seal, edits: best.edits, unknown, read };
+}
+
+// bandLayout(width, height) — where the band sits. Geometry is fixed on the 440×616 card and scales
+// with the picture, so a reader finds it in a resized copy too.
+const REF_W = 440, REF_H = 616;
+const BAND = { x: 20, y: 556, w: 400, h: 36, dot: 3 };
+function bandLayout(width, height) {
+  if (!(Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0)) return null;
+  const sx = width / REF_W, sy = height / REF_H;
+  const chars = CODE_SYMBOLS + CODE_SYMBOLS / GROUP - 1;
+  const textW = (chars * ADVANCE - 1) * BAND.dot, textH = GLYPH_H * BAND.dot;
+  const tx = Math.floor((REF_W - textW) / 2), ty = BAND.y + Math.floor((BAND.h - textH) / 2);
+  return { sx, sy, chars, band: { x: BAND.x * sx, y: BAND.y * sy, w: BAND.w * sx, h: BAND.h * sy }, text: { x: tx * sx, y: ty * sy, dotW: BAND.dot * sx, dotH: BAND.dot * sy } };
+}
+
+// paintBand(rect, code, width, height, colours) — draws the band by handing rectangles to rect(x, y,
+// w, h, rgb): the background, then one block per inked dot. Returns how many dots were inked.
+const BAND_PAPER = [243, 234, 210], BAND_INK = [21, 18, 28];
+function paintBand(rect, code, width, height) {
+  const L = bandLayout(width, height);
+  if (!L || typeof rect !== 'function' || !isStr(code) || code.length !== L.chars) return 0;
+  for (const ch of code) if (!GLYPHS[ch]) return 0;
+  rect(L.band.x, L.band.y, L.band.w, L.band.h, BAND_PAPER);
+  let inked = 0;
+  for (let k = 0; k < code.length; k++) {
+    const g = GLYPHS[code[k]];
+    for (const [r, c] of DOTS) {
+      if (g[r][c] !== '#') continue;
+      rect(L.text.x + (k * ADVANCE + c) * L.text.dotW, L.text.y + r * L.text.dotH, L.text.dotW, L.text.dotH, BAND_INK);
+      inked++;
+    }
+  }
+  return inked;
+}
+
+// readBand(luma, width, height) — reads the printed code back out of a picture. luma(x, y) → 0..255 is
+// handed in. Each symbol cell is sampled at its 35 dot centres, thresholded halfway between its own
+// darkest and lightest sample, and matched to the nearest glyph; a cell with too little contrast, or
+// more than two dots from every glyph, reads '?'. Returns the read (separators kept) and each cell.
+function readBand(luma, width, height) {
+  const L = bandLayout(width, height);
+  if (typeof luma !== 'function' || !L) return null;
+  const symbols = ALPHABET.split('');
+  const cells = [];
+  let read = '';
+  for (let k = 0; k < L.chars; k++) {
+    if (k % (GROUP + 1) === GROUP) { read += '-'; continue; }
+    const v = DOTS.map(([r, c]) => {
+      const y = luma(L.text.x + (k * ADVANCE + c + 0.5) * L.text.dotW, L.text.y + (r + 0.5) * L.text.dotH);
+      return Number.isFinite(y) ? y : 255;
+    });
+    const lo = Math.min(...v), hi = Math.max(...v);
+    if (hi - lo < 48) { cells.push({ symbol: '?', nearest: null, distance: null, contrast: hi - lo }); read += '?'; continue; }
+    const mid = (lo + hi) / 2, ink = v.map((y) => (y < mid ? '#' : '.')).join('');
+    let best = null, bestD = Infinity;
+    for (const s of symbols) {
+      const d = hamming(inkOf(s), ink);
+      if (d < bestD) { bestD = d; best = s; }             // the first glyph at the least distance wins
+    }
+    const sure = bestD <= Math.floor((MIN_GLYPH_DISTANCE - 1) / 2);
+    cells.push({ symbol: sure ? best : '?', nearest: best, distance: bestD, contrast: hi - lo });
+    read += sure ? best : '?';
+  }
+  return { read, cells, unknown: cells.filter((c) => c.symbol === '?').length };
+}
+
+// ── the survival run (data/survive-prereg.json) ─────────────────────────────────────────────────────
+// tallySurvival(seals, reads, transforms) — from the raw reads alone, re-resolved here: nothing the run
+// reported about which card it found is taken on trust. reads[t.id][i] is card i's read under transform t.
+function tallySurvival(seals, reads, transforms) {
+  if (!Array.isArray(seals) || seals.length === 0 || !reads || typeof reads !== 'object' || !Array.isArray(transforms) || transforms.length === 0) return { ok: false, why: 'seals, reads and transforms' };
+  const rows = [];
+  for (const t of transforms) {
+    const rs = t && reads[t.id];
+    if (!Array.isArray(rs) || rs.length !== seals.length) return { ok: false, why: 'every transform needs one read per card' };
+    const row = { id: t.id, realistic: t.realistic === true, n: rs.length, exact: 0, right: 0, wrong: 0, refused: 0, unknown: 0 };
+    rs.forEach((r, i) => {
+      const read = r && isStr(r.read) ? r.read : '';
+      const code = (sealCode(seals[i]) || '').replace(/-/g, '');
+      if (normalizeCode(read) === code) row.exact++;
+      row.unknown += (read.match(/\?/g) || []).length;
+      const k = resolveCode(read, seals);
+      if (!k.ok) row.refused++;
+      else if (k.seal === seals[i]) row.right++;
+      else row.wrong++;
+    });
+    row.meanUnknown = Math.round((row.unknown / row.n) * 100) / 100;
+    rows.push(row);
+  }
+  return { ok: true, rows };
+}
+
+// judgeSurvival(tally) — the four rules sealed in data/survive-prereg.json, each with the number that decided it.
+function judgeSurvival(tally) {
+  if (!tally || tally.ok !== true || !Array.isArray(tally.rows) || tally.rows.some((r) => !r || typeof r !== 'object')) return { ok: false, why: 'a tally from tallySurvival' };
+  const by = Object.fromEntries(tally.rows.map((r) => [r.id, r]));
+  const real = tally.rows.filter((r) => r.realistic);
+  const wrong = tally.rows.reduce((s, r) => s + r.wrong, 0);
+  const png = by.png, third = by.png35;
+  const rules = [
+    { id: 'stripped-exact', pass: !!png && png.exact === png.n, value: png ? png.exact + '/' + png.n + ' exact' : 'not run' },
+    { id: 'platform-ladder', pass: real.length > 0 && real.every((r) => r.right === r.n), value: real.map((r) => r.right).reduce((a, b) => a + b, 0) + '/' + real.reduce((a, r) => a + r.n, 0) + ' right' },
+    { id: 'never-wrong', pass: wrong === 0, value: wrong + ' wrong' },
+    { id: 'third-size', pass: !!third && third.right / third.n >= 0.9, value: third ? third.right + '/' + third.n + ' right' : 'not run' },
+  ];
+  return { ok: true, rules, passed: rules.filter((r) => r.pass).length, of: rules.length };
+}
+
+
+return { ALPHABET, sealCode, normalizeCode, resolveCode, bandLayout, paintBand, readBand, BAND_PAPER, BAND_INK, tallySurvival, judgeSurvival };
+})();
+/* __END_SEALMARK_KERNEL__ */
 
 const $ = s => document.querySelector(s);
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -490,9 +772,36 @@ function drawCard(tags, seal) {
   x.fillStyle = '#f3e6c2'; x.font = '600 25px Georgia, serif';
   x.fillText('konomi card', 34, 74);
   x.font = '13px ui-monospace, monospace'; x.fillStyle = '#d9cba4';
-  x.fillText(seal.slice(0, 24), 34, 566);
-  x.fillText(tags.slice(0, 40), 34, 586);
+  x.fillText(tags.slice(0, 40), 34, 540);
+  // THE VISIBLE SEAL (CARD-SPEC §7.1): the seal's code, printed in plain sight by the gated sealmark
+  // kernel — so a copy whose chunks a platform stripped can still be matched to the card it is.
+  const code = sealCode(seal);
+  if (code) paintBand((bx, by, bw, bh, rgb) => { x.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; x.fillRect(bx, by, bw, bh); }, code, 440, 616);
   return new Promise(res => c.toBlob(b => b.arrayBuffer().then(ab => res(new Uint8Array(ab))), 'image/png'));
+}
+
+// ── the deck: the cards this device holds, so a stripped copy can be matched back to one ─────────
+// Two people holding the same card is what makes a stripped copy whole again: the picture carries the
+// printed seal, the deck carries the build. Kept in this browser only (its own database name, so it
+// never collides with any other page on this origin).
+const DECK_DB = 'fallkard-forge-deck', DECK_VERSION = 1;
+function deckOpen() {
+  return new Promise((ok, no) => {
+    const q = indexedDB.open(DECK_DB, DECK_VERSION);
+    q.onupgradeneeded = () => { if (!q.result.objectStoreNames.contains('cards')) q.result.createObjectStore('cards', { keyPath: 'seal' }); };
+    q.onsuccess = () => ok(q.result); q.onerror = () => no(q.error);
+  });
+}
+async function deckTx(mode, fn) {
+  const db = await deckOpen();
+  return new Promise((ok, no) => { const t = db.transaction('cards', mode); const r = fn(t.objectStore('cards')); t.oncomplete = () => ok(r && r.result); t.onerror = () => no(t.error); });
+}
+async function deckAdd(entry) { try { await deckTx('readwrite', (s) => s.put(entry)); } catch { /* no storage here — the deck just stays empty */ } await deckShow(); }
+async function deckAll() { try { return (await deckTx('readonly', (s) => s.getAll())) || []; } catch { return []; } }
+async function deckClear() { try { await deckTx('readwrite', (s) => s.clear()); } catch {} await deckShow(); }
+async function deckShow() {
+  const n = (await deckAll()).length, el = document.getElementById('deckCount');
+  if (el) el.textContent = n === 0 ? 'Your deck on this device is empty — forge a card, or drop one with its build inside, and it is kept here.' : 'Your deck on this device: ' + n + ' card' + (n === 1 ? '' : 's') + '. A stripped copy of any of them resolves from its picture.';
 }
 
 const fact = (k, v) => `<div class="fact"><b>${k}</b><span>${v}</span></div>`;
@@ -513,12 +822,14 @@ $('#forge').addEventListener('click', async () => {
   const manifest = manifestFor({ ...opts, seal, tags, forged: TODAY });
   const art = await drawCard(tags, seal);
   forged = embed(art, b64(payload), manifest);
+  await deckAdd({ seal, payloadB64: b64(payload), manifest, added: TODAY });
 
   const url = URL.createObjectURL(new Blob([forged], { type: 'image/png' }));
   $('#preview').src = url;
   $('#forgeFacts').innerHTML =
     fact('tier', tierChip(manifest.rarity)) +
     fact('seal', seal) +
+    fact('printed', sealCode(seal) + ' — the first 80 bits of the seal, on the card face') +
     fact('build', text.length + ' chars → ' + payload.length + ' bytes packed') +
     fact('card', forged.length + ' bytes of PNG') +
     fact('tags', manifest.tags || '(none)') +
@@ -537,10 +848,11 @@ $('#dl').addEventListener('click', () => {
 // ── read ─────────────────────────────────────────────────────────────────────────────────────────
 const drop = $('#drop');
 drop.addEventListener('click', () => $('#file').click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#file').click(); } });
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) inspect(e.dataTransfer.files[0]); });
-$('#file').addEventListener('change', e => { if (e.target.files[0]) inspect(e.target.files[0]); });
+$('#file').addEventListener('change', e => { if (e.target.files[0]) inspect(e.target.files[0]); e.target.value = ''; });
 
 async function inspect(file) {
   const u8 = new Uint8Array(await file.arrayBuffer());
@@ -549,16 +861,8 @@ async function inspect(file) {
 
   let r;
   try { r = read(u8); }
-  catch (e) {
-    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT A CARD</span>`;
-    $('#readFacts').innerHTML = fact('why', e.message);
-    return;
-  }
-  if (!r.isCard) {
-    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NO BUILD INSIDE</span>`;
-    $('#readFacts').innerHTML = fact('why', r.reason);
-    return;
-  }
+  catch (e) { return fromPicture(file, e.message); }        // a JPEG, a WebP — whatever a platform made of it
+  if (!r.isCard) return fromPicture(file, r.reason);          // a PNG with its chunks stripped
 
   // ⚑ THE SEAL IS RE-COMPUTED, NEVER READ BACK AND BELIEVED. Hashing the payload we actually found
   // and comparing is the entire trust story; taking the manifest's word for it would prove nothing.
@@ -586,6 +890,7 @@ async function inspect(file) {
   $('#recovered').value = text;
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
+  if (authentic) await deckAdd({ seal: actual, payloadB64: r.payloadB64, manifest: r.manifest, added: TODAY });
 
   // a sovereign artifact rides beside the card manifest — verify every claim it makes, locally
   try {
@@ -604,6 +909,111 @@ async function inspect(file) {
     }
   } catch { /* no artifact riding on this card — it is a plain forge card, which is fine */ }
 }
+
+// ── the fallback (CARD-SPEC §7.1): no chunks left, so read the printed seal off the picture ──────
+// The pixels are sampled, the gated kernel reads the band, and the read is resolved against the deck
+// this device holds. The build that comes back is the deck's own copy, and its seal is re-computed
+// here like any other — the picture only says WHICH card it is, never what is inside it.
+async function readPicture(blob) {
+  let bmp;
+  try { bmp = await createImageBitmap(blob); } catch { return { ok: false, stage: 'image', why: 'the file is not an image this browser can open' }; }
+  const cv = document.createElement('canvas'); cv.width = bmp.width; cv.height = bmp.height;
+  const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, 0, 0);
+  const w = cv.width, h = cv.height, d = cx.getImageData(0, 0, w, h).data;
+  const luma = (px, py) => { const xx = Math.floor(px), yy = Math.floor(py); if (xx < 0 || yy < 0 || xx >= w || yy >= h) return undefined; const i = (yy * w + xx) * 4; return 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]; };
+  const band = readBand(luma, w, h);
+  const deck = await deckAll();
+  const res = resolveCode(band.read, deck.map((e) => e.seal));
+  if (!res.ok) return { ok: false, stage: 'resolve', why: res.why, band, deckSize: deck.length, width: w, height: h };
+  const entry = deck[res.index], payload = unb64(entry.payloadB64), actual = await sha256hex(payload);
+  return { ok: true, band, res, entry, payload, actual, authentic: actual === entry.seal, deckSize: deck.length, width: w, height: h };
+}
+
+async function fromPicture(file, whyNoChunksRaw) {
+  const whyNoChunks = /signature/i.test(whyNoChunksRaw)
+    ? 'this copy is no longer a PNG (' + (file.type || 'another format') + ') — whatever re-encoded it dropped the chunks'
+    : whyNoChunksRaw;
+  const p = await readPicture(file);
+  if (!p.ok && p.stage === 'resolve' && p.deckSize === 0) p.why = 'your deck on this device is empty';
+  const size = p.width ? p.width + '&times;' + p.height + ' px' : '';
+  if (!p.ok && p.stage === 'image') {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT A CARD</span>`;
+    $('#readFacts').innerHTML = fact('why', p.why);
+    return;
+  }
+  if (!p.ok && p.band.unknown === 16) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NO BUILD INSIDE</span>`;
+    $('#readFacts').innerHTML = fact('why', whyNoChunks) + fact('printed seal', 'none could be read on this picture') + fact('picture', size);
+    return;
+  }
+  if (!p.ok) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT IN YOUR DECK</span>`;
+    $('#readFacts').innerHTML = fact('chunks', 'gone — ' + whyNoChunks) + fact('printed seal', p.band.read) + fact('why', p.why)
+      + fact('your deck', p.deckSize + ' card' + (p.deckSize === 1 ? '' : 's') + ' on this device')
+      + fact('what now', 'Anyone who holds this card can open it. Drop the original card — the one with its build inside — to add it to your deck, then drop this copy again.')
+      + fact('picture', size);
+    return;
+  }
+  let text = '';
+  try { text = new TextDecoder().decode(await gunzip(p.payload)); } catch { text = '(the payload is there but would not decompress)'; }
+  $('#verdictWrap').innerHTML = p.authentic ? `<span class="verdict v-ok">RESOLVED FROM ITS PRINTED SEAL</span>` : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
+  $('#readFacts').innerHTML =
+    fact('chunks', 'gone — ' + whyNoChunks) +
+    fact('printed seal', p.band.read + ' — read off the picture') +
+    fact('corrected', p.res.edits + ' edit' + (p.res.edits === 1 ? '' : 's') + ', ' + p.res.unknown + ' unreadable symbol' + (p.res.unknown === 1 ? '' : 's')) +
+    fact('card', p.entry.seal) +
+    fact('actual', p.actual) +
+    fact('verdict', p.authentic ? 'the build from your deck is exactly what this card sealed' : 'the copy in your deck no longer matches its seal') +
+    fact('tier', tierChip((p.entry.manifest && p.entry.manifest.rarity) || 'common')) +
+    fact('picture', size);
+  $('#recovered').value = text;
+  $('#recovered').style.display = 'block';
+  $('#recLabel').style.display = 'block';
+}
+
+$('#deckForget').addEventListener('click', () => deckClear());
+deckShow();
+
+// ── does the printed seal survive? — the sealed run, tallied here by the same gated kernel ───────────
+/* __SURVIVE_DATA__ */
+const SURVIVE = {"prereg":{"rules":[{"id":"stripped-exact","rule":"every stripped full-size PNG reads back exactly — no edit and no unreadable symbol — 64 of 64"},{"id":"platform-ladder","rule":"under every realistic transform (the first nine), all 64 cards resolve to the right card"},{"id":"never-wrong","rule":"under all twelve transforms, not one read resolves to the wrong card"},{"id":"third-size","rule":"at 35% size, at least 90% of the 64 cards still resolve to the right card"}],"predictions":{"said":"before the run, by Kar","stripped-exact":"pass","platform-ladder":"pass","never-wrong":"pass — a doubtful read is refused, not guessed","third-size":"FAIL — at 35% a dot is about one pixel, and I expect whole glyphs to smear","png25":"mostly refused, none wrong","jpeg5":"most still resolve: the band is two tones in big blocks, which is what JPEG keeps best"},"transforms":[{"id":"png","label":"stripped PNG, full size","type":"image/png","quality":null,"scale":1,"realistic":true},{"id":"jpeg90","label":"JPEG quality 90","type":"image/jpeg","quality":0.9,"scale":1,"realistic":true},{"id":"jpeg50","label":"JPEG quality 50","type":"image/jpeg","quality":0.5,"scale":1,"realistic":true},{"id":"jpeg20","label":"JPEG quality 20","type":"image/jpeg","quality":0.2,"scale":1,"realistic":true},{"id":"webp60","label":"WebP quality 60","type":"image/webp","quality":0.6,"scale":1,"realistic":true},{"id":"png75","label":"PNG at 75% size","type":"image/png","quality":null,"scale":0.75,"realistic":true},{"id":"png50","label":"PNG at 50% size","type":"image/png","quality":null,"scale":0.5,"realistic":true},{"id":"jpeg75at50","label":"JPEG 75 at 50% size","type":"image/jpeg","quality":0.75,"scale":0.5,"realistic":true},{"id":"jpeg60at60","label":"JPEG 60 at 60% size","type":"image/jpeg","quality":0.6,"scale":0.6,"realistic":true},{"id":"png35","label":"PNG at 35% size","type":"image/png","quality":null,"scale":0.35,"realistic":false},{"id":"png25","label":"PNG at 25% size","type":"image/png","quality":null,"scale":0.25,"realistic":false},{"id":"jpeg5","label":"JPEG quality 5","type":"image/jpeg","quality":0.05,"scale":1,"realistic":false}],"pilot":"During development one card was pushed through seven transforms (stripped PNG; JPEG 90, 50 and 20; WebP 60; half size as PNG and as JPEG 75) and read back exactly in all seven. That pilot is why this ladder goes further, down to a quarter size and JPEG quality 5: to find where it breaks.","notMeasured":"real platforms (Discord, X, WhatsApp and the rest) — Chrome's encoders stand in for them, and each platform still has to be tried for real; and a vision model reading the band, which is a paid run and waits for Simon's key.","n":64},"run":null};
+/* __END_SURVIVE_DATA__ */
+{
+  const el = document.getElementById('surviveOut');
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (el && SURVIVE) {
+    const P = SURVIVE.prereg, R = SURVIVE.run;
+    const ruleText = (id) => esc(P.rules.find((r) => r.id === id).rule);
+    if (!R) {
+      el.innerHTML = '<p class="note warn"><b>Sealed, not yet run.</b> Before any card is damaged, these ' + P.rules.length + ' rules are fixed: '
+        + P.rules.map((r) => esc(r.rule)).join('; ') + '. The result lands here whichever way it goes.</p>';
+    } else {
+      const t = tallySurvival(R.seals, R.reads, P.transforms), j = judgeSurvival(t);
+      const label = Object.fromEntries(P.transforms.map((x) => [x.id, x.label]));
+      el.innerHTML = '<p class="note warn"><b>The sealed run: ' + j.passed + ' of ' + j.of + ' rules held.</b> ' + P.n + ' fresh cards were forged by this page and kept in its deck. Each picture was pushed through '
+        + P.transforms.length + ' kinds of damage with ' + esc(R.browser || 'the browser') + '’s own encoders, which strip the chunks as any re-encode does. Each result was read back by this page’s own reader. The rules were sealed in <code>' + esc(R.sealedIn) + '</code> before the run.</p>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"><th style="padding:.35rem .4rem">damage</th><th>read exactly</th><th>right card</th><th>refused</th><th>wrong card</th><th>unreadable / card</th></tr></thead><tbody>'
+        + t.rows.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(label[r.id]) + (r.realistic ? '' : ' <span style="color:var(--faint)">(edge)</span>') + '</td><td>' + r.exact + '/' + r.n + '</td><td>' + r.right + '/' + r.n + '</td><td>' + r.refused + '</td><td style="color:' + (r.wrong ? 'var(--no)' : 'inherit') + '">' + r.wrong + '</td><td>' + r.meanUnknown + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + '<div style="overflow-x:auto;margin-top:.8rem"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"><th style="padding:.35rem .4rem">sealed rule</th><th>result</th><th></th><th>predicted</th></tr></thead><tbody>'
+        + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + ruleText(r.id) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + '<p class="note"><b>Not measured here:</b> ' + esc(P.notMeasured) + '</p>';
+    }
+  }
+}
+
+// A handle for the survival run (tools/survive.mjs) — the SAME forge and reader a person uses, driven by
+// a script, so what is measured is this page and not a copy of it. It adds nothing a page visitor can't do.
+window.fallkardForge = {
+  async forge(text, tags = 'owl:high-left,rose:blue:1') {
+    const payload = await gzip(new TextEncoder().encode(text));
+    const seal = await sha256hex(payload);
+    const manifest = manifestFor({ assessorPass: true, depth: 0, readingKeyHonest: true, seal, tags, forged: TODAY });
+    return { seal, png: embed(await drawCard(tags, seal), b64(payload), manifest), payloadB64: b64(payload), manifest };
+  },
+  readPicture, deckAdd, deckAll, deckClear, sealCode,
+};
 
 /* __FOLD_KERNEL__ */
 // fallkard-forge · fold.mjs — FORGEUPGRADE: the fold-glyph payload type.
