@@ -253,6 +253,7 @@ every card now prints the first 80 bits of its seal on its face, in a band anyon
   only the seal. The build still rides in the named chunks, and the picture's own data is never used to smuggle
   anything.</p>
   <div id="surviveOut"></div>
+  <div id="visionOut"></div>
 </div>
 
 <h2>Why it cannot be faked</h2>
@@ -550,6 +551,39 @@ deckShow();
         + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + ruleText(r.id) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
         + '</tbody></table></div>'
         + '<p class="note"><b>Not measured here:</b> ' + esc(P.notMeasured) + '</p>';
+    }
+  }
+}
+
+// ── the paid read — a vision model reading the printed seal, graded and priced here by the gated kernel ──
+/* __VISION_KERNEL__ */
+/* __END_VISION_KERNEL__ */
+/* __VISION_DATA__ */
+/* __END_VISION_DATA__ */
+{
+  const el = document.getElementById('visionOut');
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (el && VISION) {
+    const P = VISION.prereg, R = VISION.run;
+    if (!R) {
+      el.innerHTML = '<p class="note warn"><b>The paid read is sealed, not yet run.</b> ' + P.rules.map((r) => esc(r.rule)).join('; ') + '.</p>';
+    } else {
+      const t = tallyVision(R.seals, R.replies, P.conditions), j = judgeVision(t);
+      const sp = spend([...R.usages, ...R.plumbing], R.price, R.gbpPerUsd, R.cacheMultiples), spRun = spend(R.usages, R.price, R.gbpPerUsd, R.cacheMultiples);
+      const label = Object.fromEntries(P.conditions.map((c) => [c.id, c.label]));
+      const th = 'style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"';
+      const nf = (n) => n.toLocaleString('en-GB');
+      const misses = R.replies.full.map((rep, i) => ({ i, rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep)) !== m.code.replace(/-/g, ''));
+      el.innerHTML = '<p class="note warn" style="margin-top:1.4rem"><b>The paid read: ' + j.passed + ' of ' + j.of + ' sealed rules held.</b> ' + P.n + ' more fresh cards; each picture went, alone, to <b>' + esc(P.model) + '</b> with one instruction — <i>' + esc(P.instruction) + '</i> — and nothing else: never the code, no tools. Every reply is graded here by the gated kernel against the committed codes. Sealed in <code>' + esc(R.sealedIn) + '</code> before the first paid call.</p>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">picture</th><th>read exactly</th><th>right card</th><th>refused</th><th>wrong card</th></tr></thead><tbody>'
+        + t.rows.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(label[r.id]) + '</td><td>' + r.exact + '/' + r.n + '</td><td>' + r.right + '/' + r.n + '</td><td>' + r.refused + '</td><td style="color:' + (r.wrong ? 'var(--no)' : 'inherit') + '">' + r.wrong + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + '<div style="overflow-x:auto;margin-top:.8rem"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">sealed rule</th><th>result</th><th></th><th>predicted</th></tr></thead><tbody>'
+        + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(P.rules.find((x) => x.id === r.id).rule) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + (misses.length ? '<p class="note"><b>Every full-size card not read exactly</b> (the code, then the reply): ' + misses.map((m) => '<code>' + esc(m.code) + '</code> &rarr; <code>' + esc(String(m.rep || '(no reply)').slice(0, 60)) + '</code>').join(' · ') + '</p>' : '')
+        + (() => { const all = P.conditions.flatMap((c) => R.replies[c.id].map((rep, i) => ({ rep, i }))); const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals).ok); const uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || '')); const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode((extractCode(rep) || '').replace(/u/gi, 'V'), R.seals); return k.ok && k.seal === R.seals[i]; }); return refused.length ? '<p class="note"><b>' + (uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ':</b> V read as U — a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' (checked after the run, so it is not part of the sealed result: it is the next change to CARD-SPEC §7.1, to be sealed and tested on its own).</p>' : ''; })()
+        + '<p class="note"><b>What it cost:</b> ' + sp.calls + ' calls (' + spRun.calls + ' reads + ' + R.plumbing.length + ' plumbing check), ' + nf(sp.input) + ' input and ' + nf(sp.output) + ' output tokens by the provider’s own count — <b>$' + sp.usd.toFixed(4) + ' (£' + sp.gbp.toFixed(4) + ')</b> at the list price locked from the estate’s price registry. Paid by the Claude subscription through the official CLI (credential source reported by every call: <code>' + esc(R.credential.join(', ')) + '</code>, no API key), so that is what an API key would have paid, not new money.</p>';
     }
   }
 }

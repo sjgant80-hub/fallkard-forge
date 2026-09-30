@@ -86,3 +86,22 @@ test('fuzz: the paid-read grader never throws', () => {
   const junk = [undefined, null, 0, '', 'x', [], {}, [null], [{}], { full: 5 }, [{ id: 'full' }], () => 1];
   for (const a of junk) for (const b of junk) for (const c of junk) assert.doesNotThrow(() => { extractCode(a); tallyVision(a, b, c); tallyVision([SEAL_A], b, c); judgeVision(a); judgeVision({ ok: true, rows: a }); spend(a, b, 0.75, c); });
 });
+
+test('the committed paid read, re-graded from its raw replies by the kernel', async () => {
+  const { readFileSync } = await import('node:fs');
+  const J = (f) => JSON.parse(readFileSync(new URL(f, import.meta.url), 'utf8'));
+  const pre = J('./data/vision-prereg.json'), run = J('./data/vision.json'), cards = J('./data/vision/cards.json').cards.filter((c) => !c.plumbing);
+  const seals = cards.map((c) => c.seal), pos = Object.fromEntries(cards.map((c, i) => [c.i, i]));
+  const replies = Object.fromEntries(pre.conditions.map((c) => [c.id, seals.map(() => null)]));
+  for (const r of run.rows) replies[r.condition][pos[r.card]] = r.reply;
+  assert.equal(run.rows.length, 192);
+  const t = tallyVision(seals, replies, pre.conditions);
+  assert.deepEqual(t.rows.map((r) => [r.id, r.answered, r.exact, r.right, r.refused, r.wrong]), [
+    ['full', 64, 64, 64, 0, 0], ['jpeg60at60', 64, 60, 64, 0, 0], ['png35', 64, 43, 57, 7, 0],
+  ]);
+  assert.deepEqual(judgeVision(t).rules.map((r) => [r.id, r.pass]), [['full-exact', true], ['full-right', true], ['platform-right', true], ['never-wrong', true], ['third-size', true]]);
+  const plumb = J('./data/vision-plumbing.json').rows.map((r) => r.usage);
+  const lock = J('./prices.lock.json').entries;
+  const s = spend([...run.rows.map((r) => r.usage), ...plumb], lock.find((e) => e.id === 'claude-sonnet-5'), lock.find((e) => e.id === 'fx-gbp-usd').gbpPerUsd, pre.cacheMultiples);
+  assert.deepEqual([s.calls, s.input, s.output, s.usd, s.gbp], [193, 83741, 3954, 0.207, 0.1561]);
+});

@@ -1,0 +1,83 @@
+{
+ "kind": "fallkard-forge-vision-plumbing",
+ "v": 1,
+ "sealedIn": "093cc324f8b7e1d78440ce81abab67c168222959",
+ "ranAt": "2026-09-30T15:59:36.191Z",
+ "purse": {
+  "line": "the call ceiling is spent — si-didy will refuse the frontier until it is restarted",
+  "calls": {
+   "limit": 1,
+   "left": 0,
+   "made": 1
+  },
+  "tokens": {
+   "limit": 3000,
+   "left": 2372
+  },
+  "refused": 0,
+  "lastRefusal": null
+ },
+ "rows": [
+  {
+   "card": 64,
+   "condition": "full",
+   "file": "c64-full.png",
+   "sha256": "ca66f5164a863cab33ae78ada0fed8c9c7aa63a796bbc22c6280e1886898bb31",
+   "ok": true,
+   "reply": "4ZVK-9RZ2-N0EY-HNDT",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2952,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  }
+ ],
+ "checks": [
+  {
+   "what": "the call succeeds",
+   "pass": true
+  },
+  {
+   "what": "no tools and no MCP servers",
+   "pass": true
+  },
+  {
+   "what": "only claude-sonnet-5 was used",
+   "pass": true
+  },
+  {
+   "what": "no cache write",
+   "pass": true
+  },
+  {
+   "what": "at most 1,000 input tokens (605)",
+   "pass": true
+  }
+ ],
+ "pass": true
+}

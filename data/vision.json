@@ -1,0 +1,7318 @@
+{
+ "kind": "fallkard-forge-vision",
+ "v": 1,
+ "sealedIn": "093cc324f8b7e1d78440ce81abab67c168222959",
+ "ranAt": "2026-09-30T16:13:30.792Z",
+ "purse": {
+  "line": "the call ceiling is spent — si-didy will refuse the frontier until it is restarted",
+  "calls": {
+   "limit": 192,
+   "left": 0,
+   "made": 192
+  },
+  "tokens": {
+   "limit": 400000,
+   "left": 312933
+  },
+  "refused": 0,
+  "lastRefusal": null
+ },
+ "rows": [
+  {
+   "card": 0,
+   "condition": "full",
+   "file": "c00-full.png",
+   "sha256": "0cff3cd84cfd3c444c8a116dca2de794b8c1c3c673775bec73fa2c5be911dfc0",
+   "ok": true,
+   "reply": "Z397-WMCE-051Q-5ECJ",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2573,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 1,
+   "condition": "full",
+   "file": "c01-full.png",
+   "sha256": "c2e92691505c2d7e29f374289e0606c8739eff66ebf0cada8ee7800100e6b7be",
+   "ok": true,
+   "reply": "R1P7-BQGF-80V8-CCWK",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2324,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 2,
+   "condition": "full",
+   "file": "c02-full.png",
+   "sha256": "b88e951a73aff8d350fdb6855996b674fa6916b9b72857d6d7e7eb5d983f14d8",
+   "ok": true,
+   "reply": "3E1C-XC3Q-9P1R-4ZZD",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2558,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 3,
+   "condition": "full",
+   "file": "c03-full.png",
+   "sha256": "e015fe1cc0a4ac87918f161f0636908c377798f392a0953454264a79243491d9",
+   "ok": true,
+   "reply": "6WHV-DDBJ-HCEM-6DVB",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2543,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 4,
+   "condition": "full",
+   "file": "c04-full.png",
+   "sha256": "57dd97ae65bf66b331aaf96b618fe2769c28b834359e619363a7ca34b11ec4e3",
+   "ok": true,
+   "reply": "CY41-RAQK-EXV6-PW9V",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 3080,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 5,
+   "condition": "full",
+   "file": "c05-full.png",
+   "sha256": "9d66355256033fec6ddee1a6136a50a3f1afed153202c35acd3109d7e5a5a53e",
+   "ok": true,
+   "reply": "S7CW-GW26-R89Z-GK2K",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 3134,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 6,
+   "condition": "full",
+   "file": "c06-full.png",
+   "sha256": "fdc081690c766b2d1b7c04e66e5edbe34aed4d8550e712a667b03764c4e9c3bd",
+   "ok": true,
+   "reply": "T1XD-Q7A5-DK4C-Q49Y",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2785,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 7,
+   "condition": "full",
+   "file": "c07-full.png",
+   "sha256": "afa3c9de24c4b563595a27486d34ac6290aa8182359caa5e52a34eefc97d9352",
+   "ok": true,
+   "reply": "AGKY-BE61-ESFJ-BSXN",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2979,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 8,
+   "condition": "full",
+   "file": "c08-full.png",
+   "sha256": "d65f3e63f07d85df3d784a25c6ca862fad0a1a52806c28dafe3caf45fafb600f",
+   "ok": true,
+   "reply": "ZAY5-ZBG2-FKWE-Z46R",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2368,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 9,
+   "condition": "full",
+   "file": "c09-full.png",
+   "sha256": "b8ba974aa5317e7767ad02a7afef87a677027dbaa56d2432c11e51a09dfb16ec",
+   "ok": true,
+   "reply": "00GY-PAJM-WN7E-XN0R",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2402,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 10,
+   "condition": "full",
+   "file": "c10-full.png",
+   "sha256": "4123a849ff71181a5495f813eaf9ccda18a6bd0437d26e4d93669a0bfc7f9e79",
+   "ok": true,
+   "reply": "SBZ7-Z390-WEC6-9DBJ",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2429,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 11,
+   "condition": "full",
+   "file": "c11-full.png",
+   "sha256": "0b757e95d0f601c87eb126644a080fa78385cd898d1dbdd5b6bc4c35fbdc4ddc",
+   "ok": true,
+   "reply": "WD49-869Z-74A0-ECQ0",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2261,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 12,
+   "condition": "full",
+   "file": "c12-full.png",
+   "sha256": "fe5c19c7d60c734337178a41f929b953242ddc4003c8716e12ce7fca4a8487f1",
+   "ok": true,
+   "reply": "KN9E-ZYE1-GR2X-Y1SY",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2220,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 13,
+   "condition": "full",
+   "file": "c13-full.png",
+   "sha256": "1d39d47f5133249ac310d6a76f4fc1ee0740db1088b05a4abc728191865268db",
+   "ok": true,
+   "reply": "0MBK-7XEM-M6JG-T4HA",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2365,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 14,
+   "condition": "full",
+   "file": "c14-full.png",
+   "sha256": "43dc7e8d65333446280a35f1a378e4c3dfe0bf96cc6b97d7d2296939e291c72c",
+   "ok": true,
+   "reply": "MY2T-Y124-6WD2-RQXD",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2338,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 15,
+   "condition": "full",
+   "file": "c15-full.png",
+   "sha256": "4745087ea6168bb9d913458949938733bf029037b19388aa691e4de51adeba9a",
+   "ok": true,
+   "reply": "FP7D-HY5Y-Q5P5-CM6J",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 3710,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 16,
+   "condition": "full",
+   "file": "c16-full.png",
+   "sha256": "e8e9eb1469bd87f51df0363dd730fe4318364f9177d2068c3f048bb841c97008",
+   "ok": true,
+   "reply": "0YHA-VCBE-PDHP-1M1Q",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2355,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 17,
+   "condition": "full",
+   "file": "c17-full.png",
+   "sha256": "589eb620044d60ad2b19801c75ebeda9c4ff8f64793eec2d06ef7c5337aee3d9",
+   "ok": true,
+   "reply": "WG37-6RZV-DF48-HHEG",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2414,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 18,
+   "condition": "full",
+   "file": "c18-full.png",
+   "sha256": "384e88190c3dda73d12b1cdb32dc7744d6bb9d606a3fbeb195e01912a1032e67",
+   "ok": true,
+   "reply": "290M-AZ4N-Z7F2-RSXB",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2286,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 19,
+   "condition": "full",
+   "file": "c19-full.png",
+   "sha256": "e5d49c86c185d183b261b008c207c4c2f591e3f845d2130038a3cdb14545fea7",
+   "ok": true,
+   "reply": "GWJZ-PCTP-WY72-3Z1R",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2424,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 20,
+   "condition": "full",
+   "file": "c20-full.png",
+   "sha256": "2b724a4ee6acf25cd1dea89d05abb923d222b3031af43187a2fc5d0909444bbd",
+   "ok": true,
+   "reply": "PS6Y-AV2K-VE8N-N1SZ",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2814,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 21,
+   "condition": "full",
+   "file": "c21-full.png",
+   "sha256": "90515bd8fc9132abb81b941f8c474e714beaf5592c90b355b5150a650b47dadb",
+   "ok": true,
+   "reply": "V09H-W1Z5-F5SN-DGH0",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2401,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 22,
+   "condition": "full",
+   "file": "c22-full.png",
+   "sha256": "38ebbfb54704f7afcccc7b073c045e8d7aa53c71d662f7afdf3f21d1d32bc3e3",
+   "ok": true,
+   "reply": "M0F0-H3Q9-3QS3-J1F0",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2572,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 23,
+   "condition": "full",
+   "file": "c23-full.png",
+   "sha256": "339b3d6f32f458fa109e354197a39de6ef42242fc300bd112dca509d69259c25",
+   "ok": true,
+   "reply": "ZZXV-902K-C3TV-81WV",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2861,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 24,
+   "condition": "full",
+   "file": "c24-full.png",
+   "sha256": "917daec2ca99137ddda3b40f8e564ac5f1c8bdf71b8a39420418928c654d649d",
+   "ok": true,
+   "reply": "N3B6-Z59B-PVER-4YXT",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2487,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 25,
+   "condition": "full",
+   "file": "c25-full.png",
+   "sha256": "33e9746a8ca3775a278a9b86dca5b49daf7991f4e56940bd9e73de4efac4a9e5",
+   "ok": true,
+   "reply": "CTFY-9H16-YZD9-D09C",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2129,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 26,
+   "condition": "full",
+   "file": "c26-full.png",
+   "sha256": "1a9604324d7411948931048c5586aa80a6f8f42b7d7bf93d8b41d98d723fda7c",
+   "ok": true,
+   "reply": "NT01-GR9H-43KH-WJVS",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2500,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 27,
+   "condition": "full",
+   "file": "c27-full.png",
+   "sha256": "f2c5e5a145a86781dc21586aa569e56ed1643c6552082118bdef378bba35d102",
+   "ok": true,
+   "reply": "9807-TVA1-9FQA-50XT",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0020849999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0020849999999999996,
+   "ms": 2463,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 28,
+   "condition": "full",
+   "file": "c28-full.png",
+   "sha256": "36c2985b079fec0320be81e8d2d48aa02ceb62e6217ea84c154fb6e40eb5a977",
+   "ok": true,
+   "reply": "M974-JPZE-VXD4-HY8K",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2400,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 29,
+   "condition": "full",
+   "file": "c29-full.png",
+   "sha256": "ef29047bad4d7570250fa608683a485e27ff0fb8609fbc9d70989a6fecb3b489",
+   "ok": true,
+   "reply": "5F82-MK7E-6CGC-N3JZ",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2483,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 30,
+   "condition": "full",
+   "file": "c30-full.png",
+   "sha256": "d1cebc13945aa42be91ce27b275b5272e1468033d26f5e8e61a09712dfba19a1",
+   "ok": true,
+   "reply": "VK23-E2SM-2H54-CANW",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0020849999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0020849999999999996,
+   "ms": 2399,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 31,
+   "condition": "full",
+   "file": "c31-full.png",
+   "sha256": "46d9c829dbb98a4c59b9605276c28075c8b7803814466c51a6eb435a987d0545",
+   "ok": true,
+   "reply": "ZKQ5-F15T-XYEF-XC28",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2442,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 32,
+   "condition": "full",
+   "file": "c32-full.png",
+   "sha256": "e58332aeff45c1d8da038a853f945b7d57e5e1b1da714b4ad961e927cb413369",
+   "ok": true,
+   "reply": "CXSW-ZMN9-Y28D-HZNM",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2358,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 33,
+   "condition": "full",
+   "file": "c33-full.png",
+   "sha256": "2e23a9a6cdfed8f74ed111b67ae3ccbc15030d1336e9d4a0a2b41bf1d398cb17",
+   "ok": true,
+   "reply": "0Z1P-0ZBQ-46JC-JVKX",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2420,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 34,
+   "condition": "full",
+   "file": "c34-full.png",
+   "sha256": "cc7ca93cc8c16076f414d8694e04b9f63794ec743dcc309b819fe2b8c9933d81",
+   "ok": true,
+   "reply": "FYNS-S1Q4-SJWX-ZNQD",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2374,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 35,
+   "condition": "full",
+   "file": "c35-full.png",
+   "sha256": "73ad3513f346a7004042facd9658338a4fcf140943a512922ab87ccdd120b808",
+   "ok": true,
+   "reply": "DT9P-R9HB-MDQY-Z75S",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2415,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 36,
+   "condition": "full",
+   "file": "c36-full.png",
+   "sha256": "1298f2ac1f9b3d20a58557024c547cdbbcdfcac8cebf19439adffd03a8c576fd",
+   "ok": true,
+   "reply": "KBPV-4AHQ-A51J-9GTP",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2449,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 37,
+   "condition": "full",
+   "file": "c37-full.png",
+   "sha256": "fa0455cb9a0268b3b1d3dc669182a7199de07dc6b57791ea79b8e6c65609e935",
+   "ok": true,
+   "reply": "S42Q-D639-1Y62-C2Q4",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2479,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 38,
+   "condition": "full",
+   "file": "c38-full.png",
+   "sha256": "bb894bbdc980e1451c70b46a6f24339f9f42d2377faffe1abba82529e941db43",
+   "ok": true,
+   "reply": "RC01-XKKX-A5XP-7YBX",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2393,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 39,
+   "condition": "full",
+   "file": "c39-full.png",
+   "sha256": "86fc395351800ff10bd990a0420af37a835d3b2b6ddf338dbd143ea7dee1fb51",
+   "ok": true,
+   "reply": "FNH1-16KR-XVMZ-CW9Y",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2571,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 40,
+   "condition": "full",
+   "file": "c40-full.png",
+   "sha256": "0be145cebf99931740d64050506c86b1e816cd68ac7379bfae4cac2b7e4e8fc5",
+   "ok": true,
+   "reply": "R955-608A-08EV-2MF5",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 16
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 16,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0020549999999999995,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0020549999999999995,
+   "ms": 2670,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 41,
+   "condition": "full",
+   "file": "c41-full.png",
+   "sha256": "cc7eddec0528ca6ca178ec94f4a8d7e34bdd630ff35bea0af41bbe42739297d2",
+   "ok": true,
+   "reply": "FG7W-3SC6-5H4V-ATYH",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2537,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 42,
+   "condition": "full",
+   "file": "c42-full.png",
+   "sha256": "530a4868b66a70b2c79f5c2cde4ed670649439ab270d8680f870b84380dd9a4c",
+   "ok": true,
+   "reply": "172E-T1X0-K2NE-YG22",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0020849999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0020849999999999996,
+   "ms": 2838,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 43,
+   "condition": "full",
+   "file": "c43-full.png",
+   "sha256": "174040587a222aeeb57b9a291d3b69a4f379731598fc2258dbe6e3e144165090",
+   "ok": true,
+   "reply": "0R1H-0SDN-4VD1-KZCC",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2803,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 44,
+   "condition": "full",
+   "file": "c44-full.png",
+   "sha256": "7b3a56bff91e6874d1b45dd9e491f2d3a84afc425adf010113c62ddb326c3f72",
+   "ok": true,
+   "reply": "7PV4-V7H2-SCQ3-PS2X",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2510,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 45,
+   "condition": "full",
+   "file": "c45-full.png",
+   "sha256": "dd35bf9bcbc45cc7494b8768df482409c19ae979c0d6495be0e8d295d10aedfd",
+   "ok": true,
+   "reply": "H4B1-N4C7-E099-BFN9",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2759,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 46,
+   "condition": "full",
+   "file": "c46-full.png",
+   "sha256": "ea9ae422ffd26b05df2da2e25d652dfcc7004b63d89e73dcdb2124977d626542",
+   "ok": true,
+   "reply": "XY5B-V2NS-2HDJ-279T",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2473,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 47,
+   "condition": "full",
+   "file": "c47-full.png",
+   "sha256": "18bfc3514baf8cca5659a9508507e5b752140d814e75076c72e4f4d6a2467f7f",
+   "ok": true,
+   "reply": "WAWN-QQ2R-BA3G-BQE3",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2546,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 48,
+   "condition": "full",
+   "file": "c48-full.png",
+   "sha256": "973d271de7ffb9f909632093add9c1654efcbd48b1b980458d0ed96f3edc0947",
+   "ok": true,
+   "reply": "FGX1-78G1-FCAD-31PK",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 3519,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 49,
+   "condition": "full",
+   "file": "c49-full.png",
+   "sha256": "3101a82cb6ef84ac1628e6b7b1e6c7b813749879bed181329d86446ceab20b84",
+   "ok": true,
+   "reply": "ME6D-06TV-A9F5-5G08",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2398,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 50,
+   "condition": "full",
+   "file": "c50-full.png",
+   "sha256": "dfc74ab4bbeeeab8b83f602524b8549c6b9e872823a57d9e7e845b31a49edc79",
+   "ok": true,
+   "reply": "XCZD-V13E-0AKS-GEFR",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2441,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 51,
+   "condition": "full",
+   "file": "c51-full.png",
+   "sha256": "c9c0e2e412dc04c8ddf14238b3356856523da85758e944889f7d21a166f5561c",
+   "ok": true,
+   "reply": "FD1C-QQTS-KJ76-TG03",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2667,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 52,
+   "condition": "full",
+   "file": "c52-full.png",
+   "sha256": "45a66c2cffcadd660ce80a9a27bd26cad6b107df29768e0839875bedd8ef2a62",
+   "ok": true,
+   "reply": "TQ69-A8GE-K57J-QKYB",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2123,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 53,
+   "condition": "full",
+   "file": "c53-full.png",
+   "sha256": "fa626dae9dfcc9ee707b75bc57209802ad5c291a486816a91c765ebab0072bbc",
+   "ok": true,
+   "reply": "6NQD-NQDB-V13R-8XMB",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2287,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 54,
+   "condition": "full",
+   "file": "c54-full.png",
+   "sha256": "4c5933085ed156d4dc1bee450b1da91d24f90d6dd2b55e5ad9addfe2047a7648",
+   "ok": true,
+   "reply": "B24S-YVWD-RY4D-4W1M",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2317,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 55,
+   "condition": "full",
+   "file": "c55-full.png",
+   "sha256": "35c24699292f78630b4533c1372ba63e76cc230ab060c0e238c9e3927723564a",
+   "ok": true,
+   "reply": "SRPQ-RZ6T-DEDS-BPT1",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021599999999999996,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021599999999999996,
+   "ms": 2328,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 56,
+   "condition": "full",
+   "file": "c56-full.png",
+   "sha256": "a692ab9ca1017e358ed49cf8e08e53cf54d70b87bc720387a119c01b762e1f6b",
+   "ok": true,
+   "reply": "DN0R-1PSA-2TQ9-FM0H",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2126,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 57,
+   "condition": "full",
+   "file": "c57-full.png",
+   "sha256": "994eebac1599d054a2d760a28adb6fc09d896fdd5ad1dbebbd5c798b2f49daa3",
+   "ok": true,
+   "reply": "43EQ-PHNY-DWYN-JTCN",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2448,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 58,
+   "condition": "full",
+   "file": "c58-full.png",
+   "sha256": "8c0c84360aa7893adcdb8bf2e9e13a3a0ed4a87da95b02871527967a0692e276",
+   "ok": true,
+   "reply": "H6F4-YRM5-JVEQ-X5A5",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021449999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021449999999999998,
+   "ms": 2487,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 59,
+   "condition": "full",
+   "file": "c59-full.png",
+   "sha256": "87fbbeec820eb0a76047ad20c33bdd45271cd575c0b1eded9dd45eec5729737c",
+   "ok": true,
+   "reply": "763H-0A92-8705-MKKS",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 16
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 16,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0020549999999999995,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0020549999999999995,
+   "ms": 2580,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 60,
+   "condition": "full",
+   "file": "c60-full.png",
+   "sha256": "5963daee5bf3f136d06f9093d445b1b67ed5920a6db0293b078485c653d5615b",
+   "ok": true,
+   "reply": "S88X-DRY5-TWGC-RB97",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021,
+   "ms": 2908,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 61,
+   "condition": "full",
+   "file": "c61-full.png",
+   "sha256": "9323d0c89082f16a6f90386e6699976bb3b460fc2595f725ff5fdcd6342b5d4b",
+   "ok": true,
+   "reply": "23J4-4PX5-TC6E-VT1R",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2239,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 62,
+   "condition": "full",
+   "file": "c62-full.png",
+   "sha256": "3ff9380f24935c2bb93c14c91492c66db908264142f1d30a94e3b7089eb24c5a",
+   "ok": true,
+   "reply": "61KH-PTQ7-4M1A-TD7T",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.00213,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.00213,
+   "ms": 2397,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 63,
+   "condition": "full",
+   "file": "c63-full.png",
+   "sha256": "b0d408ffbdcc7def39e6660649a713b3d44a82733a2c2e41c6d23a937966bca2",
+   "ok": true,
+   "reply": "68H2-2SXK-QGT0-H4SM",
+   "usage": {
+    "input_tokens": 605,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 605,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0021149999999999997,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0021149999999999997,
+   "ms": 2346,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 0,
+   "condition": "jpeg60at60",
+   "file": "c00-jpeg60at60.jpg",
+   "sha256": "490fe83d3030e569675ade469fe6c723ee450fb25cd687fd804b1091cde03dd2",
+   "ok": true,
+   "reply": "Z397-WMCE-051Q-5ECJ",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2417,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 1,
+   "condition": "jpeg60at60",
+   "file": "c01-jpeg60at60.jpg",
+   "sha256": "f8b4c682d8711d482d945c75d565428959d69b6a454844c8be544e7f9382c74e",
+   "ok": true,
+   "reply": "R1P7-BQGF-80V8-CCWK",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 4421,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 2,
+   "condition": "jpeg60at60",
+   "file": "c02-jpeg60at60.jpg",
+   "sha256": "77ab0e6d7b0efc119d3504e28a68dad99ef65d067e266138453f238a28eb73f7",
+   "ok": true,
+   "reply": "3E1C-XC3Q-9P1R-4ZZD",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2431,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 3,
+   "condition": "jpeg60at60",
+   "file": "c03-jpeg60at60.jpg",
+   "sha256": "53601a730ab85d7f407e938af52eb5cd3f01cda3142aeca5781e897a7ee3df0e",
+   "ok": true,
+   "reply": "6WHV-DDBJ-HCEM-6DVB",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2201,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 4,
+   "condition": "jpeg60at60",
+   "file": "c04-jpeg60at60.jpg",
+   "sha256": "215c5a8f6451d56b0d99248908456622cfae209afaac1a5b5bd198a9b0d6f1eb",
+   "ok": true,
+   "reply": "CY41-RAQK-EXV6-PW9V",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2236,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 5,
+   "condition": "jpeg60at60",
+   "file": "c05-jpeg60at60.jpg",
+   "sha256": "0e79fec431a57a53800c9ddfe528c54e6ccf872eddc1cedff7227e5ac61f44fc",
+   "ok": true,
+   "reply": "S7CW-GW26-R89Z-GK2K",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2374,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 6,
+   "condition": "jpeg60at60",
+   "file": "c06-jpeg60at60.jpg",
+   "sha256": "c8a7217cd4c6b123b7932a55b750a720a51b3986694bb61b9f9e4e7fa721a192",
+   "ok": true,
+   "reply": "T1XD-Q7A5-DK4C-Q49Y",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2810,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 7,
+   "condition": "jpeg60at60",
+   "file": "c07-jpeg60at60.jpg",
+   "sha256": "2c969db47ea97468d4d0ba9c724633d76008d63842fc5a5127d7514c9f643b26",
+   "ok": true,
+   "reply": "AGKY-BE61-ESFJ-BSXN",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2472,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 8,
+   "condition": "jpeg60at60",
+   "file": "c08-jpeg60at60.jpg",
+   "sha256": "912ddcbcc96fa809a41bdc7fe349c0fa15ace292c7063ccb8e34d598bdb8111f",
+   "ok": true,
+   "reply": "ZAY5-ZBG2-FKWE-Z46R",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2387,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 9,
+   "condition": "jpeg60at60",
+   "file": "c09-jpeg60at60.jpg",
+   "sha256": "cce4c9e4ba4e73358547b8dd094c11a9a74630e48716988eb546d8c8e02fff05",
+   "ok": true,
+   "reply": "00GY-PAJM-WN7E-XN0R",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2563,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 10,
+   "condition": "jpeg60at60",
+   "file": "c10-jpeg60at60.jpg",
+   "sha256": "dd0881bae2ccb48f8cb94c89fc282587a7a8b4379e91f2b038dfd45477d4a162",
+   "ok": true,
+   "reply": "SBZ7-Z390-WEC6-9DBJ",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2430,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 11,
+   "condition": "jpeg60at60",
+   "file": "c11-jpeg60at60.jpg",
+   "sha256": "7424b05b49c42e359533c735844314fa64c719ead30924a3e217e40c924f3ef8",
+   "ok": true,
+   "reply": "WD49-869Z-74A0-EC00",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 17
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 17,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001434,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001434,
+   "ms": 2149,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 12,
+   "condition": "jpeg60at60",
+   "file": "c12-jpeg60at60.jpg",
+   "sha256": "831b6d4f9dcfefe271eb9d3480649f018b00174a5bfe9e7f25126e07db004679",
+   "ok": true,
+   "reply": "KN9E-ZYE1-GR2X-Y1SY",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 3160,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 13,
+   "condition": "jpeg60at60",
+   "file": "c13-jpeg60at60.jpg",
+   "sha256": "9b60d26415a8d569372875c50e4a764f4ee9e7253140cf41fabd59cb713376b5",
+   "ok": true,
+   "reply": "0MBK-7XEM-M6JG-T4HA",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2200,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 14,
+   "condition": "jpeg60at60",
+   "file": "c14-jpeg60at60.jpg",
+   "sha256": "521fd4061b463ffd83c675cec5bd4bc914f885cfc65f093fdc5f44835ebd586e",
+   "ok": true,
+   "reply": "MY2T-Y124-6WD2-RQXD",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2506,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 15,
+   "condition": "jpeg60at60",
+   "file": "c15-jpeg60at60.jpg",
+   "sha256": "a8b175ce895d06cf63f13c7b05781f1fdd08bd8384fec9755125d0d511d74d1b",
+   "ok": true,
+   "reply": "FP7D-HY5Y-Q5P5-CM6J",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2287,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 16,
+   "condition": "jpeg60at60",
+   "file": "c16-jpeg60at60.jpg",
+   "sha256": "d2f4dbdceb1cdff6ea4c181817eb8084b5a3c7fdbbe62ebd4de8fc7a1cb28877",
+   "ok": true,
+   "reply": "0YHA-VCBE-PDHP-1M1Q",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2249,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 17,
+   "condition": "jpeg60at60",
+   "file": "c17-jpeg60at60.jpg",
+   "sha256": "d9481784954b6340645792ebc1498c387aa34a162a17132d7ab87e0b3c8295d5",
+   "ok": true,
+   "reply": "WG37-6RZV-DF48-HHEG",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2494,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 18,
+   "condition": "jpeg60at60",
+   "file": "c18-jpeg60at60.jpg",
+   "sha256": "dbb2422e090893cb994a4a6348d301b18a3a39266f598d3957eaaf3b070a0180",
+   "ok": true,
+   "reply": "290M-AZ4N-Z7F2-RSXB",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2625,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 19,
+   "condition": "jpeg60at60",
+   "file": "c19-jpeg60at60.jpg",
+   "sha256": "973f8cc294be776ececbb8df336cd7edd5c69d906bb8df4cabb44ad5c6668049",
+   "ok": true,
+   "reply": "GWJZ-PCTP-WY72-3Z1R",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2230,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 20,
+   "condition": "jpeg60at60",
+   "file": "c20-jpeg60at60.jpg",
+   "sha256": "afec5254b9d1e2bb30b5a4d3d27508f575e457de71a3a74156359bb3466f6ac6",
+   "ok": true,
+   "reply": "PS6Y-AV2K-VE8N-N1SZ",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2756,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 21,
+   "condition": "jpeg60at60",
+   "file": "c21-jpeg60at60.jpg",
+   "sha256": "0a090b3fa44ff4e9fea78ed7a13b15395088b325b673a5576cc97b8657a3ae8f",
+   "ok": true,
+   "reply": "V09H-W1Z5-F5SN-DGH0",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2953,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 22,
+   "condition": "jpeg60at60",
+   "file": "c22-jpeg60at60.jpg",
+   "sha256": "12d0ae9b5e5a1661d6f30cc85735491d811672db73d410ab21094e40d62b57d9",
+   "ok": true,
+   "reply": "M0F0-H3Q9-3QS3-J1F0",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2885,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 23,
+   "condition": "jpeg60at60",
+   "file": "c23-jpeg60at60.jpg",
+   "sha256": "745a7c9c5f206ce920ff984244ab6d29d9aa3473ed7ae96ca3a7c5fdf1be3dd7",
+   "ok": true,
+   "reply": "ZZXV-902K-C3TV-81WV",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2459,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 24,
+   "condition": "jpeg60at60",
+   "file": "c24-jpeg60at60.jpg",
+   "sha256": "71451bed4ddd98a6f18740f7ccf5f028aed4b2727e9c736abed4544bf9485157",
+   "ok": true,
+   "reply": "N3B6-Z59B-PVER-4YXT",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2747,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 25,
+   "condition": "jpeg60at60",
+   "file": "c25-jpeg60at60.jpg",
+   "sha256": "5d8cec4c38e8bd2e6699a12dcbf3956aeda1aebb6492e9018f02f6525c6195ea",
+   "ok": true,
+   "reply": "CTFY-9H16-YZD9-D09C",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2624,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 26,
+   "condition": "jpeg60at60",
+   "file": "c26-jpeg60at60.jpg",
+   "sha256": "0cce0fb2534388be366dd13075ecda8f69f7729eb316e1b2280f602c8826671d",
+   "ok": true,
+   "reply": "NT01-GR9H-43KH-WJVS",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2321,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 27,
+   "condition": "jpeg60at60",
+   "file": "c27-jpeg60at60.jpg",
+   "sha256": "fbead788b3b6684bd018d9d87332524f095819dad608ebb11aff157a7acd9a42",
+   "ok": true,
+   "reply": "9807-TVA1-9FQA-50XT",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001449,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001449,
+   "ms": 2465,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 28,
+   "condition": "jpeg60at60",
+   "file": "c28-jpeg60at60.jpg",
+   "sha256": "61f7c3fe17df1b97348348bc31e00fedf105785ebd36b5ce2c3888dea168fd3d",
+   "ok": true,
+   "reply": "M974-JPZE-VXD4-HY8K",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2499,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 29,
+   "condition": "jpeg60at60",
+   "file": "c29-jpeg60at60.jpg",
+   "sha256": "ffb233b1b542e7545e1d762265b7bd525bf824355fff14c6ae7a3f78c58f4a41",
+   "ok": true,
+   "reply": "5F82-MK7E-6C6C-N3JZ",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2896,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 30,
+   "condition": "jpeg60at60",
+   "file": "c30-jpeg60at60.jpg",
+   "sha256": "030d987eccafe8c73d4adef43d45d942440eff0df6c2b343922368290499c8b9",
+   "ok": true,
+   "reply": "VK23-E2SM-2H54-CANW",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001449,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001449,
+   "ms": 2389,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 31,
+   "condition": "jpeg60at60",
+   "file": "c31-jpeg60at60.jpg",
+   "sha256": "1dbde0196ccd899909d18044725e16e1e5e6682070b3e49c8b6b75a0091600fa",
+   "ok": true,
+   "reply": "ZKQ5-F15T-XYEF-XC28",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2352,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 32,
+   "condition": "jpeg60at60",
+   "file": "c32-jpeg60at60.jpg",
+   "sha256": "ac41fa54003b6cb44cbdfc0e110ed0815e1d12348ce3511bb1fc3889726b7ac7",
+   "ok": true,
+   "reply": "CXSW-ZMN9-Y28D-HZNM",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2346,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 33,
+   "condition": "jpeg60at60",
+   "file": "c33-jpeg60at60.jpg",
+   "sha256": "5d8b9acffce108885b8682735297c2700a5cd8cdac7465e8beb8508af9c8990d",
+   "ok": true,
+   "reply": "0Z1P-0ZBQ-46JC-JVKX",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2912,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 34,
+   "condition": "jpeg60at60",
+   "file": "c34-jpeg60at60.jpg",
+   "sha256": "bb24a0ea113a3b3c881b57a8d7dd4c082c8899aa3d4296513ce3652affa2ad77",
+   "ok": true,
+   "reply": "FYNS-S1Q4-SJWX-ZNQD",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2653,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 35,
+   "condition": "jpeg60at60",
+   "file": "c35-jpeg60at60.jpg",
+   "sha256": "31563a541395d73e8a497695af60645ed5987f0a45f3fd095810ff957ffad013",
+   "ok": true,
+   "reply": "DT9P-R9HB-MDQY-Z75S",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2304,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 36,
+   "condition": "jpeg60at60",
+   "file": "c36-jpeg60at60.jpg",
+   "sha256": "d5a66520adc607f83a522fff2b189592bb5e1007f2a7904cd008f9ace769ae5a",
+   "ok": true,
+   "reply": "KBPV-4AHQ-A51J-9GTP",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2381,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 37,
+   "condition": "jpeg60at60",
+   "file": "c37-jpeg60at60.jpg",
+   "sha256": "82226fbd8b81827ee97ea48b6c6049ff50b55e7df7c2e35278ad6a256818c06a",
+   "ok": true,
+   "reply": "S42Q-D639-1Y62-C204",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 17
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 17,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001434,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001434,
+   "ms": 2278,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 38,
+   "condition": "jpeg60at60",
+   "file": "c38-jpeg60at60.jpg",
+   "sha256": "4187110f36cf2593f505b16df6188f85c737ecafe860787c72cf7cb81b225034",
+   "ok": true,
+   "reply": "RC01-XKKX-A5XP-7YBX",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2580,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 39,
+   "condition": "jpeg60at60",
+   "file": "c39-jpeg60at60.jpg",
+   "sha256": "357bc5c2a660c2feea52e96988c35ca29820d9ee83115aca6d0a970894e28178",
+   "ok": true,
+   "reply": "FNH1-16KR-XVMZ-CW9Y",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2312,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 40,
+   "condition": "jpeg60at60",
+   "file": "c40-jpeg60at60.jpg",
+   "sha256": "aa1c6cab1f18fe00c6260cfe9b322fe63fa8ca9692793400c755029424c33d85",
+   "ok": true,
+   "reply": "R955-608A-08EV-2MF5",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 16
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 16,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001419,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001419,
+   "ms": 4980,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 41,
+   "condition": "jpeg60at60",
+   "file": "c41-jpeg60at60.jpg",
+   "sha256": "5f8bd0bc4942d8f25b8e9581f3fb46ab06df995ac8b84383389616245ae2309c",
+   "ok": true,
+   "reply": "FG7W-3SC6-5H4V-ATYH",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2525,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 42,
+   "condition": "jpeg60at60",
+   "file": "c42-jpeg60at60.jpg",
+   "sha256": "906791c429e6ede45456c499d81114e1aa401954957826f7c5bff6f9de30e12c",
+   "ok": true,
+   "reply": "172E-T1X0-K2NE-YG22",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001449,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001449,
+   "ms": 4573,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 43,
+   "condition": "jpeg60at60",
+   "file": "c43-jpeg60at60.jpg",
+   "sha256": "03d03c6131e46ebe470df74204ed1b205efeddd63b276920cec013fb1745e7e2",
+   "ok": true,
+   "reply": "0R1H-0SDN-4VD1-KZCC",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2588,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 44,
+   "condition": "jpeg60at60",
+   "file": "c44-jpeg60at60.jpg",
+   "sha256": "cd348d77525cb86c2dfa542f7862c2c78cb2e08234fdca142c1dd83de1fcafa9",
+   "ok": true,
+   "reply": "7PV4-V7H2-SCQ3-PS2X",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2501,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 45,
+   "condition": "jpeg60at60",
+   "file": "c45-jpeg60at60.jpg",
+   "sha256": "5bbfa14ad4e180ba56113c6190dc86405b8c9b151e852e8cf9025ed0d27a73cb",
+   "ok": true,
+   "reply": "H4B1-N4C7-E099-BFN9",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2385,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 46,
+   "condition": "jpeg60at60",
+   "file": "c46-jpeg60at60.jpg",
+   "sha256": "bc5a48b234af86f7cdf5f1ce9b46877a0713d458386d8c2af76335143b1a43cd",
+   "ok": true,
+   "reply": "XY5B-V2NS-2HDJ-279T",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2293,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 47,
+   "condition": "jpeg60at60",
+   "file": "c47-jpeg60at60.jpg",
+   "sha256": "8fd1d793b17b2397749959591ae9f6fa7650307703ef8a24efed7f6b6ced7bd2",
+   "ok": true,
+   "reply": "WAWN-QQ2R-BA3G-BQE3",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2559,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 48,
+   "condition": "jpeg60at60",
+   "file": "c48-jpeg60at60.jpg",
+   "sha256": "71a437dbd0e1c9df522986528d5657499bf27aa68b5b9e93204fcd25dc89e210",
+   "ok": true,
+   "reply": "FGX1-78G1-FCAD-31PK",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2445,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 49,
+   "condition": "jpeg60at60",
+   "file": "c49-jpeg60at60.jpg",
+   "sha256": "e11004f56ceef93d85ee4e763745d2bf2c61e4ba807b106fc7389d67f27da068",
+   "ok": true,
+   "reply": "ME6D-06TV-A9F5-5G08",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2306,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 50,
+   "condition": "jpeg60at60",
+   "file": "c50-jpeg60at60.jpg",
+   "sha256": "6abd3c06fb35d3762ccba0a65ba238a7718a589ff5309c381461a389c69e1837",
+   "ok": true,
+   "reply": "XC2D-V13E-0AKS-GEFR",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2458,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 51,
+   "condition": "jpeg60at60",
+   "file": "c51-jpeg60at60.jpg",
+   "sha256": "affef63531ac204d7684ddb7299af36a5068ba81fc86edb1176c6a2c121cecd4",
+   "ok": true,
+   "reply": "FD1C-QQTS-KJ76-TG03",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2263,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 52,
+   "condition": "jpeg60at60",
+   "file": "c52-jpeg60at60.jpg",
+   "sha256": "af7bc8bbd85eaa4d9853d0a43b12bec0d0643cbc3dcbb045c45005dc41278386",
+   "ok": true,
+   "reply": "TQ69-A8GE-K57J-QKYB",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2623,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 53,
+   "condition": "jpeg60at60",
+   "file": "c53-jpeg60at60.jpg",
+   "sha256": "cbc69fcb84354dda93de8d20cd881ec6041d73007b1f5e63b05bf401b615cd44",
+   "ok": true,
+   "reply": "6NQD-NQDB-V13R-8XMB",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2081,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 54,
+   "condition": "jpeg60at60",
+   "file": "c54-jpeg60at60.jpg",
+   "sha256": "11422f0bd60222d93dc0750b82c779eb0734adf00effd45585d91df357553280",
+   "ok": true,
+   "reply": "B24S-YVWD-RY4D-4W1M",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2164,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 55,
+   "condition": "jpeg60at60",
+   "file": "c55-jpeg60at60.jpg",
+   "sha256": "4a8496dd4b27593ac275098273aeb660fb4aa2d7eb17b89893f2c0e6e987ed4a",
+   "ok": true,
+   "reply": "SRPQ-RZ6T-DEDS-BPT1",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001524,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001524,
+   "ms": 2182,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 56,
+   "condition": "jpeg60at60",
+   "file": "c56-jpeg60at60.jpg",
+   "sha256": "b81fdd3b73fff0a450d26136007c738e5fe93f57ae35c8015a9f1b5495201b88",
+   "ok": true,
+   "reply": "DN0R-1PSA-2TQ9-FM0H",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2315,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 57,
+   "condition": "jpeg60at60",
+   "file": "c57-jpeg60at60.jpg",
+   "sha256": "fb6b55b9bfee9d68206c749e5add720605356c178e493259bb2dd7bfa5cd0612",
+   "ok": true,
+   "reply": "43EQ-PHNY-DWYN-JTCN",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2300,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 58,
+   "condition": "jpeg60at60",
+   "file": "c58-jpeg60at60.jpg",
+   "sha256": "deade0146a565091c91e041c7ac7ca77fe8adc5e1dbb3c7768cf85de68123c45",
+   "ok": true,
+   "reply": "H6F4-YRM5-JVEQ-X5A5",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001509,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001509,
+   "ms": 2406,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 59,
+   "condition": "jpeg60at60",
+   "file": "c59-jpeg60at60.jpg",
+   "sha256": "5c31fd74f0f0e87e528d4d21dcb9d5e00b1c90babfb0a4bb4c58571ad80d5759",
+   "ok": true,
+   "reply": "763H-0A92-8705-MKKS",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 16
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 16,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001419,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001419,
+   "ms": 2454,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 60,
+   "condition": "jpeg60at60",
+   "file": "c60-jpeg60at60.jpg",
+   "sha256": "e41e07162024cec86c5b6f0b3f34d015711b513765b0371653028c2eee1d15b7",
+   "ok": true,
+   "reply": "S88X-DRY5-TWGC-RB97",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001464,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001464,
+   "ms": 2287,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 61,
+   "condition": "jpeg60at60",
+   "file": "c61-jpeg60at60.jpg",
+   "sha256": "8e3ad4703bbb1ef155e61088e9471accf689c7d2974998471d6dab772964ce21",
+   "ok": true,
+   "reply": "23J4-4PX5-TC6E-VT1R",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2452,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 62,
+   "condition": "jpeg60at60",
+   "file": "c62-jpeg60at60.jpg",
+   "sha256": "efc15fb9b495edc5d4af39da74e901983be3a4566dc7eef6376027d216330c68",
+   "ok": true,
+   "reply": "61KH-PTQ7-4M1A-TD7T",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014939999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014939999999999999,
+   "ms": 2661,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 63,
+   "condition": "jpeg60at60",
+   "file": "c63-jpeg60at60.jpg",
+   "sha256": "8d7e850924c8adb3fd2e718e48db039a4d4bdef5136086f4af09432c953cc063",
+   "ok": true,
+   "reply": "68H2-2SXK-QGT0-H4SM",
+   "usage": {
+    "input_tokens": 393,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 393,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0014789999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0014789999999999998,
+   "ms": 2273,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 0,
+   "condition": "png35",
+   "file": "c00-png35.png",
+   "sha256": "5771103613be8718fe6255a178014896267ca569c635cc16ec5cdf4a3ba7ce95",
+   "ok": true,
+   "reply": "Z397-WMCE-051Q-5ECJ",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2363,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 1,
+   "condition": "png35",
+   "file": "c01-png35.png",
+   "sha256": "c4e44737f6f51859f0eb8fd03441978816e828ea885a88d05267ac33a8c0700f",
+   "ok": true,
+   "reply": "R1P7-BQGF-80V8-CCWK",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2273,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 2,
+   "condition": "png35",
+   "file": "c02-png35.png",
+   "sha256": "8fc31a983b7d946b9e9fd700426e51d3e8d6f5ba36174994ab8035094323da28",
+   "ok": true,
+   "reply": "3E1C-XC3Q-9P1R-4ZZD",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2852,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 3,
+   "condition": "png35",
+   "file": "c03-png35.png",
+   "sha256": "cb63b63cb508610d5e73a213d87dcb8275c0eda55adcb4cca46c564669455972",
+   "ok": true,
+   "reply": "6WHU-DDBJ-HCEM-6DVB",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2569,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 4,
+   "condition": "png35",
+   "file": "c04-png35.png",
+   "sha256": "1a09e75301388f22880f9a4ed8692b96ebf07931f3a267183a0557b0815a3638",
+   "ok": true,
+   "reply": "CY41-RAQK-EXU6-PW9V",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2227,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 5,
+   "condition": "png35",
+   "file": "c05-png35.png",
+   "sha256": "30daaa1ed84b1035de9f8e07f7b4b6a8dab84f9a3fbcbba7008631537537ba0b",
+   "ok": true,
+   "reply": "S7CW-GW26-R89Z-GK2K",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2408,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 6,
+   "condition": "png35",
+   "file": "c06-png35.png",
+   "sha256": "44da4e62487c931745b687472196741ffd49219a9f64bc6831d35a3562202092",
+   "ok": true,
+   "reply": "T1XD-Q7A5-DK4C-Q49Y",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2305,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 7,
+   "condition": "png35",
+   "file": "c07-png35.png",
+   "sha256": "46450d1d077a19a42c3a10df9852a094172e9c2d94bbbe7da29a30fdc7003b5c",
+   "ok": true,
+   "reply": "AGKY-BE61-ESFJ-BSXN",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2458,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 8,
+   "condition": "png35",
+   "file": "c08-png35.png",
+   "sha256": "f7c40e2338dd63c0be22d7b0f6fb3abd151c51131802f49f56172c185411d0fe",
+   "ok": true,
+   "reply": "ZAY5-ZBG2-FKWE-Z46R",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2265,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 9,
+   "condition": "png35",
+   "file": "c09-png35.png",
+   "sha256": "31bd59f004e9539b3fc58c6f1739541669dc1b9c3351393dfffc0dbd29b13909",
+   "ok": true,
+   "reply": "006Y-PAJM-WN7E-XN0R",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 4178,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 10,
+   "condition": "png35",
+   "file": "c10-png35.png",
+   "sha256": "45088afe07e3872b21f57991ba2f4329664b40c17b6a1554eac6d755dd6a3a85",
+   "ok": true,
+   "reply": "SB27-Z390-WEC6-9DBJ",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2247,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 11,
+   "condition": "png35",
+   "file": "c11-png35.png",
+   "sha256": "232a9bce28706abc9df6014e502bc23ee8e86f49b7c5897e34f6e4edade74eb2",
+   "ok": true,
+   "reply": "WD49-869Z-74A0-EC00",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 17
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 17,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001158,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001158,
+   "ms": 2465,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 12,
+   "condition": "png35",
+   "file": "c12-png35.png",
+   "sha256": "8b1bedad792ab157baa98b687af2b8f3eaa9822eaa045704c807430b87b010cb",
+   "ok": true,
+   "reply": "KN9E-ZYE1-GR2X-Y1SY",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2452,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 13,
+   "condition": "png35",
+   "file": "c13-png35.png",
+   "sha256": "576287c9fa1ba46e88ff10b5d370332468e4527974371f12fb1a8f22aa0aabf3",
+   "ok": true,
+   "reply": "0MBK-7XEM-M6JG-T4HA",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2437,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 14,
+   "condition": "png35",
+   "file": "c14-png35.png",
+   "sha256": "ec73a9c4cf18af60b4c5f051636b5c13fd0972c42f9c8b35d4ebb80de3759063",
+   "ok": true,
+   "reply": "MY2T-Y124-6WD2-R0XD",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2665,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 15,
+   "condition": "png35",
+   "file": "c15-png35.png",
+   "sha256": "1be53e9654ccba71e71948e581f50b48c620a0399a3faff071c6a379975eda41",
+   "ok": true,
+   "reply": "FP7D-HY5Y-Q5P5-CM6J",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2349,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 16,
+   "condition": "png35",
+   "file": "c16-png35.png",
+   "sha256": "e2f85129162dc2fc58e9bf417d8b45101ec1cc1728de6144e83fd8e4975abbef",
+   "ok": true,
+   "reply": "0YHA-VCBE-PDHP-1M1Q",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2396,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 17,
+   "condition": "png35",
+   "file": "c17-png35.png",
+   "sha256": "d822f9b2d251a542390aa95d763cf8db5274861b0981115814d58d427309f3e6",
+   "ok": true,
+   "reply": "WG37-6RZV-DF48-HHEG",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2418,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 18,
+   "condition": "png35",
+   "file": "c18-png35.png",
+   "sha256": "5dd72ee171a8e783f4374af6b0a2960fb317ec307dc5da9d8e3d8f294fc8519d",
+   "ok": true,
+   "reply": "290M-AZ4N-Z7F2-RSXB",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2451,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 19,
+   "condition": "png35",
+   "file": "c19-png35.png",
+   "sha256": "7b0536d70be955e1acd14ab2e1157995766bedfb3f82f15093f10efd135c2e10",
+   "ok": true,
+   "reply": "GWJZ-PCTP-WY72-3Z1R",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2389,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 20,
+   "condition": "png35",
+   "file": "c20-png35.png",
+   "sha256": "da53b75ed1f9fdf35f5261f0423c8825c6107c80dffd2c615651604cd0a6efba",
+   "ok": true,
+   "reply": "PS6Y-AU2K-VE8N-N1SZ",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2818,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 21,
+   "condition": "png35",
+   "file": "c21-png35.png",
+   "sha256": "5acce5ea3e37dbea056e7e08b986a25b6f94925730a82b1bc7a7bac99a0f153d",
+   "ok": true,
+   "reply": "V09H-W1Z5-F5SN-DGH0",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 3299,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 22,
+   "condition": "png35",
+   "file": "c22-png35.png",
+   "sha256": "70462ed89280ba1dd065515a0f06a295f6617108c3b0627936a8cfe764ae979c",
+   "ok": true,
+   "reply": "M0F0-H3D9-3QS3-J1F0",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2521,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 23,
+   "condition": "png35",
+   "file": "c23-png35.png",
+   "sha256": "7af2d7acbbfbe8bfb4d983f6f7134d10a92e6742cad07fe8a26b2f07f4fcbcaf",
+   "ok": true,
+   "reply": "ZZXV-902K-C3TV-81WV",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2281,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 24,
+   "condition": "png35",
+   "file": "c24-png35.png",
+   "sha256": "7bf080b34114dd2980248a99a921295e0896bfb954d1a130eec315a18a06916c",
+   "ok": true,
+   "reply": "N3B6-Z59B-PU8R-4YXT",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2292,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 25,
+   "condition": "png35",
+   "file": "c25-png35.png",
+   "sha256": "529b108d90232ee386152fd165e50155f481bcc46b276b4d0ecf822e71e7334c",
+   "ok": true,
+   "reply": "CTFY-9H16-YZD9-D09C",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2364,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 26,
+   "condition": "png35",
+   "file": "c26-png35.png",
+   "sha256": "2270cb43e3a19d303d7682f6057f84c79795da7a61869a7da1eb732c18fdbf39",
+   "ok": true,
+   "reply": "NT01-GR9H-43KH-WJVS",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2565,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 27,
+   "condition": "png35",
+   "file": "c27-png35.png",
+   "sha256": "fea5574346d981f234ce39cb135137ce65acb82b12ca81e5fbd60c8341d66a64",
+   "ok": true,
+   "reply": "9807-TVA1-9FQA-50XT",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001173,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001173,
+   "ms": 3128,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 28,
+   "condition": "png35",
+   "file": "c28-png35.png",
+   "sha256": "5c95913bd2facac18ecc449309b793f62e2176020e217a434c8f7c5155e47253",
+   "ok": true,
+   "reply": "M974-JPZE-UXD4-HY8K",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2508,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 29,
+   "condition": "png35",
+   "file": "c29-png35.png",
+   "sha256": "6bf399fe36dbc22f603cf750bf2ef1811034dbd099a583d0d2a7816be2c06296",
+   "ok": true,
+   "reply": "5F82-MK7E-6C6C-N3JZ",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 3299,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 30,
+   "condition": "png35",
+   "file": "c30-png35.png",
+   "sha256": "ed09dea277a3cfd6afb5785aab231ec11dfe97f5a2108f6a626d86ff6f03cfcc",
+   "ok": true,
+   "reply": "VK23-E2SM-2H54-CANW",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001173,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001173,
+   "ms": 2411,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 31,
+   "condition": "png35",
+   "file": "c31-png35.png",
+   "sha256": "0699950461731988f57f83868f3fd80491f38bb405767d3c91d27a78563b6d11",
+   "ok": true,
+   "reply": "ZKQ5-F15T-XYEF-XC28",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2325,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 32,
+   "condition": "png35",
+   "file": "c32-png35.png",
+   "sha256": "2fd8e2a35259b7e50f945abec4f1af3b598ad9c3348233cc5645d8b3a7855142",
+   "ok": true,
+   "reply": "CXSW-ZMN9-Y28D-HZNM",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2332,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 33,
+   "condition": "png35",
+   "file": "c33-png35.png",
+   "sha256": "358ab3321d836654a417f9440178ffe5b631dc56f96c5ee4866da4efda08b544",
+   "ok": true,
+   "reply": "0Z1P-0ZBQ-46JC-JVKX",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2661,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 34,
+   "condition": "png35",
+   "file": "c34-png35.png",
+   "sha256": "b55afd4ad093ae12abd7bbe2d4ef5b43cd5ecacd5f1c7d7f731d96755c093551",
+   "ok": true,
+   "reply": "FYNS-S104-SJWX-ZNQD",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2566,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 35,
+   "condition": "png35",
+   "file": "c35-png35.png",
+   "sha256": "e33eb532cbe5e71da11dda3b5859a827d90216c7aec817eb2d6a6b4e2bf591cf",
+   "ok": true,
+   "reply": "DT9P-R9HB-MDQY-Z75S",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2503,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 36,
+   "condition": "png35",
+   "file": "c36-png35.png",
+   "sha256": "9e210c5d3b9f40b5f1c2dce670e4d596bc9f8aeb6db4bccc5ca4237653c69d95",
+   "ok": true,
+   "reply": "KBPV-4AHQ-A51J-9GTP",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2336,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 37,
+   "condition": "png35",
+   "file": "c37-png35.png",
+   "sha256": "784b700522c6f06b42a58acf09d24f1b0ca7ba239fb8b9414897c4486c95d62a",
+   "ok": true,
+   "reply": "S420-D639-1Y62-C204",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 15
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 15,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011279999999999999,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011279999999999999,
+   "ms": 2045,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 38,
+   "condition": "png35",
+   "file": "c38-png35.png",
+   "sha256": "dc41e27fbf1ac9aadd5a3b602c930c20b1983a8649a529b7a782cd34dfdd8b6c",
+   "ok": true,
+   "reply": "RC01-XKKX-A5XP-7YBX",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2831,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 39,
+   "condition": "png35",
+   "file": "c39-png35.png",
+   "sha256": "8129c3c65eeff40032341109a2b6b79ddb085563be294cdd640dccf3ca8ec925",
+   "ok": true,
+   "reply": "FNH1-16KR-XVMZ-CW9Y",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2393,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 40,
+   "condition": "png35",
+   "file": "c40-png35.png",
+   "sha256": "9dd46449bbc3a09123445c07de41313d3a26d8870bf7cefda119a01be354f5a3",
+   "ok": true,
+   "reply": "R955-608A-08EV-2MF5",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 16
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 16,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001143,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001143,
+   "ms": 2283,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 41,
+   "condition": "png35",
+   "file": "c41-png35.png",
+   "sha256": "8a6c258e17c0e939885a34fe5ffa35cbe3249017dbdca353afe3cd406671a709",
+   "ok": true,
+   "reply": "FG7W-3SC6-5H4V-ATYH",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2536,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 42,
+   "condition": "png35",
+   "file": "c42-png35.png",
+   "sha256": "18c5b700caf73bf0b50515d4a8f4e5988ecc9b84d2f660993453fdd61be3e17f",
+   "ok": true,
+   "reply": "172E-T1X0-K2NE-Y622",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 18
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 18,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001173,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001173,
+   "ms": 2383,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 43,
+   "condition": "png35",
+   "file": "c43-png35.png",
+   "sha256": "6776ac4b0646849ad2c38d222e09c3ee59b0933332637eeddc54fbc88afa2a56",
+   "ok": true,
+   "reply": "QR1H-0SDN-4VD1-KZCC",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2373,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 44,
+   "condition": "png35",
+   "file": "c44-png35.png",
+   "sha256": "a033ba505ccdef91a1914e62b3f3d541d95c6688c0dd865e31069d29a622c7a7",
+   "ok": true,
+   "reply": "7PV4-V7H2-SC03-PS2X",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2690,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 45,
+   "condition": "png35",
+   "file": "c45-png35.png",
+   "sha256": "e1a77e296447cb5f7086c3b865ee288a87d080c23dfead312a716d85f0541293",
+   "ok": true,
+   "reply": "H4B1-N4C7-E099-BFN9",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2596,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 46,
+   "condition": "png35",
+   "file": "c46-png35.png",
+   "sha256": "73cbbe74df0057da1ab4e8c44818dd7f4ce75747a061af8cce0d64bc2877e78c",
+   "ok": true,
+   "reply": "XY5B-V2NS-2HDJ-279T",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2456,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 47,
+   "condition": "png35",
+   "file": "c47-png35.png",
+   "sha256": "047a012ed0a47a2c9e972b86ce77ba8c7ae6617cafec1e3f3226782031689c7c",
+   "ok": true,
+   "reply": "WAWN-Q02R-BA3G-B0E3",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2686,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 48,
+   "condition": "png35",
+   "file": "c48-png35.png",
+   "sha256": "73a1f7b515694e70f9a3e133bc8f9dc40ae8b6b757cfda48642c29cc47cd4593",
+   "ok": true,
+   "reply": "FGX1-78G1-FCAD-31PK",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2380,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 49,
+   "condition": "png35",
+   "file": "c49-png35.png",
+   "sha256": "412d5b55abf541eea3f8428dedd9a517129d23e42c2b0d2ada585b54a7f4237a",
+   "ok": true,
+   "reply": "ME6D-06TV-A9F5-5G08",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2984,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 50,
+   "condition": "png35",
+   "file": "c50-png35.png",
+   "sha256": "de8fc1c7dfa592c003d661b3c6d76d30844de31a3e1cbf20ed5f23afb769acff",
+   "ok": true,
+   "reply": "XCZD-V13E-0AKS-GEFR",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2505,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 51,
+   "condition": "png35",
+   "file": "c51-png35.png",
+   "sha256": "91d138b9facdafc736671ccc10176551382196a79374908ecb634bd0e339c85f",
+   "ok": true,
+   "reply": "FD1C-QQTS-KJ76-TG03",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2776,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 52,
+   "condition": "png35",
+   "file": "c52-png35.png",
+   "sha256": "02be59fdbc89377e81560a3c560772936b5a4d4682b0aa15a2c9dbd737a2166a",
+   "ok": true,
+   "reply": "TQ69-A8GE-K57J-QKYB",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2426,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 53,
+   "condition": "png35",
+   "file": "c53-png35.png",
+   "sha256": "567790521015f55a6c82a2695a9665830bee1c2539c4d12103bb6719e63b6e5a",
+   "ok": true,
+   "reply": "6N0D-N0DB-U13R-8XMB",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2673,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 54,
+   "condition": "png35",
+   "file": "c54-png35.png",
+   "sha256": "a60d3f38bfdb41a95069759935b04c58dffa34c79fcf603356f6910d1c85a6d9",
+   "ok": true,
+   "reply": "B24S-YUWD-RY4D-4W1M",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2408,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 55,
+   "condition": "png35",
+   "file": "c55-png35.png",
+   "sha256": "d8ba482f6c6badba423eb5075efdbf496a3e2ea32b1f9f468b824e765e5cdb27",
+   "ok": true,
+   "reply": "SRPQ-RZ6T-DEDS-BPT1",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 23
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 23,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001248,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001248,
+   "ms": 2223,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 56,
+   "condition": "png35",
+   "file": "c56-png35.png",
+   "sha256": "d6249b0cc46324c9efb971c11325915419299dc11c748050ca8f31d9237aa786",
+   "ok": true,
+   "reply": "DN0R-1PSA-2TQ9-FM0H",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2445,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 57,
+   "condition": "png35",
+   "file": "c57-png35.png",
+   "sha256": "13417e0278a96e753d9f6945956d960ce51e6f5fe96ca7cbff446e325080d756",
+   "ok": true,
+   "reply": "43EQ-PHNY-DWYN-JTCN",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 3380,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 58,
+   "condition": "png35",
+   "file": "c58-png35.png",
+   "sha256": "6859519f86053974ce3a8cea6366894d0374c5ef27c3e2e2ad61fb42380a99e9",
+   "ok": true,
+   "reply": "H6F4-YRM5-JVEQ-X5A5",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 22
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 22,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001233,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001233,
+   "ms": 2624,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 59,
+   "condition": "png35",
+   "file": "c59-png35.png",
+   "sha256": "5a5217dfb03b04438aa2fc8bda24fb30ed45cf72fb966fdbc9a4d33f57de3275",
+   "ok": true,
+   "reply": "763H-0A92-8705-MKKS",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 16
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 16,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001143,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001143,
+   "ms": 2466,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 60,
+   "condition": "png35",
+   "file": "c60-png35.png",
+   "sha256": "c26b51f2e872227d5fc8e3e856a3d82bbe7a2a18d24e7c95ac83d8f2638fed3a",
+   "ok": true,
+   "reply": "S08X-DRY5-TWGC-RB97",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 19
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 19,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.0011879999999999998,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.0011879999999999998,
+   "ms": 2514,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 61,
+   "condition": "png35",
+   "file": "c61-png35.png",
+   "sha256": "4d53cf8b1d657c60bbf32864ea531993c2ff549c17a793d952f3e42fda8841e9",
+   "ok": true,
+   "reply": "23J4-4PX5-TC6E-VT1R",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2749,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 62,
+   "condition": "png35",
+   "file": "c62-png35.png",
+   "sha256": "1b0c2772e91b360ee411348d23e66e5870e06a2f76c92e3d836b59c46b307bf8",
+   "ok": true,
+   "reply": "61KH-PTQ7-4M1A-TD7T",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 21
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 21,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001218,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001218,
+   "ms": 2411,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  },
+  {
+   "card": 63,
+   "condition": "png35",
+   "file": "c63-png35.png",
+   "sha256": "bd8b811368fbf3482438ba6a89ecb8691813ca360559d8a55dac633413dbaf0d",
+   "ok": true,
+   "reply": "68H2-2SXK-0GT0-H4SM",
+   "usage": {
+    "input_tokens": 301,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0,
+    "cache_read": 0,
+    "output_tokens": 20
+   },
+   "modelUsage": {
+    "claude-sonnet-5": {
+     "inputTokens": 301,
+     "outputTokens": 20,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0,
+     "webSearchRequests": 0,
+     "costUSD": 0.001203,
+     "contextWindow": 1000000,
+     "maxOutputTokens": 64000
+    }
+   },
+   "cliCostUsd": 0.001203,
+   "ms": 2889,
+   "init": {
+    "model": "claude-sonnet-5",
+    "tools": [],
+    "mcp_servers": [],
+    "apiKeySource": "none",
+    "version": "2.1.201"
+   },
+   "receipt": true,
+   "error": null
+  }
+ ]
+}
