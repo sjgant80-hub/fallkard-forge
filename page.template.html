@@ -156,6 +156,11 @@ platform stripped, or turned into a JPEG: if the card is in your deck, its print
 <div class="panel">
   <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a card or picture to read">Drop a card or any picture here, or click to choose one
     <input type="file" id="file" accept="image/*" style="display:none"></div>
+  <div class="row" style="align-items:flex-end;margin-top:.4rem">
+    <div><label for="typed">or type the code printed on the card — for a copy too small or blurred to read from its pixels</label>
+      <input id="typed" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" autocapitalize="characters"></div>
+    <div style="flex:0 0 auto"><button id="typedGo" type="button" class="ghost">Find it by its code</button></div>
+  </div>
   <p class="note" style="margin:.8rem 0 0"><span id="deckCount">Your deck on this device is empty.</span>
     <button id="deckForget" type="button" class="ghost" style="margin:.4rem 0 0;padding:.3rem .8rem;font-size:.8rem">Forget this device's deck</button></p>
   <div class="out" id="readOut">
@@ -254,6 +259,7 @@ every card now prints the first 80 bits of its seal on its face, in a band anyon
   anything.</p>
   <div id="surviveOut"></div>
   <div id="visionOut"></div>
+  <div id="shipOut"></div>
 </div>
 
 <h2>Why it cannot be faked</h2>
@@ -524,6 +530,36 @@ async function fromPicture(file, whyNoChunksRaw) {
   $('#recLabel').style.display = 'block';
 }
 
+// ── the typed path: a code read by eye (or by a model) off a copy too small for the pixel reader ─────
+// Resolved under the current read rule, 0.2: U reads as V — the creatures' fold (see "the first thing the game shipped").
+async function fromTyped(typedText) {
+  $('#readOut').classList.add('show');
+  $('#recovered').style.display = 'none'; $('#recLabel').style.display = 'none';
+  const deck = await deckAll();
+  const res = resolveCode(typedText, deck.map((e) => e.seal));
+  const rule = fact('read rule', '0.2 — U reads as V, the fold the kard-evolve creatures found');
+  if (!res.ok) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">${res.read === undefined ? 'NOT A CODE' : 'NOT IN YOUR DECK'}</span>`;
+    $('#readFacts').innerHTML = fact('typed', esc(typedText)) + (res.read !== undefined ? fact('read as', res.read) : '') + fact('why', deck.length === 0 && res.read !== undefined ? 'your deck on this device is empty' : res.why) + rule;
+    return;
+  }
+  const entry = deck[res.index], payload = unb64(entry.payloadB64), actual = await sha256hex(payload);
+  const authentic = actual === entry.seal;
+  let text = '';
+  try { text = new TextDecoder().decode(await gunzip(payload)); } catch { text = '(the payload is there but would not decompress)'; }
+  $('#verdictWrap').innerHTML = authentic ? `<span class="verdict v-ok">RESOLVED FROM A TYPED CODE</span>` : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
+  $('#readFacts').innerHTML = fact('typed', esc(typedText)) + fact('read as', res.read)
+    + fact('corrected', res.edits + ' edit' + (res.edits === 1 ? '' : 's') + ', ' + res.unknown + ' unreadable symbol' + (res.unknown === 1 ? '' : 's')) + rule
+    + fact('card', entry.seal) + fact('actual', actual)
+    + fact('verdict', authentic ? 'the build from your deck is exactly what this card sealed' : 'the copy in your deck no longer matches its seal')
+    + fact('tier', tierChip((entry.manifest && entry.manifest.rarity) || 'common'));
+  $('#recovered').value = text;
+  $('#recovered').style.display = 'block'; $('#recLabel').style.display = 'block';
+}
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+$('#typedGo').addEventListener('click', () => { const v = $('#typed').value.trim(); if (v) fromTyped(v); });
+$('#typed').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const v = $('#typed').value.trim(); if (v) fromTyped(v); } });
+
 $('#deckForget').addEventListener('click', () => deckClear());
 deckShow();
 
@@ -573,7 +609,7 @@ deckShow();
       const label = Object.fromEntries(P.conditions.map((c) => [c.id, c.label]));
       const th = 'style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"';
       const nf = (n) => n.toLocaleString('en-GB');
-      const misses = R.replies.full.map((rep, i) => ({ i, rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep)) !== m.code.replace(/-/g, ''));
+      const misses = R.replies.full.map((rep, i) => ({ i, rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep), '0.1') !== m.code.replace(/-/g, ''));
       el.innerHTML = '<p class="note warn" style="margin-top:1.4rem"><b>The paid read: ' + j.passed + ' of ' + j.of + ' sealed rules held.</b> ' + P.n + ' more fresh cards; each picture went, alone, to <b>' + esc(P.model) + '</b> with one instruction — <i>' + esc(P.instruction) + '</i> — and nothing else: never the code, no tools. Every reply is graded here by the gated kernel against the committed codes. Sealed in <code>' + esc(R.sealedIn) + '</code> before the first paid call.</p>'
         + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">picture</th><th>read exactly</th><th>right card</th><th>refused</th><th>wrong card</th></tr></thead><tbody>'
         + t.rows.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(label[r.id]) + '</td><td>' + r.exact + '/' + r.n + '</td><td>' + r.right + '/' + r.n + '</td><td>' + r.refused + '</td><td style="color:' + (r.wrong ? 'var(--no)' : 'inherit') + '">' + r.wrong + '</td></tr>').join('')
@@ -582,8 +618,62 @@ deckShow();
         + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(P.rules.find((x) => x.id === r.id).rule) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
         + '</tbody></table></div>'
         + (misses.length ? '<p class="note"><b>Every full-size card not read exactly</b> (the code, then the reply): ' + misses.map((m) => '<code>' + esc(m.code) + '</code> &rarr; <code>' + esc(String(m.rep || '(no reply)').slice(0, 60)) + '</code>').join(' · ') + '</p>' : '')
-        + (() => { const all = P.conditions.flatMap((c) => R.replies[c.id].map((rep, i) => ({ rep, i }))); const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals).ok); const uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || '')); const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode((extractCode(rep) || '').replace(/u/gi, 'V'), R.seals); return k.ok && k.seal === R.seals[i]; }); return refused.length ? '<p class="note"><b>' + (uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ':</b> V read as U — a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' (checked after the run, so it is not part of the sealed result: it is the next change to CARD-SPEC §7.1, to be sealed and tested on its own).</p>' : ''; })()
+        + (() => { const all = P.conditions.flatMap((c) => R.replies[c.id].map((rep, i) => ({ rep, i }))); const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals, { rule: '0.1' }).ok); const uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || '')); const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode(extractCode(rep), R.seals, { rule: '0.2' }); return k.ok && k.seal === R.seals[i]; }); return refused.length ? '<p class="note"><b>' + (uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ':</b> V read as U — a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' (checked after the run, so not part of this sealed result). It has since shipped: read rule 0.2, measured on its own seal — see <a href="#shipped">the first thing the game shipped</a>, below.</p>' : ''; })()
         + '<p class="note"><b>What it cost:</b> ' + sp.calls + ' calls (' + spRun.calls + ' reads + ' + R.plumbing.length + ' plumbing check), ' + nf(sp.input) + ' input and ' + nf(sp.output) + ' output tokens by the provider’s own count — <b>$' + sp.usd.toFixed(4) + ' (£' + sp.gbp.toFixed(4) + ')</b> at the list price locked from the estate’s price registry. Paid by the Claude subscription through the official CLI (credential source reported by every call: <code>' + esc(R.credential.join(', ')) + '</code>, no API key), so that is what an API key would have paid, not new money.</p>';
+    }
+  }
+}
+
+// ── the first thing the game shipped — read rule 0.2, U reads as V — measured here, live, from the data on this page ──
+/* __SHIP_DATA__ */
+/* __END_SHIP_DATA__ */
+{
+  const el = document.getElementById('shipOut');
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (el && SHIP) {
+    const P = SHIP.prereg, R = SHIP.run;
+    const credit = '<h3 id="shipped" style="font-family:var(--serif);color:var(--gold);font-weight:500;font-size:1.12rem;margin:1.8rem 0 .4rem">The first thing the game shipped · U reads as V</h3>'
+      + '<p class="note"><b>Found</b> ' + esc(P.credit.found).replace('kard-evolve (https://sjgant80-hub.github.io/kard-evolve/)', '<a href="https://sjgant80-hub.github.io/kard-evolve/">kard-evolve</a>')
+      + ', ' + esc(P.credit.again).replace('the self-observing creature (https://sjgant80-hub.github.io/kard-evolve/observer.html)', '<a href="https://sjgant80-hub.github.io/kard-evolve/observer.html">the self-observing creature</a>') + '; ' + esc(P.credit.from) + '.</p>'
+      + '<p class="note"><b>The change</b> (CARD-SPEC §7.1, read rule 0.2): <code>' + esc(P.change.rule.split(': ')[0]) + '</code> — ' + esc(P.change.rule.split(': ').slice(1).join(': ')) + ' <b>Where:</b> ' + esc(P.change.where) + '</p>';
+    if (!R || typeof VISION === 'undefined' || !VISION || !VISION.run || !SURVIVE || !SURVIVE.run) {
+      el.innerHTML = credit + '<p class="note warn"><b>Sealed, being measured.</b> ' + P.rules.map((r) => esc(r.rule)).join('; ') + '.</p>';
+    } else {
+      const V = VISION.run, S = SURVIVE.run;
+      const recorded = VISION.prereg.conditions.flatMap((c) => V.replies[c.id].map((rep, i) => ({ read: extractCode(rep) || '', card: i, condition: c.id })));
+      const bare = (rs) => rs.map(({ read, card }) => ({ read, card }));
+      const pixels = SURVIVE.prereg.transforms.flatMap((t) => S.reads[t.id].map((r, i) => ({ read: (r && r.read) || '', card: i })));
+      const everyV = V.seals.map((s, i) => ({ read: sealCode(s).replace(/V/g, 'U'), card: i })).filter((r) => r.read.includes('U'));
+      const parts = {
+        recorded: compareRules(bare(recorded), V.seals, '0.1', '0.2'),
+        uReads: compareRules(bare(recorded.filter((r) => /u/i.test(r.read))), V.seals, '0.1', '0.2'),
+        pixels: compareRules(pixels, S.seals, '0.1', '0.2'),
+        everyV: compareRules(everyV, V.seals, '0.1', '0.2'),
+        survivalBefore: tallySurvival(S.seals, S.reads, SURVIVE.prereg.transforms, '0.1'),
+        survivalAfter: tallySurvival(S.seals, S.reads, SURVIVE.prereg.transforms, '0.2'),
+      };
+      const j = judgeUV(parts);
+      const label = Object.fromEntries(VISION.prereg.conditions.map((c) => [c.id, c.label]));
+      const byCond = VISION.prereg.conditions.map((c) => [c.id, compareRules(bare(recorded.filter((r) => r.condition === c.id)), V.seals, '0.1', '0.2')]);
+      const th = 'style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"';
+      const row = (name, c) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + name + '</td><td>' + c.before.right + '/' + c.n + '</td><td><b>' + c.after.right + '/' + c.n + '</b></td><td>' + c.after.wrong + '</td><td>' + c.broken.length + '</td></tr>';
+      const uList = recorded.filter((r) => /u/i.test(r.read)), fixedReads = parts.uReads.fixed.map((i) => uList[i]);
+      el.innerHTML = credit
+        + '<p class="note warn"><b>Measured on its own seal (<code>' + esc(R.sealedIn.slice(0, 7)) + '</code>): ' + j.passed + ' of ' + j.of + ' rules held.</b> Re-derived on this page, just now, from the paid read’s replies and the survival run’s pixel reads above, by the inlined gated kernel.</p>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">reads</th><th>right, rule 0.1</th><th>right, rule 0.2</th><th>wrong</th><th>broken</th></tr></thead><tbody>'
+        + byCond.map(([id, c]) => row('paid read — ' + esc(label[id]), c)).join('') + row('survival run — all ' + parts.pixels.n + ' pixel reads', parts.pixels) + row('every V-card written with U', parts.everyV)
+        + '</tbody></table></div>'
+        + '<div style="overflow-x:auto;margin-top:.8rem"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">sealed rule</th><th>result</th><th></th><th>predicted</th></tr></thead><tbody>'
+        + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(P.rules.find((x) => x.id === r.id).rule) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + (!fixedReads.length ? '<p class="note"><b>It fixed none of the recorded reads.</b></p>' : '<p class="note"><b>The reads it fixed</b> (the code, then what the model read): ' + fixedReads.map((r) => '<code>' + esc(sealCode(V.seals[r.card])) + '</code> &rarr; <code>' + esc(r.read) + '</code>').join(' · ') + '.</p>')
+        + '<div class="row" style="align-items:flex-end;margin-top:.4rem"><div><label for="shipTry">try a read against the paid read’s ' + V.seals.length + ' cards, under both rules — one of the reads above, or any code with a U in it</label>'
+        + '<input id="shipTry" autocomplete="off" spellcheck="false" value="' + esc(fixedReads.length ? fixedReads[0].read : '') + '"></div>'
+        + '<div style="flex:0 0 auto"><button id="shipGo" type="button" class="ghost">Resolve it</button></div></div><p class="note" id="shipTryOut" aria-live="polite"></p>';
+      const say = (k) => k.ok ? 'card <code>' + esc(sealCode(k.seal)) + '</code> — ' + k.edits + ' edit' + (k.edits === 1 ? '' : 's') : 'refused — ' + esc(k.why);
+      const tryIt = () => { const t = document.getElementById('shipTry').value.trim(); if (!t) return; document.getElementById('shipTryOut').innerHTML = '<b>rule 0.1:</b> ' + say(resolveCode(t, V.seals, { rule: '0.1' })) + '<br><b>rule 0.2:</b> ' + say(resolveCode(t, V.seals, { rule: '0.2' })); };
+      document.getElementById('shipGo').addEventListener('click', tryIt);
+      document.getElementById('shipTry').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); tryIt(); } });
     }
   }
 }

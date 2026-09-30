@@ -105,3 +105,13 @@ test('the committed paid read, re-graded from its raw replies by the kernel', as
   const s = spend([...run.rows.map((r) => r.usage), ...plumb], lock.find((e) => e.id === 'claude-sonnet-5'), lock.find((e) => e.id === 'fx-gbp-usd').gbpPerUsd, pre.cacheMultiples);
   assert.deepEqual([s.calls, s.input, s.output, s.usd, s.gbp], [193, 83741, 3954, 0.207, 0.1561]);
 });
+
+test('tallyVision grades under read rule 0.1 unless told otherwise', () => {
+  const S = [SEAL_A, SEAL_B];
+  const u = sealCode(SEAL_B).replace(/V/g, 'U');
+  const replies = { full: [sealCode(SEAL_A), 'The code is ' + u] };
+  const a = tallyVision(S, replies, [{ id: 'full' }]).rows[0], b = tallyVision(S, replies, [{ id: 'full' }], '0.2').rows[0];
+  assert.deepEqual([a.exact, a.right, a.refused], [1, 1, 1]);
+  assert.deepEqual([b.exact, b.right, b.refused], [2, 2, 0]);
+  assert.deepEqual(tallyVision(S, replies, [{ id: 'full' }], '0.1').rows[0].refused, 1);
+});

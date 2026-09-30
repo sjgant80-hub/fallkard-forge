@@ -1,0 +1,60 @@
+{
+ "kind": "fallkard-forge-uv-prereg",
+ "v": 1,
+ "written": "2026-09-30",
+ "approvedBy": "Simon, relayed verbatim: \"yes go kar ship it into the card format lfg\"",
+ "statement": "Sealed, committed and pushed before the change is measured. The first thing the creatures' game ships to production: CARD-SPEC §7.1 read rule 0.2 reads U as V. The result is published whichever way it lands.",
+ "credit": {
+  "found": "by the creatures of kard-evolve (https://sjgant80-hub.github.io/kard-evolve/): the sealed evolution's champion UV|515 carried U → V from generation 14, found by mutation and selection with nothing telling it to look (seal a1f6c43, record sha256 4529a418c273d6d602813c5f36b11d9993c7f275032cf592a6618524fa11df9b)",
+  "again": "and by the self-observing creature (https://sjgant80-hub.github.io/kard-evolve/observer.html): with no answer key it looked at its own refused reads, suspected U and chose U → V at generation 1 (median over 8 seeds; seal 44f55ce)",
+  "from": "the misreads it learned from are this repository's own sealed paid read (data/vision.json)"
+ },
+ "change": {
+  "rule": "normalizeCode(text, rule): rule 0.1 as before (case-blind, O→0, I and L→1); rule 0.2 also U→V. U is in no code, and V is the symbol the model saw as U every time.",
+  "where": "the live reader and the new \"type the code\" path use rule 0.2. The survival run and the paid read, sealed under 0.1, stay graded under 0.1."
+ },
+ "sealed": {
+  "sealmark.mjs": "3b2c9540118dbe1493c99daea7518e3abdaf523b10455faff48afda0d0fcba12",
+  "vision.mjs": "e30305374ee1f5befb04bca0e799d8584ba0d1c61ca12c6f10d3ea5ddc10d2fd",
+  "data/vision.json": "b1323fe7682cdc8a1dbded16222da272a30be6aedd836793d3e64e8560a95a82",
+  "data/vision/cards.json": "2e4732965ddd0e709970f3816a2207b7c07d4f5c2ea6068ab7a3fc745365882d",
+  "data/survive.json": "7c0bba34c10b6c118b337d0e8d0d5776e05bc40207e851681a059e50f707bbcc",
+  "data/survive-prereg.json": "b21bec0a9efa6f776c4c9cdaa49eecc3547f1a7df3b091ea754e38c7935f90e7"
+ },
+ "measured": {
+  "recorded": "all 192 recorded replies of the paid read (full size, platform copy, 35%), each reply's code extracted as the paid read did, resolved against its 64 cards under 0.1 and under 0.2",
+  "uReads": "the recorded replies whose code holds a U",
+  "pixels": "all 768 pixel reads of the survival run (64 cards × 12 kinds of damage), resolved against their deck under 0.1 and under 0.2",
+  "everyV": "every one of the paid read's 64 cards whose code holds a V, written with every V as U"
+ },
+ "rules": [
+  {
+   "id": "fixes-the-seven",
+   "rule": "every recorded reply that holds a U resolves to the right card under 0.2, and none did under 0.1"
+  },
+  {
+   "id": "breaks-nothing",
+   "rule": "no recorded reply and no pixel read that resolved to the right card under 0.1 resolves otherwise under 0.2, and no exact read stops being exact"
+  },
+  {
+   "id": "never-wrong",
+   "rule": "under 0.2, not one of the 192 recorded replies or 768 pixel reads names a wrong card"
+  },
+  {
+   "id": "pixels-unchanged",
+   "rule": "the survival run's tally under 0.2 is identical, row for row, to its tally under 0.1"
+  },
+  {
+   "id": "every-v-as-u",
+   "rule": "every V-card written with every V as U resolves to the right card under 0.2, and none did under 0.1"
+  }
+ ],
+ "predictions": {
+  "said": "before measuring, by Kar",
+  "fixes-the-seven": "pass — 7 of 7; the 35% copies go from 57 to 64 right",
+  "breaks-nothing": "pass — a U was never a symbol, so a read with one was never right before",
+  "never-wrong": "pass",
+  "pixels-unchanged": "pass — the pixel reader never outputs a U",
+  "every-v-as-u": "pass"
+ }
+}

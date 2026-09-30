@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the U→V seal is checked against the commit that sealed it
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -57,6 +59,13 @@ jobs:
 
       - name: The paid read's seal is exactly what its script writes from the committed cards
         run: node scripts/vision.mjs --check
+
+      # THE FIRST THING THE GAME SHIPPED — read rule 0.2 (U reads as V), sealed before it was measured. Once measured,
+      # the measurement re-runs here on every push and must come out identical.
+      - name: The U→V change — its seal, then its measurement re-run
+        run: |
+          node scripts/uv-ship.mjs --check
+          if [ -f data/uv-run.json ]; then node scripts/uv-ship.mjs --verify; fi
 
       - name: The basis — no untraced price, and this repository's own current compliance map
         run: |

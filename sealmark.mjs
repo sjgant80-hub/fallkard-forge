@@ -69,6 +69,7 @@ export const GLYPHS = {
 };
 
 const isStr = (v) => typeof v === 'string';
+const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const inkOf = (g) => GLYPHS[g].join('');
 // every dot of a glyph as [row, column], in reading order — one list, so no loop bound can drift
 const DOTS = Array.from({ length: GLYPH_H * GLYPH_W }, (_, i) => [Math.floor(i / GLYPH_W), i % GLYPH_W]);
@@ -93,11 +94,19 @@ export function sealCode(sealHex) {
   return out;
 }
 
-// normalizeCode(text) — what a read means: case-blind, O→0, I and L→1, separators and spaces dropped.
-// '?' stands for a symbol that could not be read and is kept. Any other character makes it no code.
-export function normalizeCode(text) {
-  if (!isStr(text)) return null;
-  const s = text.toUpperCase().replace(/[\s\-_.·]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+// The read rule has versions (CARD-SPEC §7.1). 0.1 is the rule as first specified. 0.2 (2026-09-30) also reads U as V:
+// the fold the creatures of kard-evolve found untold — the champion UV|515 at generation 14 of the sealed run, and the
+// self-observing creature at generation 1 — shipped only after its own sealed measurement (data/uv-prereg.json).
+// Every experiment sealed under 0.1 is still graded under 0.1.
+export const READ_RULES = ['0.1', '0.2'];
+export const READ_RULE = '0.2';
+
+// normalizeCode(text, rule) — what a read means: case-blind, O→0, I and L→1, separators and spaces dropped, and from
+// rule 0.2 U→V. '?' stands for a symbol that could not be read and is kept. Any other character makes it no code.
+export function normalizeCode(text, rule = READ_RULE) {
+  if (!isStr(text) || !READ_RULES.includes(rule)) return null;
+  const folded = text.toUpperCase().replace(/[\s\-_.·]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+  const s = rule === '0.1' ? folded : folded.replace(/U/g, 'V');
   for (const ch of s) if (ch !== '?' && !ALPHABET.includes(ch)) return null;
   return s;
 }
@@ -125,7 +134,7 @@ export function resolveCode(text, seals, opts = {}) {
   const maxEdits = Number.isInteger(o.maxEdits) ? o.maxEdits : 3;
   const margin = Number.isInteger(o.margin) ? o.margin : 3;
   const maxUnknown = Number.isInteger(o.maxUnknown) ? o.maxUnknown : 4;
-  const read = normalizeCode(text);
+  const read = normalizeCode(text, o.rule === undefined ? READ_RULE : o.rule);
   if (read === null || read.length === 0) return { ok: false, why: 'the read is not a seal code' };
   const unknown = read.split('').filter((c) => c === '?').length;
   if (unknown > maxUnknown) return { ok: false, why: 'too little of the seal could be read', read };
@@ -208,9 +217,10 @@ export function readBand(luma, width, height) {
 }
 
 // ── the survival run (data/survive-prereg.json) ─────────────────────────────────────────────────────
-// tallySurvival(seals, reads, transforms) — from the raw reads alone, re-resolved here: nothing the run
-// reported about which card it found is taken on trust. reads[t.id][i] is card i's read under transform t.
-export function tallySurvival(seals, reads, transforms) {
+// tallySurvival(seals, reads, transforms, rule) — from the raw reads alone, re-resolved here: nothing the run
+// reported about which card it found is taken on trust. reads[t.id][i] is card i's read under transform t. Graded
+// under read rule 0.1 unless told otherwise — the rule it was sealed with.
+export function tallySurvival(seals, reads, transforms, rule = '0.1') {
   if (!Array.isArray(seals) || seals.length === 0 || !reads || typeof reads !== 'object' || !Array.isArray(transforms) || transforms.length === 0) return { ok: false, why: 'seals, reads and transforms' };
   const rows = [];
   for (const t of transforms) {
@@ -220,9 +230,9 @@ export function tallySurvival(seals, reads, transforms) {
     rs.forEach((r, i) => {
       const read = r && isStr(r.read) ? r.read : '';
       const code = (sealCode(seals[i]) || '').replace(/-/g, '');
-      if (normalizeCode(read) === code) row.exact++;
+      if (normalizeCode(read, rule) === code) row.exact++;
       row.unknown += (read.match(/\?/g) || []).length;
-      const k = resolveCode(read, seals);
+      const k = resolveCode(read, seals, { rule });
       if (!k.ok) row.refused++;
       else if (k.seal === seals[i]) row.right++;
       else row.wrong++;
@@ -249,4 +259,47 @@ export function judgeSurvival(tally) {
   return { ok: true, rules, passed: rules.filter((r) => r.pass).length, of: rules.length };
 }
 
-export default { ALPHABET, GLYPHS, sealCode, normalizeCode, readDistance, resolveCode, bandLayout, paintBand, readBand, glyphDistance, tallySurvival, judgeSurvival };
+// ── shipping a read-rule change (data/uv-prereg.json) ───────────────────────────────────────────────
+// compareRules(reads, seals, from, to) — every read [{ read, card }] resolved under two read rules: how many are right,
+// wrong, refused and exact under each, which it fixes (not right before, right after), which it breaks (right before,
+// not after), and which exact reads it would lose.
+export function compareRules(reads, seals, from, to) {
+  if (!Array.isArray(reads) || !Array.isArray(seals) || seals.length === 0 || !READ_RULES.includes(from) || !READ_RULES.includes(to) || reads.some((r) => !isObj(r) || !Number.isInteger(r.card) || !seals[r.card])) return { ok: false, why: 'reads [{ read, card }], the deck, and two read rules' };
+  const tally = () => ({ right: 0, wrong: 0, refused: 0, exact: 0 });
+  const before = tally(), after = tally(), fixed = [], broken = [], lostExact = [];
+  const judge = (r, rule) => {
+    const code = sealCode(seals[r.card]).replace(/-/g, ''), k = resolveCode(r.read, seals, { rule });
+    return { exact: normalizeCode(r.read, rule) === code, outcome: !k.ok ? 'refused' : k.seal === seals[r.card] ? 'right' : 'wrong' };
+  };
+  reads.forEach((r, i) => {
+    const a = judge(r, from), b = judge(r, to);
+    before[a.outcome]++; after[b.outcome]++;
+    if (a.exact) before.exact++;
+    if (b.exact) after.exact++;
+    if (a.outcome !== 'right' && b.outcome === 'right') fixed.push(i);
+    if (a.outcome === 'right' && b.outcome !== 'right') broken.push(i);
+    if (a.exact && !b.exact) lostExact.push(i);
+  });
+  return { ok: true, n: reads.length, before, after, fixed, broken, lostExact };
+}
+
+// judgeUV(parts) — the five rules sealed for shipping U→V, each with the number that decided it. parts: compareRules
+// results for the recorded replies, the recorded replies that hold a U, the survival run's pixel reads and every
+// V-card written with U; and the survival tallies under both rules.
+export function judgeUV(parts) {
+  const c = (x) => isObj(x) && x.ok === true && isObj(x.before) && isObj(x.after) && Array.isArray(x.broken) && Array.isArray(x.lostExact);
+  const p = isObj(parts) ? parts : {};
+  if (!c(p.recorded) || !c(p.uReads) || !c(p.pixels) || !c(p.everyV) || !isObj(p.survivalBefore) || !isObj(p.survivalAfter)) return { ok: false, why: 'recorded, uReads, pixels and everyV from compareRules, and the survival tallies before and after' };
+  const broken = p.recorded.broken.length + p.pixels.broken.length, lost = p.recorded.lostExact.length + p.pixels.lostExact.length;
+  const wrong = p.recorded.after.wrong + p.pixels.after.wrong;
+  const rules = [
+    { id: 'fixes-the-seven', pass: p.uReads.n > 0 && p.uReads.after.right === p.uReads.n && p.uReads.before.right === 0, value: p.uReads.after.right + ' of ' + p.uReads.n + ' now resolve to the right card (' + p.uReads.before.right + ' before)' },
+    { id: 'breaks-nothing', pass: broken === 0 && lost === 0, value: broken + ' broken, ' + lost + ' exact reads lost, across ' + (p.recorded.n + p.pixels.n) + ' reads' },
+    { id: 'never-wrong', pass: wrong === 0, value: wrong + ' wrong cards across ' + (p.recorded.n + p.pixels.n) + ' reads' },
+    { id: 'pixels-unchanged', pass: JSON.stringify(p.survivalBefore) === JSON.stringify(p.survivalAfter), value: JSON.stringify(p.survivalBefore) === JSON.stringify(p.survivalAfter) ? 'every row identical' : 'the tally changed' },
+    { id: 'every-v-as-u', pass: p.everyV.n > 0 && p.everyV.after.right === p.everyV.n && p.everyV.before.right === 0, value: p.everyV.after.right + ' of ' + p.everyV.n + ' now resolve (' + p.everyV.before.right + ' before)' },
+  ];
+  return { ok: true, rules, passed: rules.filter((r) => r.pass).length, of: rules.length };
+}
+
+export default { ALPHABET, GLYPHS, READ_RULES, READ_RULE, compareRules, judgeUV, sealCode, normalizeCode, readDistance, resolveCode, bandLayout, paintBand, readBand, glyphDistance, tallySurvival, judgeSurvival };

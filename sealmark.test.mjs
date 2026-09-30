@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ALPHABET, CODE_SYMBOLS, GROUP, GLYPH_W, GLYPH_H, ADVANCE, MIN_GLYPH_DISTANCE, GLYPHS, REF_W, REF_H, BAND, BAND_PAPER, BAND_INK,
-  glyphDistance, sealCode, normalizeCode, readDistance, resolveCode, bandLayout, paintBand, readBand, tallySurvival, judgeSurvival,
+  READ_RULES, READ_RULE, compareRules, judgeUV, glyphDistance, sealCode, normalizeCode, readDistance, resolveCode, bandLayout, paintBand, readBand, tallySurvival, judgeSurvival,
 } from './sealmark.mjs';
 
 // a code back to the hex it came from — an independent inverse, so sealCode is not checked against itself
@@ -71,7 +71,17 @@ test('normalizeCode: case-blind, O→0, I and L→1, separators dropped, ? kept,
   assert.equal(normalizeCode('7YD?·R8EM'), '7YD?R8EM');
   assert.equal(normalizeCode('.a'), 'A');
   assert.equal(normalizeCode(''), '');
-  for (const bad of ['U', 'u123', '7YD0!', 'é', null, 42]) assert.equal(normalizeCode(bad), null);
+  for (const bad of ['7YD0!', 'é', null, 42]) assert.equal(normalizeCode(bad), null);
+  // rule 0.1, the rule every sealed experiment was graded with: U is no symbol
+  for (const bad of ['U', 'u123']) assert.equal(normalizeCode(bad, '0.1'), null);
+  assert.equal(normalizeCode('OoIiLl', '0.1'), '001111');
+  // rule 0.2, current: U reads as V — the creatures' fold
+  assert.deepEqual([READ_RULES, READ_RULE], [['0.1', '0.2'], '0.2']);
+  assert.equal(normalizeCode('U'), 'V');
+  assert.equal(normalizeCode('u123'), 'V123');
+  assert.equal(normalizeCode('6WHU-DDBJ', '0.2'), '6WHVDDBJ');
+  assert.equal(normalizeCode('uoil', '0.2'), 'V011');
+  for (const bad of ['0.3', '', null, 2]) assert.equal(normalizeCode('ABC', bad), null);
 });
 
 test('readDistance: edits, with ? matching anything for free', () => {
@@ -115,7 +125,15 @@ test('resolveCode: the nearest card in the deck, corrected — or a refusal, nev
   assert.equal(resolveCode('7YD0-R8EM-X1XP-B88F', [SEAL_A, SEAL_B], { margin: 99 }).ok, false);
   // a deck of one needs no margin
   assert.equal(resolveCode('7YD0-R8EM-X1XP-B88F', [SEAL_A]).ok, true);
-  for (const [t, d, re] of [['U', deck, /not a seal code/], ['', deck, /not a seal code/], [null, deck, /not a seal code/], ['7YD0', null, /no deck/], ['7YD0', ['x', 5], /no card in the deck has a seal/], ['7YD0', [], /no card in the deck has a seal/]]) assert.match(resolveCode(t, d).why, re);
+  // rule 0.1 refuses a U; rule 0.2 reads it as V and finds the card
+  assert.match(resolveCode('U', deck, { rule: '0.1' }).why, /not a seal code/);
+  assert.match(resolveCode('7YD0-R8EM-X1XP-B88F', deck, { rule: '9.9' }).why, /not a seal code/);
+  const vCard = sealCode(SEAL_B);
+  assert.ok(vCard.includes('V'));
+  assert.equal(resolveCode(vCard.replace(/V/g, 'U'), deck).seal, SEAL_B);
+  assert.equal(resolveCode(vCard.replace(/V/g, 'U'), deck, { rule: '0.2' }).edits, 0);
+  assert.equal(resolveCode(vCard.replace(/V/g, 'U'), deck, { rule: '0.1' }).ok, false);
+  for (const [t, d, re] of [['!', deck, /not a seal code/], ['', deck, /not a seal code/], [null, deck, /not a seal code/], ['7YD0', null, /no deck/], ['7YD0', ['x', 5], /no card in the deck has a seal/], ['7YD0', [], /no card in the deck has a seal/]]) assert.match(resolveCode(t, d).why, re);
 });
 
 test('bandLayout: fixed on the 440×616 card, scaled with the picture', () => {
@@ -277,4 +295,50 @@ test('the committed survival run, re-derived from its raw reads by the kernel', 
   ]);
   const j = judgeSurvival(t);
   assert.deepEqual(j.rules.map((r) => [r.id, r.pass]), [['stripped-exact', true], ['platform-ladder', true], ['never-wrong', true], ['third-size', false]]);
+});
+
+test('read rules: tallySurvival grades under 0.1 unless told otherwise', () => {
+  const S = [SEAL_A, SEAL_B];
+  const uRead = sealCode(SEAL_B).replace(/V/g, 'U');
+  const reads = { t: [{ read: sealCode(SEAL_A) }, { read: uRead }] };
+  const T = [{ id: 't', realistic: true }];
+  const r01 = tallySurvival(S, reads, T).rows[0], r02 = tallySurvival(S, reads, T, '0.2').rows[0];
+  assert.deepEqual([r01.exact, r01.right, r01.refused], [1, 1, 1]);
+  assert.deepEqual([r02.exact, r02.right, r02.refused], [2, 2, 0]);
+  assert.equal(tallySurvival(S, reads, T, '0.1').rows[0].refused, 1);
+  assert.equal(tallySurvival(S, reads, T, 'x').rows[0].refused, 2);
+});
+
+test('compareRules: every read under two rules — fixed, broken, exact kept or lost', () => {
+  const deck = [SEAL_A, SEAL_B, 'e1' + 'd'.repeat(62)];
+  const u = sealCode(SEAL_B).replace(/V/g, 'U');
+  const reads = [{ read: u, card: 1 }, { read: sealCode(SEAL_A), card: 0 }, { read: sealCode(SEAL_A), card: 2 }, { read: 'ZZZZ-ZZZZ-ZZZZ-ZZZZ', card: 0 }];
+  const f = compareRules(reads, deck, '0.1', '0.2');
+  assert.deepEqual([f.n, f.before, f.after, f.fixed, f.broken, f.lostExact], [4, { right: 1, wrong: 1, refused: 2, exact: 1 }, { right: 2, wrong: 1, refused: 1, exact: 2 }, [0], [], []]);
+  const b = compareRules(reads, deck, '0.2', '0.1');                              // the other way round breaks it
+  assert.deepEqual([b.fixed, b.broken, b.lostExact], [[], [0], [0]]);
+  assert.deepEqual(compareRules([], deck, '0.1', '0.2').before, { right: 0, wrong: 0, refused: 0, exact: 0 });
+  for (const bad of [[null, deck, '0.1', '0.2'], [reads, [], '0.1', '0.2'], [reads, null, '0.1', '0.2'], [reads, deck, '0.3', '0.2'], [reads, deck, '0.1', null], [[{ read: 'A', card: 9 }], deck, '0.1', '0.2'], [[{ read: 'A', card: 'x' }], deck, '0.1', '0.2'], [[null], deck, '0.1', '0.2']]) assert.match(compareRules(...bad).why, /two read rules/);
+});
+
+test('judgeUV: the five sealed rules for shipping U→V, each at its edge', () => {
+  const cmp = (before, after, broken = [], lostExact = [], n = 7) => ({ ok: true, n, before: { right: 0, wrong: 0, refused: 0, exact: 0, ...before }, after: { right: 0, wrong: 0, refused: 0, exact: 0, ...after }, fixed: [], broken, lostExact });
+  const good = { recorded: cmp({ right: 185 }, { right: 192 }, [], [], 192), uReads: cmp({ right: 0 }, { right: 7 }), pixels: cmp({ right: 600 }, { right: 600 }, [], [], 768), everyV: cmp({ right: 0 }, { right: 40 }, [], [], 40), survivalBefore: { rows: [1] }, survivalAfter: { rows: [1] } };
+  const j = judgeUV(good);
+  assert.deepEqual(j.rules.map((r) => [r.id, r.pass]), [['fixes-the-seven', true], ['breaks-nothing', true], ['never-wrong', true], ['pixels-unchanged', true], ['every-v-as-u', true]]);
+  assert.deepEqual([j.passed, j.of, j.rules[0].value, j.rules[1].value, j.rules[2].value], [5, 5, '7 of 7 now resolve to the right card (0 before)', '0 broken, 0 exact reads lost, across 960 reads', '0 wrong cards across 960 reads']);
+  const at = (patch, id) => judgeUV({ ...good, ...patch }).rules.find((r) => r.id === id).pass;
+  assert.equal(at({ uReads: cmp({ right: 0 }, { right: 6 }) }, 'fixes-the-seven'), false);
+  assert.equal(at({ uReads: cmp({ right: 1 }, { right: 7 }) }, 'fixes-the-seven'), false);
+  assert.equal(at({ uReads: cmp({}, {}, [], [], 0) }, 'fixes-the-seven'), false);
+  assert.equal(at({ recorded: cmp({ right: 185 }, { right: 192 }, [3], [], 192) }, 'breaks-nothing'), false);
+  assert.equal(at({ pixels: cmp({ right: 600 }, { right: 600 }, [], [4], 768) }, 'breaks-nothing'), false);
+  assert.equal(at({ recorded: cmp({ right: 185 }, { right: 191, wrong: 1 }, [], [], 192) }, 'never-wrong'), false);
+  assert.equal(at({ pixels: cmp({ right: 600 }, { right: 599, wrong: 1 }, [], [], 768) }, 'never-wrong'), false);
+  assert.equal(at({ survivalAfter: { rows: [2] } }, 'pixels-unchanged'), false);
+  assert.equal(judgeUV({ ...good, survivalAfter: { rows: [2] } }).rules[3].value, 'the tally changed');
+  assert.equal(at({ everyV: cmp({ right: 0 }, { right: 39 }, [], [], 40) }, 'every-v-as-u'), false);
+  assert.equal(at({ everyV: cmp({ right: 2 }, { right: 40 }, [], [], 40) }, 'every-v-as-u'), false);
+  assert.equal(at({ everyV: cmp({}, {}, [], [], 0) }, 'every-v-as-u'), false);
+  for (const bad of [null, {}, { ...good, recorded: null }, { ...good, uReads: { ok: false } }, { ...good, pixels: { ...good.pixels, broken: 'x' } }, { ...good, everyV: { ...good.everyV, after: null } }, { ...good, survivalBefore: null }, { ...good, survivalAfter: 5 }]) assert.match(judgeUV(bad).why, /compareRules/);
 });

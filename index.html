@@ -156,6 +156,11 @@ platform stripped, or turned into a JPEG: if the card is in your deck, its print
 <div class="panel">
   <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a card or picture to read">Drop a card or any picture here, or click to choose one
     <input type="file" id="file" accept="image/*" style="display:none"></div>
+  <div class="row" style="align-items:flex-end;margin-top:.4rem">
+    <div><label for="typed">or type the code printed on the card — for a copy too small or blurred to read from its pixels</label>
+      <input id="typed" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" autocapitalize="characters"></div>
+    <div style="flex:0 0 auto"><button id="typedGo" type="button" class="ghost">Find it by its code</button></div>
+  </div>
   <p class="note" style="margin:.8rem 0 0"><span id="deckCount">Your deck on this device is empty.</span>
     <button id="deckForget" type="button" class="ghost" style="margin:.4rem 0 0;padding:.3rem .8rem;font-size:.8rem">Forget this device's deck</button></p>
   <div class="out" id="readOut">
@@ -254,6 +259,7 @@ every card now prints the first 80 bits of its seal on its face, in a band anyon
   anything.</p>
   <div id="surviveOut"></div>
   <div id="visionOut"></div>
+  <div id="shipOut"></div>
 </div>
 
 <h2>Why it cannot be faked</h2>
@@ -473,7 +479,7 @@ function read(png) {
 /* __END_CARD_KERNEL__ */
 /* __SEALMARK_KERNEL__ */
 // ── sealmark.mjs ──
-const { ALPHABET, sealCode, normalizeCode, resolveCode, bandLayout, paintBand, readBand, BAND_PAPER, BAND_INK, tallySurvival, judgeSurvival } = (() => {
+const { ALPHABET, READ_RULES, READ_RULE, sealCode, normalizeCode, resolveCode, bandLayout, paintBand, readBand, BAND_PAPER, BAND_INK, tallySurvival, judgeSurvival, compareRules, judgeUV } = (() => {
 // ════════════════════════════════════════════════════════════════════════════════════════════════
 // sealmark.mjs · THE VISIBLE SEAL — CARD-SPEC §7.1
 //
@@ -545,6 +551,7 @@ const GLYPHS = {
 };
 
 const isStr = (v) => typeof v === 'string';
+const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const inkOf = (g) => GLYPHS[g].join('');
 // every dot of a glyph as [row, column], in reading order — one list, so no loop bound can drift
 const DOTS = Array.from({ length: GLYPH_H * GLYPH_W }, (_, i) => [Math.floor(i / GLYPH_W), i % GLYPH_W]);
@@ -569,11 +576,19 @@ function sealCode(sealHex) {
   return out;
 }
 
-// normalizeCode(text) — what a read means: case-blind, O→0, I and L→1, separators and spaces dropped.
-// '?' stands for a symbol that could not be read and is kept. Any other character makes it no code.
-function normalizeCode(text) {
-  if (!isStr(text)) return null;
-  const s = text.toUpperCase().replace(/[\s\-_.·]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+// The read rule has versions (CARD-SPEC §7.1). 0.1 is the rule as first specified. 0.2 (2026-09-30) also reads U as V:
+// the fold the creatures of kard-evolve found untold — the champion UV|515 at generation 14 of the sealed run, and the
+// self-observing creature at generation 1 — shipped only after its own sealed measurement (data/uv-prereg.json).
+// Every experiment sealed under 0.1 is still graded under 0.1.
+const READ_RULES = ['0.1', '0.2'];
+const READ_RULE = '0.2';
+
+// normalizeCode(text, rule) — what a read means: case-blind, O→0, I and L→1, separators and spaces dropped, and from
+// rule 0.2 U→V. '?' stands for a symbol that could not be read and is kept. Any other character makes it no code.
+function normalizeCode(text, rule = READ_RULE) {
+  if (!isStr(text) || !READ_RULES.includes(rule)) return null;
+  const folded = text.toUpperCase().replace(/[\s\-_.·]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+  const s = rule === '0.1' ? folded : folded.replace(/U/g, 'V');
   for (const ch of s) if (ch !== '?' && !ALPHABET.includes(ch)) return null;
   return s;
 }
@@ -601,7 +616,7 @@ function resolveCode(text, seals, opts = {}) {
   const maxEdits = Number.isInteger(o.maxEdits) ? o.maxEdits : 3;
   const margin = Number.isInteger(o.margin) ? o.margin : 3;
   const maxUnknown = Number.isInteger(o.maxUnknown) ? o.maxUnknown : 4;
-  const read = normalizeCode(text);
+  const read = normalizeCode(text, o.rule === undefined ? READ_RULE : o.rule);
   if (read === null || read.length === 0) return { ok: false, why: 'the read is not a seal code' };
   const unknown = read.split('').filter((c) => c === '?').length;
   if (unknown > maxUnknown) return { ok: false, why: 'too little of the seal could be read', read };
@@ -684,9 +699,10 @@ function readBand(luma, width, height) {
 }
 
 // ── the survival run (data/survive-prereg.json) ─────────────────────────────────────────────────────
-// tallySurvival(seals, reads, transforms) — from the raw reads alone, re-resolved here: nothing the run
-// reported about which card it found is taken on trust. reads[t.id][i] is card i's read under transform t.
-function tallySurvival(seals, reads, transforms) {
+// tallySurvival(seals, reads, transforms, rule) — from the raw reads alone, re-resolved here: nothing the run
+// reported about which card it found is taken on trust. reads[t.id][i] is card i's read under transform t. Graded
+// under read rule 0.1 unless told otherwise — the rule it was sealed with.
+function tallySurvival(seals, reads, transforms, rule = '0.1') {
   if (!Array.isArray(seals) || seals.length === 0 || !reads || typeof reads !== 'object' || !Array.isArray(transforms) || transforms.length === 0) return { ok: false, why: 'seals, reads and transforms' };
   const rows = [];
   for (const t of transforms) {
@@ -696,9 +712,9 @@ function tallySurvival(seals, reads, transforms) {
     rs.forEach((r, i) => {
       const read = r && isStr(r.read) ? r.read : '';
       const code = (sealCode(seals[i]) || '').replace(/-/g, '');
-      if (normalizeCode(read) === code) row.exact++;
+      if (normalizeCode(read, rule) === code) row.exact++;
       row.unknown += (read.match(/\?/g) || []).length;
-      const k = resolveCode(read, seals);
+      const k = resolveCode(read, seals, { rule });
       if (!k.ok) row.refused++;
       else if (k.seal === seals[i]) row.right++;
       else row.wrong++;
@@ -725,8 +741,51 @@ function judgeSurvival(tally) {
   return { ok: true, rules, passed: rules.filter((r) => r.pass).length, of: rules.length };
 }
 
+// ── shipping a read-rule change (data/uv-prereg.json) ───────────────────────────────────────────────
+// compareRules(reads, seals, from, to) — every read [{ read, card }] resolved under two read rules: how many are right,
+// wrong, refused and exact under each, which it fixes (not right before, right after), which it breaks (right before,
+// not after), and which exact reads it would lose.
+function compareRules(reads, seals, from, to) {
+  if (!Array.isArray(reads) || !Array.isArray(seals) || seals.length === 0 || !READ_RULES.includes(from) || !READ_RULES.includes(to) || reads.some((r) => !isObj(r) || !Number.isInteger(r.card) || !seals[r.card])) return { ok: false, why: 'reads [{ read, card }], the deck, and two read rules' };
+  const tally = () => ({ right: 0, wrong: 0, refused: 0, exact: 0 });
+  const before = tally(), after = tally(), fixed = [], broken = [], lostExact = [];
+  const judge = (r, rule) => {
+    const code = sealCode(seals[r.card]).replace(/-/g, ''), k = resolveCode(r.read, seals, { rule });
+    return { exact: normalizeCode(r.read, rule) === code, outcome: !k.ok ? 'refused' : k.seal === seals[r.card] ? 'right' : 'wrong' };
+  };
+  reads.forEach((r, i) => {
+    const a = judge(r, from), b = judge(r, to);
+    before[a.outcome]++; after[b.outcome]++;
+    if (a.exact) before.exact++;
+    if (b.exact) after.exact++;
+    if (a.outcome !== 'right' && b.outcome === 'right') fixed.push(i);
+    if (a.outcome === 'right' && b.outcome !== 'right') broken.push(i);
+    if (a.exact && !b.exact) lostExact.push(i);
+  });
+  return { ok: true, n: reads.length, before, after, fixed, broken, lostExact };
+}
 
-return { ALPHABET, sealCode, normalizeCode, resolveCode, bandLayout, paintBand, readBand, BAND_PAPER, BAND_INK, tallySurvival, judgeSurvival };
+// judgeUV(parts) — the five rules sealed for shipping U→V, each with the number that decided it. parts: compareRules
+// results for the recorded replies, the recorded replies that hold a U, the survival run's pixel reads and every
+// V-card written with U; and the survival tallies under both rules.
+function judgeUV(parts) {
+  const c = (x) => isObj(x) && x.ok === true && isObj(x.before) && isObj(x.after) && Array.isArray(x.broken) && Array.isArray(x.lostExact);
+  const p = isObj(parts) ? parts : {};
+  if (!c(p.recorded) || !c(p.uReads) || !c(p.pixels) || !c(p.everyV) || !isObj(p.survivalBefore) || !isObj(p.survivalAfter)) return { ok: false, why: 'recorded, uReads, pixels and everyV from compareRules, and the survival tallies before and after' };
+  const broken = p.recorded.broken.length + p.pixels.broken.length, lost = p.recorded.lostExact.length + p.pixels.lostExact.length;
+  const wrong = p.recorded.after.wrong + p.pixels.after.wrong;
+  const rules = [
+    { id: 'fixes-the-seven', pass: p.uReads.n > 0 && p.uReads.after.right === p.uReads.n && p.uReads.before.right === 0, value: p.uReads.after.right + ' of ' + p.uReads.n + ' now resolve to the right card (' + p.uReads.before.right + ' before)' },
+    { id: 'breaks-nothing', pass: broken === 0 && lost === 0, value: broken + ' broken, ' + lost + ' exact reads lost, across ' + (p.recorded.n + p.pixels.n) + ' reads' },
+    { id: 'never-wrong', pass: wrong === 0, value: wrong + ' wrong cards across ' + (p.recorded.n + p.pixels.n) + ' reads' },
+    { id: 'pixels-unchanged', pass: JSON.stringify(p.survivalBefore) === JSON.stringify(p.survivalAfter), value: JSON.stringify(p.survivalBefore) === JSON.stringify(p.survivalAfter) ? 'every row identical' : 'the tally changed' },
+    { id: 'every-v-as-u', pass: p.everyV.n > 0 && p.everyV.after.right === p.everyV.n && p.everyV.before.right === 0, value: p.everyV.after.right + ' of ' + p.everyV.n + ' now resolve (' + p.everyV.before.right + ' before)' },
+  ];
+  return { ok: true, rules, passed: rules.filter((r) => r.pass).length, of: rules.length };
+}
+
+
+return { ALPHABET, READ_RULES, READ_RULE, sealCode, normalizeCode, resolveCode, bandLayout, paintBand, readBand, BAND_PAPER, BAND_INK, tallySurvival, judgeSurvival, compareRules, judgeUV };
 })();
 /* __END_SEALMARK_KERNEL__ */
 
@@ -972,6 +1031,36 @@ async function fromPicture(file, whyNoChunksRaw) {
   $('#recLabel').style.display = 'block';
 }
 
+// ── the typed path: a code read by eye (or by a model) off a copy too small for the pixel reader ─────
+// Resolved under the current read rule, 0.2: U reads as V — the creatures' fold (see "the first thing the game shipped").
+async function fromTyped(typedText) {
+  $('#readOut').classList.add('show');
+  $('#recovered').style.display = 'none'; $('#recLabel').style.display = 'none';
+  const deck = await deckAll();
+  const res = resolveCode(typedText, deck.map((e) => e.seal));
+  const rule = fact('read rule', '0.2 — U reads as V, the fold the kard-evolve creatures found');
+  if (!res.ok) {
+    $('#verdictWrap').innerHTML = `<span class="verdict v-no">${res.read === undefined ? 'NOT A CODE' : 'NOT IN YOUR DECK'}</span>`;
+    $('#readFacts').innerHTML = fact('typed', esc(typedText)) + (res.read !== undefined ? fact('read as', res.read) : '') + fact('why', deck.length === 0 && res.read !== undefined ? 'your deck on this device is empty' : res.why) + rule;
+    return;
+  }
+  const entry = deck[res.index], payload = unb64(entry.payloadB64), actual = await sha256hex(payload);
+  const authentic = actual === entry.seal;
+  let text = '';
+  try { text = new TextDecoder().decode(await gunzip(payload)); } catch { text = '(the payload is there but would not decompress)'; }
+  $('#verdictWrap').innerHTML = authentic ? `<span class="verdict v-ok">RESOLVED FROM A TYPED CODE</span>` : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
+  $('#readFacts').innerHTML = fact('typed', esc(typedText)) + fact('read as', res.read)
+    + fact('corrected', res.edits + ' edit' + (res.edits === 1 ? '' : 's') + ', ' + res.unknown + ' unreadable symbol' + (res.unknown === 1 ? '' : 's')) + rule
+    + fact('card', entry.seal) + fact('actual', actual)
+    + fact('verdict', authentic ? 'the build from your deck is exactly what this card sealed' : 'the copy in your deck no longer matches its seal')
+    + fact('tier', tierChip((entry.manifest && entry.manifest.rarity) || 'common'));
+  $('#recovered').value = text;
+  $('#recovered').style.display = 'block'; $('#recLabel').style.display = 'block';
+}
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+$('#typedGo').addEventListener('click', () => { const v = $('#typed').value.trim(); if (v) fromTyped(v); });
+$('#typed').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const v = $('#typed').value.trim(); if (v) fromTyped(v); } });
+
 $('#deckForget').addEventListener('click', () => deckClear());
 deckShow();
 
@@ -1036,10 +1125,11 @@ function extractCode(reply) {
   return run ? run.text : reply.trim();
 }
 
-// tallyVision(seals, replies, conditions) — per condition: how many replies read the code exactly (as the spec reads
+// tallyVision(seals, replies, conditions, rule) — graded under read rule 0.1 unless told otherwise, the rule the paid
+// read was sealed with. Per condition: how many replies read the code exactly (as the spec reads
 // it: case-blind, O→0, I/L→1), how many were exact to the letter as printed, and which card each resolves to.
 // replies[c.id][i] is card i's reply under condition c (a string, or null for a call that did not answer).
-function tallyVision(seals, replies, conditions) {
+function tallyVision(seals, replies, conditions, rule = '0.1') {
   if (!Array.isArray(seals) || seals.length === 0 || seals.some((x) => sealCode(x) === null) || !isObj(replies) || !Array.isArray(conditions) || conditions.length === 0) return { ok: false, why: 'seals, replies and conditions' };
   const rows = [];
   for (const c of conditions) {
@@ -1051,8 +1141,8 @@ function tallyVision(seals, replies, conditions) {
       const got = extractCode(reply);
       if (isStr(reply)) row.answered++;
       if (got === code) row.printed++;
-      if (normalizeCode(got) === code.replace(/-/g, '')) row.exact++;
-      const k = resolveCode(got, seals);
+      if (normalizeCode(got, rule) === code.replace(/-/g, '')) row.exact++;
+      const k = resolveCode(got, seals, { rule });
       if (!k.ok) row.refused++;
       else if (k.seal === seals[i]) row.right++;
       else row.wrong++;
@@ -1114,7 +1204,7 @@ const VISION = {"prereg":{"rules":[{"id":"full-exact","rule":"at least 60 of the
       const label = Object.fromEntries(P.conditions.map((c) => [c.id, c.label]));
       const th = 'style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"';
       const nf = (n) => n.toLocaleString('en-GB');
-      const misses = R.replies.full.map((rep, i) => ({ i, rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep)) !== m.code.replace(/-/g, ''));
+      const misses = R.replies.full.map((rep, i) => ({ i, rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep), '0.1') !== m.code.replace(/-/g, ''));
       el.innerHTML = '<p class="note warn" style="margin-top:1.4rem"><b>The paid read: ' + j.passed + ' of ' + j.of + ' sealed rules held.</b> ' + P.n + ' more fresh cards; each picture went, alone, to <b>' + esc(P.model) + '</b> with one instruction — <i>' + esc(P.instruction) + '</i> — and nothing else: never the code, no tools. Every reply is graded here by the gated kernel against the committed codes. Sealed in <code>' + esc(R.sealedIn) + '</code> before the first paid call.</p>'
         + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">picture</th><th>read exactly</th><th>right card</th><th>refused</th><th>wrong card</th></tr></thead><tbody>'
         + t.rows.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(label[r.id]) + '</td><td>' + r.exact + '/' + r.n + '</td><td>' + r.right + '/' + r.n + '</td><td>' + r.refused + '</td><td style="color:' + (r.wrong ? 'var(--no)' : 'inherit') + '">' + r.wrong + '</td></tr>').join('')
@@ -1123,8 +1213,63 @@ const VISION = {"prereg":{"rules":[{"id":"full-exact","rule":"at least 60 of the
         + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(P.rules.find((x) => x.id === r.id).rule) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
         + '</tbody></table></div>'
         + (misses.length ? '<p class="note"><b>Every full-size card not read exactly</b> (the code, then the reply): ' + misses.map((m) => '<code>' + esc(m.code) + '</code> &rarr; <code>' + esc(String(m.rep || '(no reply)').slice(0, 60)) + '</code>').join(' · ') + '</p>' : '')
-        + (() => { const all = P.conditions.flatMap((c) => R.replies[c.id].map((rep, i) => ({ rep, i }))); const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals).ok); const uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || '')); const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode((extractCode(rep) || '').replace(/u/gi, 'V'), R.seals); return k.ok && k.seal === R.seals[i]; }); return refused.length ? '<p class="note"><b>' + (uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ':</b> V read as U — a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' (checked after the run, so it is not part of the sealed result: it is the next change to CARD-SPEC §7.1, to be sealed and tested on its own).</p>' : ''; })()
+        + (() => { const all = P.conditions.flatMap((c) => R.replies[c.id].map((rep, i) => ({ rep, i }))); const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals, { rule: '0.1' }).ok); const uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || '')); const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode(extractCode(rep), R.seals, { rule: '0.2' }); return k.ok && k.seal === R.seals[i]; }); return refused.length ? '<p class="note"><b>' + (uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ':</b> V read as U — a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' (checked after the run, so not part of this sealed result). It has since shipped: read rule 0.2, measured on its own seal — see <a href="#shipped">the first thing the game shipped</a>, below.</p>' : ''; })()
         + '<p class="note"><b>What it cost:</b> ' + sp.calls + ' calls (' + spRun.calls + ' reads + ' + R.plumbing.length + ' plumbing check), ' + nf(sp.input) + ' input and ' + nf(sp.output) + ' output tokens by the provider’s own count — <b>$' + sp.usd.toFixed(4) + ' (£' + sp.gbp.toFixed(4) + ')</b> at the list price locked from the estate’s price registry. Paid by the Claude subscription through the official CLI (credential source reported by every call: <code>' + esc(R.credential.join(', ')) + '</code>, no API key), so that is what an API key would have paid, not new money.</p>';
+    }
+  }
+}
+
+// ── the first thing the game shipped — read rule 0.2, U reads as V — measured here, live, from the data on this page ──
+/* __SHIP_DATA__ */
+const SHIP = {"prereg":{"rules":[{"id":"fixes-the-seven","rule":"every recorded reply that holds a U resolves to the right card under 0.2, and none did under 0.1"},{"id":"breaks-nothing","rule":"no recorded reply and no pixel read that resolved to the right card under 0.1 resolves otherwise under 0.2, and no exact read stops being exact"},{"id":"never-wrong","rule":"under 0.2, not one of the 192 recorded replies or 768 pixel reads names a wrong card"},{"id":"pixels-unchanged","rule":"the survival run's tally under 0.2 is identical, row for row, to its tally under 0.1"},{"id":"every-v-as-u","rule":"every V-card written with every V as U resolves to the right card under 0.2, and none did under 0.1"}],"predictions":{"said":"before measuring, by Kar","fixes-the-seven":"pass — 7 of 7; the 35% copies go from 57 to 64 right","breaks-nothing":"pass — a U was never a symbol, so a read with one was never right before","never-wrong":"pass","pixels-unchanged":"pass — the pixel reader never outputs a U","every-v-as-u":"pass"},"credit":{"found":"by the creatures of kard-evolve (https://sjgant80-hub.github.io/kard-evolve/): the sealed evolution's champion UV|515 carried U → V from generation 14, found by mutation and selection with nothing telling it to look (seal a1f6c43, record sha256 4529a418c273d6d602813c5f36b11d9993c7f275032cf592a6618524fa11df9b)","again":"and by the self-observing creature (https://sjgant80-hub.github.io/kard-evolve/observer.html): with no answer key it looked at its own refused reads, suspected U and chose U → V at generation 1 (median over 8 seeds; seal 44f55ce)","from":"the misreads it learned from are this repository's own sealed paid read (data/vision.json)"},"change":{"rule":"normalizeCode(text, rule): rule 0.1 as before (case-blind, O→0, I and L→1); rule 0.2 also U→V. U is in no code, and V is the symbol the model saw as U every time.","where":"the live reader and the new \"type the code\" path use rule 0.2. The survival run and the paid read, sealed under 0.1, stay graded under 0.1."}},"run":null};
+/* __END_SHIP_DATA__ */
+{
+  const el = document.getElementById('shipOut');
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (el && SHIP) {
+    const P = SHIP.prereg, R = SHIP.run;
+    const credit = '<h3 id="shipped" style="font-family:var(--serif);color:var(--gold);font-weight:500;font-size:1.12rem;margin:1.8rem 0 .4rem">The first thing the game shipped · U reads as V</h3>'
+      + '<p class="note"><b>Found</b> ' + esc(P.credit.found).replace('kard-evolve (https://sjgant80-hub.github.io/kard-evolve/)', '<a href="https://sjgant80-hub.github.io/kard-evolve/">kard-evolve</a>')
+      + ', ' + esc(P.credit.again).replace('the self-observing creature (https://sjgant80-hub.github.io/kard-evolve/observer.html)', '<a href="https://sjgant80-hub.github.io/kard-evolve/observer.html">the self-observing creature</a>') + '; ' + esc(P.credit.from) + '.</p>'
+      + '<p class="note"><b>The change</b> (CARD-SPEC §7.1, read rule 0.2): <code>' + esc(P.change.rule.split(': ')[0]) + '</code> — ' + esc(P.change.rule.split(': ').slice(1).join(': ')) + ' <b>Where:</b> ' + esc(P.change.where) + '</p>';
+    if (!R || typeof VISION === 'undefined' || !VISION || !VISION.run || !SURVIVE || !SURVIVE.run) {
+      el.innerHTML = credit + '<p class="note warn"><b>Sealed, being measured.</b> ' + P.rules.map((r) => esc(r.rule)).join('; ') + '.</p>';
+    } else {
+      const V = VISION.run, S = SURVIVE.run;
+      const recorded = VISION.prereg.conditions.flatMap((c) => V.replies[c.id].map((rep, i) => ({ read: extractCode(rep) || '', card: i, condition: c.id })));
+      const bare = (rs) => rs.map(({ read, card }) => ({ read, card }));
+      const pixels = SURVIVE.prereg.transforms.flatMap((t) => S.reads[t.id].map((r, i) => ({ read: (r && r.read) || '', card: i })));
+      const everyV = V.seals.map((s, i) => ({ read: sealCode(s).replace(/V/g, 'U'), card: i })).filter((r) => r.read.includes('U'));
+      const parts = {
+        recorded: compareRules(bare(recorded), V.seals, '0.1', '0.2'),
+        uReads: compareRules(bare(recorded.filter((r) => /u/i.test(r.read))), V.seals, '0.1', '0.2'),
+        pixels: compareRules(pixels, S.seals, '0.1', '0.2'),
+        everyV: compareRules(everyV, V.seals, '0.1', '0.2'),
+        survivalBefore: tallySurvival(S.seals, S.reads, SURVIVE.prereg.transforms, '0.1'),
+        survivalAfter: tallySurvival(S.seals, S.reads, SURVIVE.prereg.transforms, '0.2'),
+      };
+      const j = judgeUV(parts);
+      const label = Object.fromEntries(VISION.prereg.conditions.map((c) => [c.id, c.label]));
+      const byCond = VISION.prereg.conditions.map((c) => [c.id, compareRules(bare(recorded.filter((r) => r.condition === c.id)), V.seals, '0.1', '0.2')]);
+      const th = 'style="text-align:left;color:var(--faint);font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase"';
+      const row = (name, c) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + name + '</td><td>' + c.before.right + '/' + c.n + '</td><td><b>' + c.after.right + '/' + c.n + '</b></td><td>' + c.after.wrong + '</td><td>' + c.broken.length + '</td></tr>';
+      const uList = recorded.filter((r) => /u/i.test(r.read)), fixedReads = parts.uReads.fixed.map((i) => uList[i]);
+      el.innerHTML = credit
+        + '<p class="note warn"><b>Measured on its own seal (<code>' + esc(R.sealedIn.slice(0, 7)) + '</code>): ' + j.passed + ' of ' + j.of + ' rules held.</b> Re-derived on this page, just now, from the paid read’s replies and the survival run’s pixel reads above, by the inlined gated kernel.</p>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">reads</th><th>right, rule 0.1</th><th>right, rule 0.2</th><th>wrong</th><th>broken</th></tr></thead><tbody>'
+        + byCond.map(([id, c]) => row('paid read — ' + esc(label[id]), c)).join('') + row('survival run — all ' + parts.pixels.n + ' pixel reads', parts.pixels) + row('every V-card written with U', parts.everyV)
+        + '</tbody></table></div>'
+        + '<div style="overflow-x:auto;margin-top:.8rem"><table style="width:100%;border-collapse:collapse;font-size:.84rem"><thead><tr ' + th + '><th style="padding:.35rem .4rem">sealed rule</th><th>result</th><th></th><th>predicted</th></tr></thead><tbody>'
+        + j.rules.map((r) => '<tr style="border-top:1px solid var(--line)"><td style="padding:.35rem .4rem">' + esc(P.rules.find((x) => x.id === r.id).rule) + '</td><td>' + esc(r.value) + '</td><td style="font-family:var(--mono);color:' + (r.pass ? 'var(--ok)' : 'var(--no)') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td><td style="color:var(--dim)">' + esc(P.predictions[r.id]) + '</td></tr>').join('')
+        + '</tbody></table></div>'
+        + (!fixedReads.length ? '<p class="note"><b>It fixed none of the recorded reads.</b></p>' : '<p class="note"><b>The reads it fixed</b> (the code, then what the model read): ' + fixedReads.map((r) => '<code>' + esc(sealCode(V.seals[r.card])) + '</code> &rarr; <code>' + esc(r.read) + '</code>').join(' · ') + '.</p>')
+        + '<div class="row" style="align-items:flex-end;margin-top:.4rem"><div><label for="shipTry">try a read against the paid read’s ' + V.seals.length + ' cards, under both rules — one of the reads above, or any code with a U in it</label>'
+        + '<input id="shipTry" autocomplete="off" spellcheck="false" value="' + esc(fixedReads.length ? fixedReads[0].read : '') + '"></div>'
+        + '<div style="flex:0 0 auto"><button id="shipGo" type="button" class="ghost">Resolve it</button></div></div><p class="note" id="shipTryOut" aria-live="polite"></p>';
+      const say = (k) => k.ok ? 'card <code>' + esc(sealCode(k.seal)) + '</code> — ' + k.edits + ' edit' + (k.edits === 1 ? '' : 's') : 'refused — ' + esc(k.why);
+      const tryIt = () => { const t = document.getElementById('shipTry').value.trim(); if (!t) return; document.getElementById('shipTryOut').innerHTML = '<b>rule 0.1:</b> ' + say(resolveCode(t, V.seals, { rule: '0.1' })) + '<br><b>rule 0.2:</b> ' + say(resolveCode(t, V.seals, { rule: '0.2' })); };
+      document.getElementById('shipGo').addEventListener('click', tryIt);
+      document.getElementById('shipTry').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); tryIt(); } });
     }
   }
 }

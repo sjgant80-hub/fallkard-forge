@@ -27,10 +27,11 @@ export function extractCode(reply) {
   return run ? run.text : reply.trim();
 }
 
-// tallyVision(seals, replies, conditions) — per condition: how many replies read the code exactly (as the spec reads
+// tallyVision(seals, replies, conditions, rule) — graded under read rule 0.1 unless told otherwise, the rule the paid
+// read was sealed with. Per condition: how many replies read the code exactly (as the spec reads
 // it: case-blind, O→0, I/L→1), how many were exact to the letter as printed, and which card each resolves to.
 // replies[c.id][i] is card i's reply under condition c (a string, or null for a call that did not answer).
-export function tallyVision(seals, replies, conditions) {
+export function tallyVision(seals, replies, conditions, rule = '0.1') {
   if (!Array.isArray(seals) || seals.length === 0 || seals.some((x) => sealCode(x) === null) || !isObj(replies) || !Array.isArray(conditions) || conditions.length === 0) return { ok: false, why: 'seals, replies and conditions' };
   const rows = [];
   for (const c of conditions) {
@@ -42,8 +43,8 @@ export function tallyVision(seals, replies, conditions) {
       const got = extractCode(reply);
       if (isStr(reply)) row.answered++;
       if (got === code) row.printed++;
-      if (normalizeCode(got) === code.replace(/-/g, '')) row.exact++;
-      const k = resolveCode(got, seals);
+      if (normalizeCode(got, rule) === code.replace(/-/g, '')) row.exact++;
+      const k = resolveCode(got, seals, { rule });
       if (!k.ok) row.refused++;
       else if (k.seal === seals[i]) row.right++;
       else row.wrong++;

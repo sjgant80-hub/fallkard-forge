@@ -168,8 +168,15 @@ payload bytes, never anything hidden. It is printed in plain sight, like a seria
 are drawn centred in it from the 5×7 dot font in `sealmark.mjs`, three pixels per dot, in ink `rgb(21,18,28)`. Every
 pair of the 32 symbols differs in at least five dots. A card of another size scales the band with it.
 
-**How it is read.** Case-blind; `O` reads as `0`, `I` and `L` as `1`; separators and spaces are ignored; an unreadable
-symbol is `?`. A pixel reader samples each of the 35 dot centres per symbol, thresholds halfway between that cell's
+**How it is read.** Case-blind; `O` reads as `0`, `I` and `L` as `1`; from read rule 0.2, `U` reads as `V`; separators
+and spaces are ignored; an unreadable symbol is `?`. The read rule is versioned. **0.1** is the rule above without the
+`U`; every result sealed before 2026-09-30 was measured under it and stays graded under it. **0.2** adds `U` → `V`. It is
+the rule the reader uses, for pixels and for a typed code alike. `U` is in no code, and the paid read showed a vision model
+seeing the `V` glyph as `U` every time. The fold was not found by a person: the creatures of
+[kard-evolve](https://sjgant80-hub.github.io/kard-evolve/) evolved it from those misreads (the sealed evolution's
+champion carried it from generation 14), and the [self-observing creature](https://sjgant80-hub.github.io/kard-evolve/observer.html)
+found it again with no answer key. Rule 0.2 was sealed before it was measured (`data/uv-prereg.json`), and its
+result is in the README whichever way it landed. A pixel reader samples each of the 35 dot centres per symbol, thresholds halfway between that cell's
 darkest and lightest sample, and takes the nearest glyph if it is within two dots. Otherwise the symbol is `?`.
 
 **How it is resolved.** Against the holder's deck, by edit distance with `?` matching anything. It is accepted only

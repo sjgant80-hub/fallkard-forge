@@ -49,7 +49,7 @@ const studioKernel = Object.entries(STUDIO_EXPORTS).map(([f, names]) => {
 // on every card it forges and reads it back off a stripped card with the same gated code.
 const SEAL_OPEN = '/* __SEALMARK_KERNEL__ */';
 const SEAL_CLOSE = '/* __END_SEALMARK_KERNEL__ */';
-const SEAL_NAMES = ['ALPHABET', 'sealCode', 'normalizeCode', 'resolveCode', 'bandLayout', 'paintBand', 'readBand', 'BAND_PAPER', 'BAND_INK', 'tallySurvival', 'judgeSurvival'];
+const SEAL_NAMES = ['ALPHABET', 'READ_RULES', 'READ_RULE', 'sealCode', 'normalizeCode', 'resolveCode', 'bandLayout', 'paintBand', 'readBand', 'BAND_PAPER', 'BAND_INK', 'tallySurvival', 'judgeSurvival', 'compareRules', 'judgeUV'];
 // the survival run: its sealed pre-registration always, and its raw reads once they exist — the page tallies
 // them itself with the inlined kernel, so no survival number on the page is typed or trusted
 const SURV_OPEN = '/* __SURVIVE_DATA__ */', SURV_CLOSE = '/* __END_SURVIVE_DATA__ */';
@@ -94,6 +94,13 @@ const VISION = visPre && {
   })(),
 };
 const visData = 'const VISION = ' + JSON.stringify(VISION || null).replace(/</g, '\\u003c') + ';';
+
+// THE FIRST THING THE GAME SHIPPED — read rule 0.2 (U reads as V). The page re-derives the measurement itself from
+// the paid read's replies and the survival run's reads it already carries; this block brings only the seal's words.
+const SH_OPEN = '/* __SHIP_DATA__ */', SH_CLOSE = '/* __END_SHIP_DATA__ */';
+const uvPre = readJson('data/uv-prereg.json'), uvRun = readJson('data/uv-run.json');
+const SHIP = uvPre && { prereg: { rules: uvPre.rules, predictions: uvPre.predictions, credit: uvPre.credit, change: uvPre.change }, run: uvRun && { sealedIn: uvRun.sealedIn.slice(0, 7) } };
+const shipData = 'const SHIP = ' + JSON.stringify(SHIP || null).replace(/</g, '\\u003c') + ';';
 const sealBody = readFileSync(new URL('../sealmark.mjs', import.meta.url), 'utf8')
   .replace(/^#!.*\r?\n/, '')
   .replace(/^import[^\n]*\n/gm, '')
@@ -115,7 +122,7 @@ if (sa < 0 || sb < 0) throw new Error('the studio-kernel markers are missing fro
 let out = html.slice(0, sa + STUDIO_OPEN.length) + '\n' + studioKernel + '\n' + html.slice(sb);
 const fa2 = out.indexOf(FOLD_OPEN), fb2 = out.indexOf(FOLD_CLOSE);
 out = out.slice(0, fa2 + FOLD_OPEN.length) + '\n' + foldKernel + '\n' + out.slice(fb2);
-for (const [o, c, body, what] of [[VD_OPEN, VD_CLOSE, visData, 'vision-data'], [VIS_OPEN, VIS_CLOSE, visKernel, 'vision-kernel']]) {
+for (const [o, c, body, what] of [[SH_OPEN, SH_CLOSE, shipData, 'ship-data'], [VD_OPEN, VD_CLOSE, visData, 'vision-data'], [VIS_OPEN, VIS_CLOSE, visKernel, 'vision-kernel']]) {
   const x = out.indexOf(o), y = out.indexOf(c);
   if (x < 0 || y < 0) throw new Error('the ' + what + ' markers are missing from page.template.html');
   out = out.slice(0, x + o.length) + '\n' + body + '\n' + out.slice(y);
@@ -181,18 +188,44 @@ writeFileSync(new URL('../index.html', import.meta.url), out);
     V.push('| Sealed rule | Result | | Predicted |');
     V.push('|---|---|---|---|');
     for (const r of j.rules) V.push('| ' + P.rules.find((x) => x.id === r.id).rule + ' | ' + r.value + ' | ' + (r.pass ? 'PASS' : 'FAIL') + ' | ' + P.predictions[r.id] + ' |');
-    const misses = R.replies.full.map((rep, i) => ({ rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep)) !== m.code.replace(/-/g, ''));
+    const misses = R.replies.full.map((rep, i) => ({ rep, code: sealCode(R.seals[i]) })).filter((m) => normalizeCode(extractCode(m.rep), '0.1') !== m.code.replace(/-/g, ''));
     if (misses.length) { V.push(''); V.push('Full-size cards not read exactly (code → reply): ' + misses.map((m) => '`' + m.code + '` → `' + String(m.rep || '(no reply)').slice(0, 60).replace(/`/g, "'") + '`').join(' · ')); }
     V.push('');
     { const { resolveCode } = await import(new URL('../sealmark.mjs', import.meta.url).href);
       const all = P.conditions.flatMap((c) => R.replies[c.id].map((rep, i) => ({ rep, i })));
-      const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals).ok), uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || ''));
-      const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode((extractCode(rep) || '').replace(/u/gi, 'V'), R.seals); return k.ok && k.seal === R.seals[i]; });
-      if (refused.length) { V.push(''); V.push((uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ': V read as U, a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' — checked after the run, so it is not part of the sealed result; it is the next change to CARD-SPEC §7.1, to be sealed and tested on its own.'); } }
+      const refused = all.filter(({ rep }) => !resolveCode(extractCode(rep), R.seals, { rule: '0.1' }).ok), uRead = refused.filter(({ rep }) => /u/i.test(extractCode(rep) || ''));
+      const uFolded = uRead.filter(({ rep, i }) => { const k = resolveCode(extractCode(rep), R.seals, { rule: '0.2' }); return k.ok && k.seal === R.seals[i]; });
+      if (refused.length) { V.push(''); V.push((uRead.length === refused.length ? 'Every refusal was the same slip' : uRead.length + ' of the ' + refused.length + ' refusals were one slip') + ': V read as U, a letter the alphabet leaves out, so the whole read was refused rather than guessed. Folding U to V, the way O is already folded to 0, finds the right card for ' + uFolded.length + ' of those ' + uRead.length + ' — checked after the run, so not part of this sealed result. It has since shipped as read rule 0.2, measured on its own seal (below).'); } }
     V.push('');
     V.push('Spend: ' + sp.calls + ' calls (' + spRun.calls + ' reads + ' + R.plumbing.length + ' plumbing check), ' + fmt(sp.input) + ' input and ' + fmt(sp.output) + ' output tokens by the provider\'s own count — **$' + sp.usd.toFixed(4) + ' (£' + sp.gbp.toFixed(4) + ')** at the ' + P.model + ' list price locked in `prices.lock.json`. Paid by the Claude subscription through the official CLI (credential source: ' + R.credential.join(', ') + ' — no API key), so that is what an API key would have paid, not new money.');
   }
   readme2 = readme2.slice(0, vb + VB.length) + '\n' + V.join('\n') + '\n' + readme2.slice(ve);
+
+  // the shipped change's block, from its sealed, committed measurement (CI re-runs it with uv-ship.mjs --verify)
+  const UB = '<!-- ⟦UV-BEGIN⟧ generated by scripts/build-page.mjs — do not edit here -->', UE = '<!-- ⟦UV-END⟧ -->';
+  const ub = readme2.indexOf(UB), ue = readme2.indexOf(UE);
+  if (ub < 0 || ue < 0) throw new Error('the uv markers are missing from README.md');
+  const U = [];
+  if (!uvPre) U.push('Not sealed yet.');
+  else if (!uvRun) U.push('Sealed in `data/uv-prereg.json` before it was measured: ' + uvPre.rules.map((r) => r.rule).join('; ') + '. The result lands here whichever way it goes.');
+  else {
+    const r = uvRun.result, jj = r.judged, P = r.parts;
+    const cond = { full: 'paid read — full size', jpeg60at60: 'paid read — platform copy', png35: 'paid read — 35% copy' };
+    U.push('**Read rule 0.2 — U reads as V — measured on its own seal (`' + uvRun.sealedIn.slice(0, 7) + '`): ' + jj.passed + ' of ' + jj.of + ' sealed rules held.**');
+    U.push('');
+    U.push('| Reads | Right card, rule 0.1 | Right card, rule 0.2 | Wrong card, 0.2 | Broken |');
+    U.push('|---|---|---|---|---|');
+    for (const [id, c] of Object.entries(r.byCondition)) U.push('| ' + cond[id] + ' | ' + c.before.right + '/' + c.n + ' | ' + c.after.right + '/' + c.n + ' | ' + c.after.wrong + ' | ' + c.broken.length + ' |');
+    U.push('| survival run — every pixel read | ' + P.pixels.before.right + '/' + P.pixels.n + ' | ' + P.pixels.after.right + '/' + P.pixels.n + ' | ' + P.pixels.after.wrong + ' | ' + P.pixels.broken.length + ' |');
+    U.push('| every V-card written with U | ' + P.everyV.before.right + '/' + P.everyV.n + ' | ' + P.everyV.after.right + '/' + P.everyV.n + ' | ' + P.everyV.after.wrong + ' | ' + P.everyV.broken.length + ' |');
+    U.push('');
+    U.push('| Sealed rule | Result | | Predicted |');
+    U.push('|---|---|---|---|');
+    for (const x of jj.rules) U.push('| ' + uvPre.rules.find((y) => y.id === x.id).rule + ' | ' + x.value + ' | ' + (x.pass ? 'PASS' : 'FAIL') + ' | ' + uvPre.predictions[x.id] + ' |');
+    U.push('');
+    U.push('The reads it fixed (the card\'s code → what the model wrote): ' + r.fixed.map((f) => '`' + f.code + '` → `' + f.read + '`').join(' · ') + '.');
+  }
+  readme2 = readme2.slice(0, ub + UB.length) + '\n' + U.join('\n') + '\n' + readme2.slice(ue);
   writeFileSync(new URL('../README.md', import.meta.url), readme2);
 }
 
