@@ -48,6 +48,16 @@ jobs:
       - name: The survival run's seal is exactly what its script writes
         run: node scripts/survive.mjs --check
 
+      # THE PAID READ — vision.mjs grades a vision model's reads of the printed seal. Gated like sealmark.
+      - name: The paid read's grader — tests, then the mutation gate
+        run: |
+          node --test vision.test.mjs
+          node .witness6/witness.mjs mutate vision.mjs --timeout 60000 --cap 400 --test node --test vision.test.mjs | tee vision.out
+          grep -q '"clean": true' vision.out || { echo "::error::mutants survived in vision.mjs"; exit 1; }
+
+      - name: The paid read's seal is exactly what its script writes from the committed cards
+        run: node scripts/vision.mjs --check
+
       - name: The basis — no untraced price, and this repository's own current compliance map
         run: |
           git clone --quiet https://github.com/sjgant80-hub/fallstack /tmp/fallstack && git -C /tmp/fallstack checkout --quiet 4eeb828
