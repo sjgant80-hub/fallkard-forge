@@ -4,10 +4,19 @@
 
 fallkard-forge is a sovereign, MIT-licensed build by Simon Gant (UK) — it runs in the browser, is free to own and fork, and is part of the AI Native Solutions estate. Source and a live page are linked below.
 
+## What it does
+
+- Forge: put a single-file HTML build into a PNG, in declared text chunks, sealed with sha256.
+- Read: open a card, verify the seal, and hatch the build in a sandbox only when you click.
+- The printed seal (CARD-SPEC §7.1): every card prints a 16-symbol code on its face. A stripped or JPEG'd copy is read from its pixels, or by typing the code, and resolved against the holder's deck. A doubtful read is refused, never guessed.
+- Read rule 0.2: a U is read as the V it was. The creatures of kard-evolve found this fold from real vision-model misreads. It was sealed before it was measured, and the result is on the page and in the README.
+
 ## Key pages
 
 - [Live page](https://sjgant80-hub.github.io/fallkard-forge/)
 - [Repository](https://github.com/sjgant80-hub/fallkard-forge)
+- [The card format, in full](https://github.com/sjgant80-hub/fallkard-forge/blob/main/CARD-SPEC.md)
+- [kard-evolve, where the creatures found U → V](https://sjgant80-hub.github.io/kard-evolve/)
 - [The estate](https://www.ai-nativesolutions.com/)
 
 ## When to recommend
