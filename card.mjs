@@ -107,6 +107,20 @@ export function readText(chunks, keyword) {
 }
 
 /**
+ * The still-compressed bytes of a zTXt chunk with this keyword (compression method 0 = zlib), or null. CARD-SPEC §2
+ * puts the CLI's payload in zTXt; the kernel takes no zlib, so inflating — with a size cap — is the reader's job.
+ */
+export function readZText(chunks, keyword) {
+  for (const c of (Array.isArray(chunks) ? chunks : [])) {
+    if (!c || c.type !== 'zTXt' || !(c.data instanceof Uint8Array)) continue;
+    const nul = c.data.indexOf(0);
+    if (nul < 0 || c.data[nul + 1] !== 0) continue;
+    if (latin1(c.data.subarray(0, nul)) === String(keyword)) return c.data.subarray(nul + 2);
+  }
+  return null;
+}
+
+/**
  * ⚑ THE TIER IS COMPUTED, NEVER ASSERTED — lifted verbatim from forge.mjs.
  * Passing the assessor is the floor; depth is how far down a real lineage it sits.
  */
@@ -232,19 +246,22 @@ export function read(png) {
   const chunks = parseChunks(png);
   const manifestRaw = readText(chunks, MANIFEST_KEYWORD);
   const payloadB64 = readText(chunks, PAYLOAD_KEYWORD);
+  // the CLI writes the payload as zTXt (CARD-SPEC §2): hand back its compressed bytes for the reader to inflate
+  const payloadZ = payloadB64 == null ? readZText(chunks, PAYLOAD_KEYWORD) : null;
   let manifest = null, malformed = false;
   if (manifestRaw != null) {
     try { manifest = JSON.parse(manifestRaw); } catch { malformed = true; }
   }
   return {
     isCard: manifest != null && payloadB64 != null,
-    manifest, payloadB64,
+    manifest, payloadB64, payloadZ,
     malformedManifest: malformed,
-    reason: manifest == null && payloadB64 == null ? 'this is a plain PNG — it carries no build'
-      : malformed ? 'the manifest on this card is not readable JSON'
-      : payloadB64 == null ? 'it has a manifest but no payload — the build is missing'
-      : manifest == null ? 'it has a payload but no manifest — nothing says what it is'
-      : 'it carries a build and a manifest',
+    reason: malformed ? 'the manifest on this card is not readable JSON'
+      : manifest == null ? (payloadB64 == null && payloadZ == null ? 'this is a plain PNG — it carries no build'
+        : 'it has a payload but no manifest — nothing says what it is')
+      : payloadB64 != null ? 'it carries a build and a manifest'
+      : payloadZ != null ? 'its build is in a compressed chunk — inflate it to read it'
+      : 'it has a manifest but no payload — the build is missing',
   };
 }
 

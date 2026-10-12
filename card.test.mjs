@@ -1,10 +1,11 @@
 // card.test.mjs — PROOF-OF-PLAY for the card that carries a real build.
 import {
-  crc32, parseChunks, makeChunk, serialise, textChunk, readText,
+  crc32, parseChunks, makeChunk, serialise, textChunk, readText, readZText,
   rarity, manifestFor, canonical, signable, tierCheck, embed, read, concat, bytes, latin1,
   PNG_SIG, PAYLOAD_KEYWORD, MANIFEST_KEYWORD, TIER_ORDER,
 } from './card.mjs';
 import { rarity as nodeRarity } from './forge.mjs';
+import { readFileSync } from 'node:fs';
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { c ? pass++ : fail++; console.log((c ? '  ✓ ' : '  ✗ FAIL ') + m); };
@@ -260,12 +261,45 @@ console.log('\n=== §P0 · the tier cannot be asserted; the signature covers eve
   ok(tierCheck('common', 'common') === 'earned' && tierCheck('holo', 'holo') === 'earned', 'the ends of the order compare correctly');
 }
 
+console.log('\n=== §8a · a payload the CLI wrote as zTXt (CARD-SPEC §2) is handed back compressed ===');
+{
+  const z = (kw, method, body) => ({ type: 'zTXt', data: concat([bytes(kw), new Uint8Array([0, method]), body]) });
+  const body = new Uint8Array([120, 156, 1, 2, 3]);
+  ok(Array.from(readZText([z('konomi-payload', 0, body)], 'konomi-payload')).join() === body.join(), 'the compressed bytes after the keyword and method come back exactly');
+  ok(readZText([z('konomi-payload', 1, body)], 'konomi-payload') === null, 'an unknown compression method is refused');
+  ok(readZText([z('konomi-other', 0, body)], 'konomi-payload') === null, 'another keyword is not this one');
+  ok(readZText([{ type: 'tEXt', data: concat([bytes('konomi-payload'), new Uint8Array([0, 0]), body]) }], 'konomi-payload') === null, 'a tEXt chunk is not a zTXt chunk');
+  ok(readZText([{ type: 'zTXt', data: bytes('konomi-payload') }], 'konomi-payload') === null, 'no NUL, no keyword boundary — refused');
+  ok(Array.from(readZText([z('', 0, body)], '')).join() === body.join(), 'an empty keyword is still a keyword (NUL at position 0)');
+  ok(readZText([{ type: 'zTXt', data: 'konomi-payload\0\0x' }], 'konomi-payload') === null, 'data that is not bytes is skipped');
+  for (const j of [null, undefined, {}, 'x', [null, 5]]) ok(readZText(j, 'konomi-payload') === null, 'nothing usable → null');
+  pass -= 4;
+  // read(): a card whose payload is zTXt is NOT a card until the reader inflates it — and says exactly that
+  const p = serialise([{ type: 'IHDR', data: new Uint8Array(13) }, textChunk(MANIFEST_KEYWORD, '{"v":"0.1","seal":"x"}'), z(PAYLOAD_KEYWORD, 0, body), { type: 'IEND', data: new Uint8Array(0) }]);
+  const r = read(p);
+  ok(r.isCard === false && r.payloadB64 === null && Array.from(r.payloadZ).join() === body.join(), 'read() hands back the compressed payload for the reader to inflate');
+  ok(r.reason === 'its build is in a compressed chunk — inflate it to read it', 'and says why it is not yet a card');
+  const noManifest = read(serialise([{ type: 'IHDR', data: new Uint8Array(13) }, z(PAYLOAD_KEYWORD, 0, body), { type: 'IEND', data: new Uint8Array(0) }]));
+  ok(noManifest.reason === 'it has a payload but no manifest — nothing says what it is', 'a compressed payload with no manifest is named as such');
+  const both = read(serialise([{ type: 'IHDR', data: new Uint8Array(13) }, textChunk(MANIFEST_KEYWORD, '{"v":"0.1"}'), textChunk(PAYLOAD_KEYWORD, 'QUJD'), z(PAYLOAD_KEYWORD, 0, body), { type: 'IEND', data: new Uint8Array(0) }]));
+  ok(both.isCard === true && both.payloadZ === null, 'a plain tEXt payload wins; the zTXt one is not even looked at');
+  const plain = read(serialise([{ type: 'IHDR', data: new Uint8Array(13) }, { type: 'IEND', data: new Uint8Array(0) }]));
+  ok(plain.reason === 'this is a plain PNG — it carries no build' && plain.payloadZ === null, 'a plain PNG is still a plain PNG');
+  const bad = read(serialise([{ type: 'IHDR', data: new Uint8Array(13) }, textChunk(MANIFEST_KEYWORD, '{nope'), { type: 'IEND', data: new Uint8Array(0) }]));
+  ok(bad.reason === 'the manifest on this card is not readable JSON', 'a broken manifest is named as broken, even with no payload');
+  // the real CLI example cards now hand their payload back
+  for (const f of ['seal-000.png', 'seal-001-quine.png']) {
+    const e = read(new Uint8Array(readFileSync(new URL('./examples/' + f, import.meta.url))));
+    ok(e.manifest !== null && e.payloadZ instanceof Uint8Array && e.payloadZ.length > 0, 'examples/' + f + ' hands back its zTXt payload');
+  }
+}
+
 console.log('\n=== §9 · pure under garbage ===');
 {
   const junk = [null, undefined, '', 0, [], {}, NaN, 'x', new Uint8Array(0), 10n, Symbol('s')];
   let threw = null;
   for (const j of junk) {
-    try { rarity(j); manifestFor(j); readText(j, j); crc32(j); concat([]); canonical(j); signable(j, j); tierCheck(j, j); }
+    try { rarity(j); manifestFor(j); readText(j, j); readZText(j, j); crc32(j); concat([]); canonical(j); signable(j, j); tierCheck(j, j); }
     catch (e) { threw = `${String(j && j.toString ? j.toString() : typeof j)} → ${e.message}`; }
   }
   ok(threw === null, 'the pure helpers never throw' + (threw ? ' — ' + threw : ''));

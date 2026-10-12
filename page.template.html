@@ -282,8 +282,8 @@ async function gzip(u8) {
 // A card is untrusted input: a small payload can be built to inflate enormously, so decompression stops at a cap.
 // Real builds come from a text box and are tiny; one past the cap is treated as one that would not decompress.
 const MAX_BUILD = 8 * 1024 * 1024;
-async function gunzip(u8, max = MAX_BUILD) {
-  const ds = new DecompressionStream('gzip');
+async function gunzip(u8, max = MAX_BUILD, format = 'gzip') {
+  const ds = new DecompressionStream(format);
   const w = ds.writable.getWriter(); w.write(u8).catch(() => {}); w.close().catch(() => {});
   const rd = ds.readable.getReader(); const out = []; let n = 0;
   for (;;) {
@@ -427,6 +427,13 @@ async function judgeCard(u8) {
   let r;
   try { r = read(u8); }
   catch (e) { return { isCard: false, reason: e.message }; }  // a JPEG, a WebP — whatever a platform made of it
+  // a card the CLI forged carries its payload as zTXt (CARD-SPEC §2): inflate it here, capped, then judge it the same
+  if (!r.isCard && r.manifest && r.payloadZ) {
+    try {
+      const text = new TextDecoder('latin1').decode(await gunzip(r.payloadZ, MAX_CARD_B64, 'deflate'));
+      r = { ...r, payloadB64: text.trim(), isCard: true, reason: 'it carries a build and a manifest' };
+    } catch { return { isCard: false, reason: 'its compressed payload would not inflate' }; }
+  }
   if (!r.isCard) return { isCard: false, reason: r.reason };   // a PNG with its chunks stripped
 
   // ⚑ THE SEAL IS RE-COMPUTED, NEVER READ BACK AND BELIEVED. Hashing the payload we actually found
@@ -472,7 +479,7 @@ async function showRead(u8, blob) {
     fact('tier', tierChip(earned) + (claim === 'overclaim'
       ? ` — <b>overclaim</b>: the card says ${esc(r.manifest.rarity)}; its build earns ${earned}`
       : ' — earned by the build, re-checked here')) +
-    fact('signed', !signed ? 'no — forged before cards were signed'
+    fact('signed', !signed ? 'no — no key vouches for who forged it'
       : sigOk ? '✓ Ed25519 · ' + esc(String(r.manifest.signer).slice(0, 12)) + '…'
       : '✗ the signature does not match these bytes') +
     fact('claimed', esc(r.manifest.seal)) +

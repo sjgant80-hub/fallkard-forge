@@ -232,3 +232,5 @@ A conformant implementation must:
 4. refuse to hatch on seal mismatch;
 5. never hatch without an explicit user action, and always sandbox;
 6. compute rarity rather than accept an asserted tier.
+7. read `konomi-payload` from either a `tEXt` or a `zTXt` chunk (§2 lets the payload ride compressed), inflating a
+   `zTXt` payload with a size cap before anything else is done with it.
