@@ -1,0 +1,36 @@
+{
+  "kind": "fallkard-forge-trade-live-run",
+  "v": 2,
+  "date": "2026-10-12",
+  "what": "MESH step 2, run live on the forge page itself: two devices pair by a hand-pasted invite and reply, each proves the key its invite named on THIS link, and cards travel straight across a WebRTC DataChannel. The receiver re-checks every card with the same judgement the reader makes and shows nothing that fails.",
+  "honest_scope": "Two independent browser identities on ONE machine (http://localhost:8160 and http://127.0.0.1:8160 — different origins, so separate storage and separate non-extractable Ed25519 keys). A recorded observation, not a regenerable receipt: browser keys, certificates and link codes are random. The decisions are made by trade.mjs, which CI mutation-gates. The two-DEVICE run waits on a second device.",
+  "topology": {
+    "deviceA": { "origin": "http://localhost:8160", "key": "PYZGxatsVejhwHDNz0sTB+I8QMUXJlgkoxQz3wsK0ao=", "note": "planted in the OLD format (an exportable private key in localStorage); the page moved it into IndexedDB as non-extractable on first use — same public key, exportKey now throws InvalidAccessError, the localStorage copy deleted" },
+    "deviceB": { "origin": "http://127.0.0.1:8160", "key": "efMG9415YUI5iqdRbqJTSXeSI+MCGZHUZmw84b7iBrM=" },
+    "link": "RTCPeerConnection DataChannel; invite + reply pasted by hand (fall-os webrtc.mjs, fall-federate invite check, both vendored and inlined)",
+    "stun": "none — the STUN box was unticked on both devices; no third party at all"
+  },
+  "proof_of_key": {
+    "A_proved_to_B": true,
+    "B_proved_to_A": true,
+    "bound_to_link": { "A_end": "sha-256 E3:B9:65:E9:19:09:E2:D3:DB:F0:42:DE:15:25:D6:F1:65:32:F2:33:E7:2F:53:0F:10:20:42:1D:C2:F8:A5:7C", "B_end": "sha-256 08:F4:2F:35:E0:4D:4C:85:DF:11:DB:FD:10:7B:5C:57:42:BF:84:23:BF:F9:C5:20:BF:A9:C8:08:F8:DF:30:31" },
+    "how": "on open, each device sends a fresh 16-byte challenge; the other signs 'fallkard-forge trade hello v1|nonce|its key|the asker's key|its certificate fingerprint|the asker's certificate fingerprint'. A third device relaying the challenge between two pairings cannot present the prover's certificate on its own link, so a relayed proof does not verify (the adversarial review found the key-only version could be relayed)."
+  },
+  "cases": [
+    { "case": "genuine", "sent": "A → B: a card A just forged (68472 bytes, 8 parts)", "arrived_intact": true, "verdict": "ACCEPTED", "stage": "accepted", "from": "sender", "tier": "uncommon (re-derived from the build on B)", "shown": "picture + facts; added to B's deck" },
+    { "case": "build-swapped", "sent": "A → B: the same picture and manifest carrying a different build (68376 bytes)", "arrived_intact": true, "verdict": "REFUSED", "stage": "seal", "reason": "the build inside is not the build that was sealed — refused, nothing shown", "shown": "the refusal only — no picture, no build" },
+    { "case": "traded-on (run 1)", "sent": "B → A: the card B received, opened in B's reader, sent back", "verdict": "ACCEPTED", "from": "other", "reason": "signed by a key other than the one the sender named: a card it holds, passed on" },
+    { "case": "hostile artifact", "sent": "A → B: an unsigned card with an honest seal and a konomi-artifact bundle whose tier is an <img onerror> payload", "arrived_intact": true, "verdict": "ACCEPTED", "from": "unsigned", "tier": "common", "opened_in_reader": "the payload shows as text; no script ran (window flag stayed 0; no element injected)" },
+    { "case": "disconnect", "what": "A closed its page", "result": "B said 'the other device is gone' 5 s later and disabled Send" }
+  ],
+  "the_script_injection_fixed": {
+    "before": "the then-live page (commit cad1539), served locally: dropping the hostile card into the reader RAN its payload (window flag 1, one injected element)",
+    "after": "this page: the same card, dropped in and received over the link, runs nothing (flag 0, no element); the check text is escaped",
+    "found_by": "the adversarial review of this change; the hole predates the trade (studio commit 77e2594) but the trade put it one click from a remote peer"
+  },
+  "never_ran_the_build": "opening a received card only reads it; the only iframe on the page is the studio's own preview (hidden, empty)",
+  "network": "each device requested only its own page (a single file) plus local blob: URLs for the pictures. Zero requests left the machine.",
+  "console_errors": 0,
+  "phone_width": "375px: no element wider than the screen",
+  "held": true
+}

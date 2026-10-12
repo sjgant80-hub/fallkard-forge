@@ -60,6 +60,14 @@ jobs:
       - name: The paid read's seal is exactly what its script writes from the committed cards
         run: node scripts/vision.mjs --check
 
+      # THE TRADE (MESH step 2) — trade.mjs decides what a device may show of a card another device sent it, and
+      # proves who sent it. Gated like sealmark; nothing baselined.
+      - name: The trade kernel — tests, then the mutation gate
+        run: |
+          node --test trade.test.mjs
+          node .witness6/witness.mjs mutate trade.mjs --timeout 60000 --cap 400 --test node --test trade.test.mjs | tee trade.out
+          grep -q '"clean": true' trade.out || { echo "::error::mutants survived in trade.mjs"; exit 1; }
+
       # THE FIRST THING THE GAME SHIPPED — read rule 0.2 (U reads as V), sealed before it was measured. Once measured,
       # the measurement re-runs here on every push and must come out identical.
       - name: The U→V change — its seal, then its measurement re-run

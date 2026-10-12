@@ -109,6 +109,24 @@ const sealBody = readFileSync(new URL('../sealmark.mjs', import.meta.url), 'utf8
   .replace(/^export \{[^}]*\};?\s*$/gm, '');
 const sealKernel = '// ── sealmark.mjs ──\nconst { ' + SEAL_NAMES.join(', ') + ' } = (() => {\n' + sealBody + '\nreturn { ' + SEAL_NAMES.join(', ') + ' };\n})();';
 
+// THE TRADE (MESH step 2) — trade.mjs (gated) plus the two vendored transport pieces it rides on: fall-os's
+// hand-pasted-invite WebRTC link and fall-federate's invite check. Each scoped, like the studio kernels.
+const TRADE_OPEN = '/* __TRADE_KERNEL__ */', TRADE_CLOSE = '/* __END_TRADE_KERNEL__ */';
+const TRADE_PARTS = {
+  'trade.mjs': ['LIMITS', 'MAX_CARD_B64', 'cardParts', 'makeAssembler', 'inviteIdOf', 'keyOfInviteId', 'fingerprintOf', 'helloText', 'admit'],
+  'vendor/fall-os/webrtc.mjs': ['makeLink'],
+  'vendor/fall-federate/signaling.mjs': ['makeInvite', 'readInvite'],
+};
+const tradeKernel = Object.entries(TRADE_PARTS).map(([f, names]) => {
+  const body = readFileSync(new URL('../' + f, import.meta.url), 'utf8')
+    .replace(/^#!.*\r?\n/, '')
+    .replace(/^import[^\n]*\n/gm, '')
+    .replace(/^export default[\s\S]*?;\s*$/m, '')
+    .replace(/^export (function|const|async function)/gm, '$1')
+    .replace(/^export \{[^}]*\};?\s*$/gm, '');
+  return '// ── ' + f + ' ──\nconst { ' + names.join(', ') + ' } = (() => {\n' + body + '\nreturn { ' + names.join(', ') + ' };\n})();';
+}).join('\n');
+
 const html = readFileSync(new URL('../page.template.html', import.meta.url), 'utf8');
 const a = html.indexOf(OPEN), b = html.indexOf(CLOSE);
 if (a < 0 || b < 0) throw new Error('the kernel markers are missing from page.template.html');
@@ -133,6 +151,9 @@ out = out.slice(0, va + SURV_OPEN.length) + '\n' + survBlock + '\n' + out.slice(
 const ma = out.indexOf(SEAL_OPEN), mb = out.indexOf(SEAL_CLOSE);
 if (ma < 0 || mb < 0) throw new Error('the sealmark markers are missing from page.template.html');
 out = out.slice(0, ma + SEAL_OPEN.length) + '\n' + sealKernel + '\n' + out.slice(mb);
+const ta = out.indexOf(TRADE_OPEN), tb = out.indexOf(TRADE_CLOSE);
+if (ta < 0 || tb < 0) throw new Error('the trade-kernel markers are missing from page.template.html');
+out = out.slice(0, ta + TRADE_OPEN.length) + '\n' + tradeKernel + '\n' + out.slice(tb);
 const a2 = out.indexOf(OPEN), b2 = out.indexOf(CLOSE);
 out = out.slice(0, a2 + OPEN.length) + '\n' + kernel + '\n' + out.slice(b2);
 
@@ -246,7 +267,7 @@ writeFileSync(new URL('../index.html', import.meta.url), out);
   writeFileSync(new URL('../README.md', import.meta.url), readme2);
 }
 
-for (const fn of ['function embed', 'function read', 'function rarity', 'function crc32', 'function sealCode', 'function readBand', 'function resolveCode']) {
+for (const fn of ['function embed', 'function read', 'function rarity', 'function crc32', 'function sealCode', 'function readBand', 'function resolveCode', 'function admit', 'function makeAssembler', 'function makeLink', 'function readInvite']) {
   if (!out.includes(fn)) throw new Error(`the page does not contain ${fn} — the inline did not take`);
 }
 if (/^export /m.test(out.slice(a, out.indexOf(CLOSE)))) throw new Error('module syntax survived into the page');

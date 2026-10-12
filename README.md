@@ -18,6 +18,42 @@ scanners is a non-goal and a non-feature.
 **The format is published in full: [`CARD-SPEC.md`](CARD-SPEC.md).** Learn it and you can read
 any card, verify it, and forge your own. That document *is* the initiation.
 
+## TRADE ONE · device to device, no server
+
+Pair two devices by swapping two codes however you already talk — a message, an email — and send cards straight
+across a direct WebRTC link. No server is in the path, and the STUN server (named on the page, used only to find a
+route across networks) can be switched off. The receiving device re-checks every card with the reader's own
+judgement — the seal re-computed, the signature checked, the tier re-derived from the build — and shows nothing
+that fails: no picture, no build. Received builds are never run.
+
+**Who sent it is proven, not claimed.** An invite only names a key. Once the link opens, each device signs a fresh
+challenge from the other with that key, bound to the two certificate fingerprints of *this* link — so a third device
+paired with both cannot relay one's proof to the other. Until a device has proven its key, a card signed by that key
+is shown but not credited to it. A card signed by someone else is accepted and labelled as one the sender holds and
+is passing on. Received cards are judged one at a time, at most 64 per link, and a build that would inflate past
+8 MB is treated as one that does not decompress.
+
+**A hole this change found and closed.** A card can carry a sovereign-artifact bundle, and the reader quoted that
+bundle's own claims into the page unescaped — so a card whose bundle claimed the tier `<img src=x onerror=…>` ran
+script in the page. It predates the trade, but the trade put it one click from a remote device. Measured on the page
+that was live: dropping such a card ran its payload. Fixed: every text a card carries is escaped before it reaches the
+page, and `page-safety.test.mjs` pins it.
+
+`trade.mjs` makes those decisions: parts and bounded reassembly, the challenge text, and the verdict order
+transit → parse → seal → signature → accepted. It is pure, mutation-gated clean with nothing baselined, and
+inlined into the page. The link is [fall-os](https://github.com/sjgant80-hub/fall-os)'s and the invite check
+[fall-federate](https://github.com/sjgant80-hub/fall-federate)'s, vendored in `vendor/` with their provenance.
+
+Run live (`data/trade-live.json`), two browser identities on one machine, no STUN: both devices proved their keys
+on the link; a genuine card was accepted and credited to its sender; a copy with its build swapped was refused at the
+seal and nothing was shown; a received card passed back was accepted as one the sender holds; the hostile card above
+was accepted as unsigned and, opened, ran nothing; when one device closed, the other said so within 5 s. Zero requests
+left the machine. The two-device run waits on a second device.
+
+The builder key is now **non-extractable**, kept in IndexedDB: the page can ask it to sign but can never read it. A
+key from before (an exportable key in localStorage) is moved in on first use — same public key — and the old copy
+deleted. Honest limit: other pages on the same origin could still ask it to sign.
+
 ## THE PRINTED SEAL · a stripped card still finds its build
 
 Post a card and a platform may strip its chunks or turn it into a JPEG; only the picture survives. So every

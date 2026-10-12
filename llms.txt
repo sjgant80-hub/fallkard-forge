@@ -9,6 +9,7 @@ fallkard-forge is a sovereign, MIT-licensed build by Simon Gant (UK) — it runs
 - Forge: put a single-file HTML build into a PNG, in declared text chunks, sealed with sha256.
 - Read: open a card, verify the seal, and hatch the build in a sandbox only when you click.
 - The printed seal (CARD-SPEC §7.1): every card prints a 16-symbol code on its face. A stripped or JPEG'd copy is read from its pixels, or by typing the code, and resolved against the holder's deck. A doubtful read is refused, never guessed.
+- Trade: pair two devices by a hand-pasted invite and reply (no server; the STUN server is named and optional) and send cards straight across. The receiver re-checks every card's seal and signature and re-derives its tier, and shows nothing that fails. Each device proves the key its invite named before a card is credited to it. Received builds are never run.
 - Read rule 0.2: a U is read as the V it was. The creatures of kard-evolve found this fold from real vision-model misreads. It was sealed before it was measured, and the result is on the page and in the README.
 
 ## Key pages

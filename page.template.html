@@ -123,6 +123,46 @@ platform stripped, or turned into a JPEG: if the card is in your deck, its print
   </div>
 </div>
 
+<h2 id="trade">Trade one · <span style="opacity:.65">device to device, no server</span></h2>
+<p class="sub">Pair this device with another by swapping two codes however you already talk — a message, an email,
+in person. Then send cards straight across. The other device re-checks every card's seal and signature itself, and
+shows nothing that fails.</p>
+<div class="panel">
+  <label class="chk" style="display:flex;gap:.6rem;align-items:flex-start;font-family:inherit;font-size:.92rem;letter-spacing:0;text-transform:none;color:var(--dim)"><input type="checkbox" id="trStun" checked style="width:auto;margin-top:.3rem">
+    <span>Use a STUN server (Google's <code>stun.l.google.com</code>) so this works across different networks. It sees
+    your IP address and nothing else — no card, no build. Untick it to use no third party at all (same network or
+    same machine only).</span></label>
+  <div class="row" style="margin-top:.6rem">
+    <button id="trHost" type="button">Start — make an invite</button>
+    <button id="trJoin" type="button" class="ghost">Join — I have an invite</button>
+  </div>
+  <div id="trHostBox" hidden>
+    <label for="trInviteOut">1 · send this invite to the other device</label>
+    <textarea id="trInviteOut" readonly spellcheck="false" style="min-height:5rem"></textarea>
+    <label for="trReplyIn">2 · paste the reply that comes back</label>
+    <textarea id="trReplyIn" spellcheck="false" style="min-height:5rem" placeholder="their reply"></textarea>
+    <button id="trFinish" type="button">Connect</button>
+  </div>
+  <div id="trJoinBox" hidden>
+    <label for="trInviteIn">1 · paste the invite you were sent</label>
+    <textarea id="trInviteIn" spellcheck="false" style="min-height:5rem" placeholder="their invite"></textarea>
+    <button id="trAccept" type="button">Make my reply</button>
+    <label for="trReplyOut">2 · send this reply back</label>
+    <textarea id="trReplyOut" readonly spellcheck="false" style="min-height:5rem"></textarea>
+  </div>
+  <p class="sub" id="trStatus" role="status" aria-live="polite">not connected</p>
+  <div class="row">
+    <button id="trSend" type="button" disabled>Send the card you forged or opened</button>
+    <button id="trSendSwap" type="button" class="ghost" disabled>Send a copy with its build swapped</button>
+  </div>
+  <p class="sub" id="trSent"></p>
+  <div id="trInbox" aria-live="polite"><p class="sub">Cards this device receives appear here, each with what it re-checked.</p></div>
+</div>
+<p class="note"><b>Who sent it is proven, not claimed.</b> An invite only names a key. Once the link opens, each
+device signs a fresh challenge from the other with its own key; until it has, a card is never described as coming
+from the device that sent it. The "swapped" button is there so you can watch a bad card get refused: the copy keeps
+the picture and the label but carries a different build, and the other device says so and shows nothing.</p>
+
 
 <h2>Fold one · <span style="opacity:.65">forgeupgrade</span></h2>
 <p class="note">A second cargo for the same forge. A structure is encoded as an origami
@@ -239,10 +279,23 @@ async function gzip(u8) {
   const w = cs.writable.getWriter(); w.write(u8); w.close();
   return new Uint8Array(await new Response(cs.readable).arrayBuffer());
 }
-async function gunzip(u8) {
+// A card is untrusted input: a small payload can be built to inflate enormously, so decompression stops at a cap.
+// Real builds come from a text box and are tiny; one past the cap is treated as one that would not decompress.
+const MAX_BUILD = 8 * 1024 * 1024;
+async function gunzip(u8, max = MAX_BUILD) {
   const ds = new DecompressionStream('gzip');
-  const w = ds.writable.getWriter(); w.write(u8); w.close();
-  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+  const w = ds.writable.getWriter(); w.write(u8).catch(() => {}); w.close().catch(() => {});
+  const rd = ds.readable.getReader(); const out = []; let n = 0;
+  for (;;) {
+    const { done, value } = await rd.read();
+    if (done) break;
+    n += value.length;
+    if (n > max) { rd.cancel().catch(() => {}); throw new Error('the build inflates past ' + (max >> 20) + ' MB'); }
+    out.push(value);
+  }
+  const all = new Uint8Array(n); let o = 0;
+  for (const c of out) { all.set(c, o); o += c.length; }
+  return all;
 }
 const sha256hex = async (u8) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', u8)))
   .map(b => b.toString(16).padStart(2, '0')).join('');
@@ -306,7 +359,7 @@ async function deckShow() {
 const fact = (k, v) => `<div class="fact"><b>${k}</b><span>${v}</span></div>`;
 // a card is untrusted input: anything read off a manifest is escaped before it touches the page
 const esc = (v) => (v == null ? '' : String(v)).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-const tierChip = (t) => `<span class="tier t-${t}">${t}</span>`;
+const tierChip = (t) => `<span class="tier t-${esc(t)}">${esc(t)}</span>`;
 
 // ── forge ────────────────────────────────────────────────────────────────────────────────────────
 // ONE path for every card this page makes. The tier is the sovereignty gate run on the build — never a
@@ -326,12 +379,14 @@ const earnedOf = (trusted, text) => trusted
   ? rarity({ assessorPass: validateComposition(text).ok, depth: 0, readingKeyHonest: false }) : 'common';
 
 let forged = null;
+let tradeable = null;   // the card "Trade one" sends: the last one forged here, or the last authentic one opened
 $('#forge').addEventListener('click', async () => {
   const text = $('#build').value;
   const tags = $('#tags').value;
   const { manifest, payload, seal, gate } = await forgeManifest(text, tags);
   const art = await drawCard(tags, seal);
   forged = embed(art, b64(payload), manifest);
+  tradeable = { png: forged, label: 'a card forged on the sending device' }; trRefresh();
   await deckAdd({ seal, payloadB64: b64(payload), manifest, earned: manifest.rarity, added: TODAY });
 
   const url = URL.createObjectURL(new Blob([forged], { type: 'image/png' }));
@@ -345,8 +400,8 @@ $('#forge').addEventListener('click', async () => {
     fact('printed', sealCode(seal) + ' — the first 80 bits of the seal, on the card face') +
     fact('build', text.length + ' chars → ' + payload.length + ' bytes packed') +
     fact('card', forged.length + ' bytes of PNG') +
-    fact('tags', manifest.tags || '(none)') +
-    fact('forged', manifest.forged);
+    fact('tags', esc(manifest.tags) || '(none)') +
+    fact('forged', esc(manifest.forged));
   $('#forgeOut').classList.add('show');
   $('#dl').style.display = 'inline-block';
 });
@@ -367,19 +422,17 @@ drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) inspect(e.dataTransfer.files[0]); });
 $('#file').addEventListener('change', e => { if (e.target.files[0]) inspect(e.target.files[0]); e.target.value = ''; });
 
-async function inspect(file) {
-  const u8 = new Uint8Array(await file.arrayBuffer());
-  $('#readOut').classList.add('show');
-  $('#recovered').style.display = 'none'; $('#recLabel').style.display = 'none';
-
+// ONE judgement for every card this page is handed — dropped into the reader or received from a paired device.
+async function judgeCard(u8) {
   let r;
   try { r = read(u8); }
-  catch (e) { return fromPicture(file, e.message); }        // a JPEG, a WebP — whatever a platform made of it
-  if (!r.isCard) return fromPicture(file, r.reason);          // a PNG with its chunks stripped
+  catch (e) { return { isCard: false, reason: e.message }; }  // a JPEG, a WebP — whatever a platform made of it
+  if (!r.isCard) return { isCard: false, reason: r.reason };   // a PNG with its chunks stripped
 
   // ⚑ THE SEAL IS RE-COMPUTED, NEVER READ BACK AND BELIEVED. Hashing the payload we actually found
   // and comparing is the entire trust story; taking the manifest's word for it would prove nothing.
-  const payload = unb64(r.payloadB64);
+  let payload;
+  try { payload = unb64(r.payloadB64); } catch { return { isCard: false, reason: 'the payload chunk is not base64' }; }
   const actual = await sha256hex(payload);
   const sealOk = actual === r.manifest.seal;
 
@@ -388,7 +441,6 @@ async function inspect(file) {
   const signed = !!(r.manifest.sig && r.manifest.signer);
   let sigOk = null;
   if (signed) { try { sigOk = (await ed25519Verify(signable(r.manifest, actual), r.manifest.sig, r.manifest.signer)) === true; } catch { sigOk = false; } }
-  const authentic = sealOk && sigOk !== false;
 
   let text = '', inflated = false;
   try { text = new TextDecoder().decode(await gunzip(payload)); inflated = true; }
@@ -398,7 +450,20 @@ async function inspect(file) {
   // the sovereignty gate run on what actually hatched cannot be talked into a pass.
   const gate = (sealOk && inflated) ? validateComposition(text) : { ok: false, reasons: ['the build could not be checked'] };
   const earned = rarity({ assessorPass: gate.ok, depth: 0, readingKeyHonest: false });
-  const claim = tierCheck(r.manifest.rarity, earned);
+  return { isCard: true, r, actual, sealOk, signed, sigOk, signer: signed ? String(r.manifest.signer) : null,
+    text, gate, earned, claim: tierCheck(r.manifest.rarity, earned) };
+}
+
+async function inspect(file) {
+  return showRead(new Uint8Array(await file.arrayBuffer()), file);
+}
+async function showRead(u8, blob) {
+  $('#readOut').classList.add('show');
+  $('#recovered').style.display = 'none'; $('#recLabel').style.display = 'none';
+  const j = await judgeCard(u8);
+  if (!j.isCard) return fromPicture(blob, j.reason);
+  const { r, actual, sealOk, signed, sigOk, text, gate, earned, claim } = j;
+  const authentic = sealOk && sigOk !== false;
 
   $('#verdictWrap').innerHTML = authentic
     ? `<span class="verdict v-ok">AUTHENTIC</span>`
@@ -421,7 +486,10 @@ async function inspect(file) {
   $('#recovered').value = text;
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
-  if (authentic) await deckAdd({ seal: actual, payloadB64: r.payloadB64, manifest: r.manifest, earned, added: TODAY });
+  if (authentic) {
+    await deckAdd({ seal: actual, payloadB64: r.payloadB64, manifest: r.manifest, earned, added: TODAY });
+    tradeable = { png: u8, label: 'a card you opened' }; trRefresh();
+  }
 
   // a sovereign artifact rides beside the card manifest — verify every claim it makes, locally
   try {
@@ -435,7 +503,8 @@ async function inspect(file) {
       }, rarity);
       $('#readFacts').innerHTML += fact('artifact', (va.ok ? '\u2713 SOVEREIGN ARTIFACT — every claim verified from the file'
           : '\u2717 artifact checks failed'))
-        + va.checks.map(c => fact((c.ok ? '\u2713 ' : '\u2717 ') + c.name, c.why)).join('')
+        // \u2691 every check's text can carry the bundle's own strings (a hostile tier, say) \u2014 escaped, never markup
+        + va.checks.map(c => fact(esc((c.ok ? '\u2713 ' : '\u2717 ') + c.name), esc(c.why))).join('')
         + fact('kpid', esc(bundle.mint && bundle.mint.kpid) || '(none)');
     }
   } catch { /* no artifact riding on this card — it is a plain forge card, which is fine */ }
@@ -469,17 +538,17 @@ async function fromPicture(file, whyNoChunksRaw) {
   const size = p.width ? p.width + '&times;' + p.height + ' px' : '';
   if (!p.ok && p.stage === 'image') {
     $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT A CARD</span>`;
-    $('#readFacts').innerHTML = fact('why', p.why);
+    $('#readFacts').innerHTML = fact('why', esc(p.why));
     return;
   }
   if (!p.ok && p.band.unknown === 16) {
     $('#verdictWrap').innerHTML = `<span class="verdict v-no">NO BUILD INSIDE</span>`;
-    $('#readFacts').innerHTML = fact('why', whyNoChunks) + fact('printed seal', 'none could be read on this picture') + fact('picture', size);
+    $('#readFacts').innerHTML = fact('why', esc(whyNoChunks)) + fact('printed seal', 'none could be read on this picture') + fact('picture', size);
     return;
   }
   if (!p.ok) {
     $('#verdictWrap').innerHTML = `<span class="verdict v-no">NOT IN YOUR DECK</span>`;
-    $('#readFacts').innerHTML = fact('chunks', 'gone — ' + whyNoChunks) + fact('printed seal', p.band.read) + fact('why', p.why)
+    $('#readFacts').innerHTML = fact('chunks', 'gone — ' + esc(whyNoChunks)) + fact('printed seal', esc(p.band.read)) + fact('why', esc(p.why))
       + fact('your deck', p.deckSize + ' card' + (p.deckSize === 1 ? '' : 's') + ' on this device')
       + fact('what now', 'Anyone who holds this card can open it. Drop the original card — the one with its build inside — to add it to your deck, then drop this copy again.')
       + fact('picture', size);
@@ -489,8 +558,8 @@ async function fromPicture(file, whyNoChunksRaw) {
   try { text = new TextDecoder().decode(await gunzip(p.payload)); } catch { text = '(the payload is there but would not decompress)'; }
   $('#verdictWrap').innerHTML = p.authentic ? `<span class="verdict v-ok">RESOLVED FROM ITS PRINTED SEAL</span>` : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
   $('#readFacts').innerHTML =
-    fact('chunks', 'gone — ' + whyNoChunks) +
-    fact('printed seal', p.band.read + ' — read off the picture') +
+    fact('chunks', 'gone — ' + esc(whyNoChunks)) +
+    fact('printed seal', esc(p.band.read) + ' — read off the picture') +
     fact('corrected', p.res.edits + ' edit' + (p.res.edits === 1 ? '' : 's') + ', ' + p.res.unknown + ' unreadable symbol' + (p.res.unknown === 1 ? '' : 's')) +
     fact('card', p.entry.seal) +
     fact('actual', p.actual) +
@@ -533,6 +602,220 @@ $('#typed').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.prev
 
 $('#deckForget').addEventListener('click', () => deckClear());
 deckShow();
+
+// ── trade (MESH step 2): two devices, a hand-pasted invite, cards straight across — every card re-checked ─────
+// The pure part is trade.mjs (gated); the link is fall-os's and the invite check fall-federate's, both vendored.
+/* __TRADE_KERNEL__ */
+/* __END_TRADE_KERNEL__ */
+const tr = { link: null, peerKey: null, peerProven: false, myNonce: null, answered: false };
+const TR_WINDOW = 10 * 60 * 1000;                       // a reply carried back by hand can take minutes
+const TR_MAX_CARDS = 64;                                // cards one link may hand this device; more are ignored
+const randomHex = (n) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (x) => x.toString(16).padStart(2, '0')).join('');
+const trSay = (html) => { $('#trStatus').innerHTML = html; };
+const trFail = (e) => trSay('<span style="color:var(--no)">' + esc((e && e.message) || e) + '</span>');
+function trRefresh() {
+  const live = !!(tr.link && tr.link.open);
+  $('#trSend').disabled = !(live && tradeable);
+  $('#trSendSwap').disabled = !(live && tradeable);
+}
+// This link's two DTLS certificate fingerprints, read from the descriptions the browser actually used. The proof
+// of key is bound to them, so it cannot be relayed onto another link.
+const trFingerprints = (link) => ({
+  mine: fingerprintOf(link && link.pc && link.pc.localDescription && link.pc.localDescription.sdp),
+  theirs: fingerprintOf(link && link.pc && link.pc.remoteDescription && link.pc.remoteDescription.sdp),
+});
+// A new link replaces the old one, and listens from the moment it exists (a late listener lost every card in the
+// mesh's first two-node run). Cards it hands over are judged one at a time, at most TR_MAX_CARDS of them.
+function trNewLink() {
+  if (tr.link) { try { tr.link.close(); } catch { /* already closed */ } }
+  Object.assign(tr, { link: null, peerKey: null, peerProven: false, myNonce: null, answered: false });
+  const link = makeLink($('#trStun').checked ? {} : { stun: [] });
+  if (!link.ok) { trSay(esc(link.why)); return false; }
+  const feed = makeAssembler();
+  let queue = Promise.resolve(), cards = 0;
+  link.on((m) => {
+    if (link !== tr.link || !m || typeof m !== 'object') return;
+    if (m.t === 'card') {
+      const whole = feed(m);
+      if (whole && ++cards <= TR_MAX_CARDS) queue = queue.then(() => (link === tr.link ? trReceive(whole) : null)).catch(() => {});
+    } else if (m.t === 'hello') trProve(m, link);
+    else if (m.t === 'proof') trCheckProof(m, link);
+  });
+  link.pc.addEventListener('connectionstatechange', () => {
+    if (link !== tr.link) return;
+    trRefresh();
+    if (['disconnected', 'failed', 'closed'].includes(link.state)) trSay('<span style="color:var(--no)">the other device is gone</span> — make a new invite to trade again');
+  });
+  tr.link = link;
+  trRefresh();
+  return true;
+}
+function trReadBlob(text, role, mine) {
+  let obj; try { obj = JSON.parse(atob(String(text).trim())); } catch { return { ok: false, why: 'that is not an invite' }; }
+  const r = readInvite(obj);
+  if (!r.ok) return r;
+  if (r.role !== role) return { ok: false, why: 'expected ' + (role === 'offer' ? 'an invite' : 'a reply') };
+  const key = keyOfInviteId(r.id);
+  if (!key) return { ok: false, why: 'it does not name a usable key' };
+  if (key === mine) return { ok: false, why: 'that came from this same device' };
+  return { ...r, key };
+}
+async function trIdentity() {
+  const id = await builderIdentity();
+  if (!id) trSay('this browser has no Ed25519, so it cannot prove which device it is — it cannot trade');
+  return id;
+}
+// Each step holds on to the link it started with; if a newer Start/Join replaced it meanwhile, its result is dropped.
+async function trHost() {
+  const id = await trIdentity(); if (!id || !trNewLink()) return;
+  const link = tr.link;
+  $('#trHostBox').hidden = false; $('#trJoinBox').hidden = true;
+  $('#trInviteOut').value = ''; $('#trReplyIn').value = '';
+  trSay('making an invite…');
+  try {
+    const sdp = await link.invite();
+    if (link !== tr.link) return;
+    const inv = makeInvite('offer', inviteIdOf(id.pubB64), sdp);
+    if (!inv.ok) return trFail(inv.why);
+    $('#trInviteOut').value = btoa(JSON.stringify(inv.invite));
+    trSay('invite ready — send it to the other device, then paste its reply below');
+  } catch (e) { if (link === tr.link) trFail(e); }
+}
+async function trAccept() {
+  const id = await trIdentity(); if (!id) return;
+  const r = trReadBlob($('#trInviteIn').value, 'offer', id.pubB64);
+  if (!r.ok) return trFail('refused: ' + r.why);
+  if (!trNewLink()) return;
+  const link = tr.link;
+  $('#trReplyOut').value = '';
+  try {
+    const sdp = await link.accept(r.sdp);
+    if (link !== tr.link) return;
+    const inv = makeInvite('answer', inviteIdOf(id.pubB64), sdp);
+    if (!inv.ok) return trFail(inv.why);
+    tr.peerKey = r.key;
+    $('#trReplyOut').value = btoa(JSON.stringify(inv.invite));
+    trSay('reply ready — send it back; this page connects as soon as they paste it');
+    link.ready(TR_WINDOW).then(() => { if (link === tr.link) trOpened(); }, (e) => { if (link === tr.link) trFail(e); });
+  } catch (e) { if (link === tr.link) trFail('that invite could not be used — ' + ((e && e.message) || e)); }
+}
+async function trFinish() {
+  const id = await trIdentity(); if (!id) return;
+  if (!tr.link) return trFail('start first — make an invite');
+  const r = trReadBlob($('#trReplyIn').value, 'answer', id.pubB64);
+  if (!r.ok) return trFail('refused: ' + r.why);
+  const link = tr.link;
+  try {
+    await link.finish(r.sdp);
+    if (link !== tr.link) return;
+    tr.peerKey = r.key;
+    trSay('connecting…');
+    await link.ready(TR_WINDOW);
+    if (link === tr.link) trOpened();
+  } catch (e) { if (link === tr.link) trFail('that reply could not be used — ' + ((e && e.message) || e)); }
+}
+// The link is open: ask the other device to prove the key its invite named, by signing a fresh challenge that is
+// bound to this link's two certificates.
+function trOpened() {
+  tr.myNonce = randomHex(16);
+  tr.link.send({ t: 'hello', nonce: tr.myNonce });
+  trSay('<span style="color:var(--ok)">connected — a direct link, no server in the path.</span> Checking that the other device holds the key its invite named…');
+  trRefresh();
+}
+async function trProve(m, link) {
+  if (tr.answered || !tr.peerKey) return;                  // one proof per link
+  const id = await builderIdentity();
+  const fp = trFingerprints(link);
+  const text = id && helloText(m.nonce, id.pubB64, tr.peerKey, fp.mine, fp.theirs);
+  if (!text || link !== tr.link) return;
+  tr.answered = true;
+  link.send({ t: 'proof', sig: await id.sign(text) });
+}
+async function trCheckProof(m, link) {
+  if (!tr.myNonce || typeof m.sig !== 'string') return;
+  const id = await builderIdentity();
+  const fp = trFingerprints(link);
+  const text = id && helloText(tr.myNonce, tr.peerKey, id.pubB64, fp.theirs, fp.mine);
+  tr.myNonce = null;                                       // one answer per challenge
+  let ok = false;
+  try { ok = !!text && (await ed25519Verify(text, m.sig, tr.peerKey)) === true; } catch { ok = false; }
+  if (link !== tr.link) return;
+  tr.peerProven = ok;
+  trSay(ok ? '<span style="color:var(--ok)">connected, and the other device proved its key on this link</span> (' + esc(tr.peerKey.slice(0, 12)) + '…) — cards it signed will say so'
+    : '<span style="color:var(--no)">connected, but the other device did not prove the key its invite named</span> — its cards are still checked, but never credited to it');
+}
+$('#trHost').addEventListener('click', trHost);
+$('#trJoin').addEventListener('click', () => { $('#trJoinBox').hidden = false; $('#trHostBox').hidden = true; });
+$('#trAccept').addEventListener('click', trAccept);
+$('#trFinish').addEventListener('click', trFinish);
+
+// a copy that keeps the picture and the manifest — so it still CLAIMS the original seal — but carries another build
+async function swappedCopy(png) {
+  let r; try { r = read(png); } catch { return null; }
+  if (!r.isCard) return null;
+  const other = await gzip(new TextEncoder().encode('<!doctype html><h1>this is not the build that was sealed</h1>'));
+  return embed(png, b64(other), r.manifest);
+}
+async function trSend(kind) {
+  if (!tradeable) return;
+  if (!tr.link || !tr.link.open) { trRefresh(); return $('#trSent').textContent = 'not connected — nothing was sent'; }
+  const png = kind === 'swap' ? await swappedCopy(tradeable.png) : tradeable.png;
+  if (!png) return $('#trSent').textContent = 'that card could not be copied';
+  const label = kind === 'swap' ? 'a copy with its build swapped' : tradeable.label;
+  const parts = cardParts(b64(png), randomHex(8), await sha256hex(png), label);
+  if (!parts.length) return $('#trSent').textContent = 'that card is too big to send this way (the limit is ' + Math.floor(MAX_CARD_B64 * 3 / 4 / 1024) + ' KB)';
+  for (const p of parts) tr.link.send(p);
+  $('#trSent').textContent = 'sent: ' + label + ' (' + parts.length + ' part' + (parts.length === 1 ? '' : 's') + ', ' + png.length + ' bytes)';
+}
+$('#trSend').addEventListener('click', () => trSend('card'));
+$('#trSendSwap').addEventListener('click', () => trSend('swap'));
+
+// ⚑ THE RECEIVER RE-CHECKS BEFORE IT SHOWS ANYTHING: the bytes against the sender's hash, then the very same
+// judgement the reader makes — seal re-computed, signature checked, tier re-derived. A card that fails is listed
+// with the reason and nothing else: no picture, no build. The build is never run; "open it" only reads it.
+const received = [];
+const FROM_TEXT = { sender: 'signed by the device that sent it (proven on this link)', claimed: 'signed by the key the sender named — not proven, so not credited',
+  other: 'signed by another key — a card the sender holds, passed on', unsigned: 'unsigned — no key vouches for it' };
+async function trReceive(whole) {
+  let bytes = null;
+  try { bytes = unb64(whole.b64); } catch { bytes = null; }
+  const actualSha = bytes ? await sha256hex(bytes) : '';
+  const j = bytes ? await judgeCard(bytes) : { isCard: false, reason: 'the parts did not decode' };
+  const v = admit({ intact: !!bytes && actualSha === whole.sentSha, isCard: j.isCard, notCardWhy: j.reason,
+    sealOk: j.sealOk, signed: j.signed, sigOk: j.sigOk, signer: j.signer, sender: tr.peerKey, senderProven: tr.peerProven });
+  const entry = { at: new Date().toISOString(), label: whole.label, sentSha: whole.sentSha, sha: actualSha, ...v,
+    seal: j.isCard ? j.actual : null, earned: v.show ? j.earned : null, claim: v.show ? j.claim : null, signer: j.signer || null };
+  received.push(entry);
+  if (received.length === 1) $('#trInbox').innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'panel'; div.style.margin = '.7rem 0 0';
+  div.innerHTML = '<span class="verdict ' + (v.show ? 'v-ok' : 'v-no') + '">' + (v.show ? 'ACCEPTED' : 'REFUSED') + '</span> '
+    + '<b>' + esc(whole.label) + '</b><div class="facts" style="margin-top:.6rem">'
+    + fact('stage', esc(v.stage)) + fact('why', esc(v.reason))
+    + (v.show ? fact('tier', tierChip(j.earned) + (j.claim === 'overclaim' ? ' — <b>overclaim</b>: the card says ' + esc(j.r.manifest.rarity) + '; its build earns ' + esc(j.earned) : ' — earned by the build, re-checked here'))
+      + fact('from', esc(FROM_TEXT[v.from] || '') + (j.signer ? ' · ' + esc(j.signer.slice(0, 12)) + '…' : '')) + fact('seal', esc(j.actual)) : '')
+    + fact('arrived', bytes && actualSha === whole.sentSha ? 'intact — the bytes hash to what the sender sent' : 'not intact')
+    + '</div>';
+  if (v.show) {
+    await deckAdd({ seal: j.actual, payloadB64: j.r.payloadB64, manifest: j.r.manifest, earned: j.earned, added: TODAY });
+    const img = document.createElement('img');
+    const url = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+    img.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
+    img.addEventListener('error', () => URL.revokeObjectURL(url), { once: true });
+    img.src = url;
+    img.alt = 'the card that arrived'; img.style.cssText = 'max-width:180px;display:block;margin:.6rem 0;border-radius:8px';
+    const open = document.createElement('button');
+    open.type = 'button'; open.className = 'ghost'; open.textContent = 'Open it in the reader';
+    open.addEventListener('click', () => { showRead(bytes, new Blob([bytes], { type: 'image/png' })); $('#readOut').scrollIntoView({ behavior: 'smooth' }); });
+    div.append(img, open);
+  }
+  $('#trInbox').appendChild(div);
+  return entry;
+}
+// a handle for the recorded two-device run — it does nothing a visitor cannot do with the buttons
+window.forgeTrade = { host: trHost, accept: trAccept, finish: trFinish, send: trSend, received,
+  get open() { return !!(tr.link && tr.link.open); }, get peer() { return tr.peerKey; }, get proven() { return tr.peerProven; },
+  get fingerprints() { return trFingerprints(tr.link); } };
 
 // ── does the printed seal survive? — the sealed run, tallied here by the same gated kernel ───────────
 /* __SURVIVE_DATA__ */
@@ -702,7 +985,7 @@ async function drawFold() {
   $('#foldFacts').innerHTML =
     fact('fold-signature', sig) +
     fact('folds', String(v.folds) + ' points · golden angle 137.5077640…°') +
-    fact('verdict', v.valid ? 'folds coherently — the tier is earned' : v.reasons[0]) +
+    fact('verdict', v.valid ? 'folds coherently — the tier is earned' : esc(v.reasons[0])) +
     fact('center', 'HOLE — apex-less by geometry, no crease can sit at the One');
 }
 
@@ -743,20 +1026,35 @@ drawFold();
 // ── the studio: compose / generate → test live → mint as a sovereign artifact ──────────────────
 const utf8 = (str) => new TextEncoder().encode(str);
 
-// the builder identity: one Ed25519 keypair, made once, kept in this browser only
-async function builderIdentity() {
+// the builder identity: one Ed25519 key per browser, made once, NON-EXTRACTABLE, kept in IndexedDB. Page script can
+// ask it to sign but can never read its bytes, so it cannot be copied off this device. A key from the old version
+// (an exportable private key in localStorage) is moved in as non-extractable — same public key, so the cards it
+// signed still name it — and the old copy is deleted. HONEST LIMIT: this page shares its origin with other pages,
+// and any of them could ask the stored key to sign. With no IndexedDB, the key lasts for this visit only.
+const ID_DB = 'fallkard-forge-identity', ID_OLD = 'forge-studio-identity';
+let identityP = null;
+function builderIdentity() { return identityP || (identityP = loadIdentity()); }
+async function loadIdentity() {
   try {
-    const stored = localStorage.getItem('forge-studio-identity');
-    if (stored) {
-      const j = JSON.parse(stored);
-      const priv = await crypto.subtle.importKey('jwk', j.priv, { name: 'Ed25519' }, false, ['sign']);
-      return { pubB64: j.pubB64, sign: async (s2) => b64(new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, priv, utf8(s2)))) };
+    let db = null;
+    try { db = await new Promise((ok, no) => { const q = indexedDB.open(ID_DB, 1); q.onupgradeneeded = () => q.result.createObjectStore('keys'); q.onsuccess = () => ok(q.result); q.onerror = () => no(q.error); }); } catch { db = null; }
+    const idbGet = (k) => new Promise((ok, no) => { const q = db.transaction('keys').objectStore('keys').get(k); q.onsuccess = () => ok(q.result); q.onerror = () => no(q.error); });
+    const idbPut = (k, v) => new Promise((ok, no) => { const t = db.transaction('keys', 'readwrite'); t.objectStore('keys').put(v, k); t.oncomplete = () => ok(); t.onerror = () => no(t.error); });
+    const made = (pubB64, priv, kept) => ({ pubB64, kept, sign: async (s2) => b64(new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, priv, utf8(s2)))) });
+    if (db) { try { const have = await idbGet('builder'); if (have && have.priv && have.pubB64) return made(have.pubB64, have.priv, 'indexeddb'); } catch { /* fall through */ } }
+    let pubB64, priv;
+    const old = (() => { try { return JSON.parse(localStorage.getItem(ID_OLD) || 'null'); } catch { return null; } })();
+    if (old && old.priv && old.pubB64) {
+      priv = await crypto.subtle.importKey('jwk', old.priv, { name: 'Ed25519' }, false, ['sign']);
+      pubB64 = old.pubB64;
+    } else {
+      const kp = await crypto.subtle.generateKey({ name: 'Ed25519' }, false, ['sign', 'verify']);
+      priv = kp.privateKey;
+      pubB64 = b64(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));   // a public key always exports
     }
-    const kp = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
-    const pubB64 = b64(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));
-    const privJwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
-    localStorage.setItem('forge-studio-identity', JSON.stringify({ pubB64, priv: privJwk }));
-    return { pubB64, sign: async (s2) => b64(new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, kp.privateKey, utf8(s2)))) };
+    let kept = 'this visit only';
+    if (db) { try { await idbPut('builder', { pubB64, priv }); kept = 'indexeddb'; try { localStorage.removeItem(ID_OLD); } catch { /* nothing to remove */ } } catch { /* stays in memory */ } }
+    return made(pubB64, priv, kept);
   } catch { return null; }  // no Ed25519 here: mints go out unsigned, and the verify SAYS so
 }
 const ed25519Verify = async (s2, sigB64, pubB64) => {
