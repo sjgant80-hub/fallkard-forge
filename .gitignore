@@ -3,3 +3,5 @@ node_modules/
 hatched*.html
 out.html
 konomi-out/
+.witness/
+.witness6/

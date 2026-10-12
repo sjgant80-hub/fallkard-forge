@@ -24,10 +24,15 @@ node ../lineage.mjs audit .
 
 ```
 depth  status   claimed   provable   card
-1      linked   uncommon  uncommon   seal-001-quine.png
-0      root     uncommon  uncommon   seal-000.png
+1      linked   common    common     seal-001-quine.png
+0      root     common    common     seal-000.png
 ✓ every claimed tier is backed by the deck
 ```
+
+These two once claimed `uncommon`: they were forged with a flag that let the forger say "it passed
+the assessor". Once the assessor became the real gate — re-run on the build by every reader — they
+turned out not to carry the architecture line, so they earn `common`. They were re-stamped to say
+so (same seals, same payloads, same lineage); the old claim was an overclaim the format now catches.
 
 Depth 1 is what this deck can honestly prove, so depth 1 is what it claims. Reaching `rare`
 (depth ≥ 2) means actually forking a card and building on it — not minting filler to inflate a

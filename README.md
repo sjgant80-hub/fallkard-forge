@@ -172,7 +172,9 @@ the fold teaches the *structure*, not whether the structure is *true*.
 # forge a build into a card image
 node forge.mjs forge --build tool.html --image card.png \
   --tags "owl:high-left,rose:purple+red+blue:5,geo:depth3,wings:galaxy" \
-  --assessor-pass --out seal-000.png
+  --out seal-000.png
+# the tier is computed from the build (the sovereignty gate) — there is no flag to set it.
+# every card is Ed25519-signed with ~/.fallkard/identity.json (made on first use; --key to choose)
 
 # verify a card, and optionally hatch it
 node forge.mjs read seal-000.png

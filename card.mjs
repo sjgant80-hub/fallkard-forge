@@ -124,6 +124,12 @@ export function rarity(opts) {
 /**
  * Build the manifest that rides on the card. `seal` is the hash of the COMPRESSED payload, computed
  * by the caller — this kernel never hashes anything itself, so it can be tested without crypto.
+ *
+ * ⚑ THERE IS NO TIER OVERRIDE. A `rarity` passed in is ignored: the tier is always what `rarity()` can
+ * prove from the evidence. The evidence itself (assessorPass) must be COMPUTED by the caller from the
+ * build — never taken from a person's say-so — and every reader re-derives it from the payload.
+ * `signer` is the forger's Ed25519 public key (base64); it sits inside the manifest so the signature
+ * covers who signed as well as what was signed.
  */
 export function manifestFor(opts) {
   const o = (opts && typeof opts === 'object') ? opts : {};
@@ -132,10 +138,62 @@ export function manifestFor(opts) {
     seal: String(o.seal || ''),
     parent: o.parent || null,
     tags: String(o.tags || ''),
-    rarity: o.rarity || rarity(o),
+    rarity: rarity(o),
     assessor_pass: !!o.assessorPass,
     forged: String(o.forged || ''),
+    signer: o.signer ? String(o.signer) : null,
   };
+}
+
+/**
+ * Canonical JSON: keys sorted at every depth, so a signature means the same bytes everywhere.
+ * Total: a cycle, a BigInt, a function or a getter that throws becomes `null` rather than a crash —
+ * none of those can occur in a manifest that came out of JSON.parse, so nothing real is lost.
+ */
+export function canonical(v, seen) {
+  try {
+    if (v === null || typeof v !== 'object') {
+      const s = JSON.stringify(v);
+      return s === undefined ? 'null' : s;
+    }
+    const held = seen || new Set();
+    if (held.has(v)) return 'null';
+    held.add(v);
+    const out = Array.isArray(v)
+      ? '[' + v.map(x => canonical(x, held)).join(',') + ']'
+      : '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canonical(v[k], held)).join(',') + '}';
+    held.delete(v);
+    return out;
+  } catch { return 'null'; }
+}
+
+/**
+ * The exact string an Ed25519 signature covers: the manifest without its `sig`, with `seal` REPLACED by
+ * the seal the verifier computed from the payload it actually holds. So the signature fails if a single
+ * byte of the payload changed (the computed seal moves) OR a single byte of the manifest changed.
+ */
+export function signable(manifest, actualSeal) {
+  const m = (manifest && typeof manifest === 'object' && !Array.isArray(manifest)) ? manifest : {};
+  const out = {};
+  try { for (const k of Object.keys(m)) if (k !== 'sig') out[k] = m[k]; } catch { /* unreadable keys sign as absent */ }
+  out.seal = typeof actualSeal === 'string' ? actualSeal : '';
+  return canonical(out);
+}
+
+export const TIER_ORDER = ['common', 'uncommon', 'rare', 'holo'];
+
+/**
+ * Compare the tier a card CLAIMS with the tier its evidence EARNS. 'overclaim' means the card says more
+ * than can be proven — a reader shows the earned tier, never the claimed one. An unrecognised claim is
+ * an overclaim: a tier nobody defined is not a tier anybody earned.
+ */
+export function tierCheck(claimed, earned) {
+  const c = TIER_ORDER.indexOf(claimed);
+  const e = TIER_ORDER.indexOf(earned);
+  if (e < 0) return 'unknown';
+  if (c < 0 || c > e) return 'overclaim';
+  if (c < e) return 'underclaim';
+  return 'earned';
 }
 
 /**
@@ -191,7 +249,7 @@ export function read(png) {
 }
 
 export default {
-  SPEC_VERSION, PAYLOAD_KEYWORD, MANIFEST_KEYWORD, PNG_SIG,
+  SPEC_VERSION, PAYLOAD_KEYWORD, MANIFEST_KEYWORD, PNG_SIG, TIER_ORDER,
   crc32, parseChunks, makeChunk, serialise, textChunk, readText,
-  rarity, manifestFor, embed, read, concat, latin1, bytes,
+  rarity, manifestFor, canonical, signable, tierCheck, embed, read, concat, latin1, bytes,
 };

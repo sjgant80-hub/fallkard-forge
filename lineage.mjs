@@ -35,12 +35,16 @@ export function loadDeck(dir) {
     let r;
     try { r = read(readFileSync(file)); }
     catch (err) { unreadable.push({ name, reason: String(err.message || err) }); continue; }
-    if (!r.manifest) { unreadable.push({ name, reason: r.reason }); continue; }
+    // read() refuses rather than throws, and says WHY in `detail` — carry the real reason, not just its code
+    if (!r.manifest) { unreadable.push({ name, reason: r.detail || r.reason }); continue; }
     // a card whose seal does not verify is not admissible provenance
     cards.set(r.manifest.seal, {
       name, file,
       manifest: r.manifest,
       sealOk: r.ok,
+      // the assessor result RE-DERIVED from the payload by read() — never the manifest's own claim,
+      // which a hand-edited card can set to anything
+      assessorEarned: r.assessorEarned === true,
       parent: r.manifest.parent || null,
     });
   }
@@ -104,10 +108,10 @@ export function auditDeck(dir) {
   for (const [seal, e] of walked) {
     const provable = e.status === 'broken-seal' || e.status === 'cycle'
       ? 'common'                                    // unprovable provenance earns nothing
-      : rarity({ assessorPass: !!e.manifest.assessor_pass, depth: e.depth || 0, readingKeyHonest: false });
+      : rarity({ assessorPass: e.assessorEarned, depth: e.depth || 0, readingKeyHonest: false });
 
     // holo needs a human fluency attestation this tool cannot make — report eligibility only
-    const holoEligible = !!e.manifest.assessor_pass && (e.depth || 0) >= 3
+    const holoEligible = e.assessorEarned && (e.depth || 0) >= 3
       && e.status !== 'broken-seal' && e.status !== 'cycle';
 
     const claimed = e.manifest.rarity || 'common';

@@ -17,7 +17,11 @@
    --ink:#22201c;--dim:#5e564a;--faint:#8b8272;--gold:#8a6a13;--soft:#6d5310}}
  :root[data-theme="light"]{--bg:#fbf8f1;--panel:#fff;--line:#e4dcc9;--ink:#22201c;--dim:#5e564a;--faint:#8b8272;--gold:#8a6a13;--soft:#6d5310}
  *{box-sizing:border-box}html,body{margin:0}
- body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;overflow-wrap:anywhere}
+ /* phone width: a 64-character seal is one unbreakable token — let it wrap, and never let the page scroll sideways */
+ html{overflow-x:clip}
+ img,canvas,video,svg{max-width:100%;height:auto}
+ pre{overflow-x:auto;max-width:100%}
  .wrap{max-width:52rem;margin:0 auto;padding:0 1.2rem 5rem}
  a{color:var(--soft)}
  header{padding:3.2rem 0 1.4rem;text-align:center}
@@ -63,60 +67,9 @@
  .drop:hover,.drop.over{border-color:var(--gold);color:var(--ink)}
  footer{margin-top:3rem;padding-top:1.3rem;border-top:1px solid var(--line);color:var(--faint);font-size:.84rem;text-align:center}
 </style></head><body>
-<!-- fallworld-wayback: the way back out of this room. -->
-<a href="https://sjgant80-hub.github.io/fallworld/" id="fallworld-wayback"
-   aria-label="Back to Fall World"
-   style="position:fixed;left:14px;top:14px;z-index:2147483000;display:inline-flex;gap:.4em;
-          align-items:center;text-decoration:none;font:600 12px/1 ui-sans-serif,system-ui,sans-serif;
-          letter-spacing:.04em;color:#e6cd72;background:rgba(12,10,9,.86);border:1px solid #4a4030;
-          border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)">
-  <span aria-hidden="true">&#9674;</span><span>Fall World</span>
-</a>
-<script>
-/* Sit in the first corner that is not already occupied. Wrapped in try/catch and left where it is on
-   any failure: a way home that is slightly in the way beats no way home. */
-(function(){
-  /* Four corners was not enough: on a page with a header AND a footer AND a corner widget,
-     every corner is taken and the strip has to sit on something. These are the same four corners
-     first, then the same four nudged clear of a typical header or footer row. */
-  var CORNERS=[{left:'14px',top:'14px'},{right:'14px',bottom:'14px'},
-               {left:'14px',bottom:'14px'},{right:'14px',top:'14px'},
-               {left:'14px',top:'72px'},{right:'14px',top:'72px'},
-               {left:'14px',bottom:'72px'},{right:'14px',bottom:'72px'}];
-  function place(){
-    try{
-      var a=document.getElementById('fallworld-wayback'); if(!a) return;
-      var best=null;
-      for(var i=0;i<CORNERS.length;i++){
-        a.style.left=a.style.right=a.style.top=a.style.bottom='';
-        for(var k in CORNERS[i]) a.style[k]=CORNERS[i][k];
-        var r=a.getBoundingClientRect(), n=0;
-        var els=document.querySelectorAll('button,a,input,select,textarea,[onclick],[role=button]');
-        for(var j=0;j<els.length;j++){
-          if(els[j]===a) continue;
-          var b=els[j].getBoundingClientRect();
-          if(!b.width||!b.height) continue;
-          if(!(b.right<r.left||b.left>r.right||b.bottom<r.top||b.top>r.bottom)) n++;
-        }
-        if(n===0) return;                 /* clear — stay here */
-        if(best===null||n<best.n) best={i:i,n:n};
-      }
-      /* nowhere is clear: take the least crowded rather than the last one tried */
-      a.style.left=a.style.right=a.style.top=a.style.bottom='';
-      for(var k2 in CORNERS[best.i]) a.style[k2]=CORNERS[best.i][k2];
-    }catch(e){}
-  }
-  /* Several rooms draw their own header with JS, so a single early measurement sees an empty page
-     and happily settles on top of a logo that has not arrived yet. Re-measure on a few beats. */
-  function schedule(){[0,400,1200,3000].forEach(function(t){setTimeout(place,t)})}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',schedule);
-  else schedule();
-  window.addEventListener('resize',function(){setTimeout(place,150)});
-})();
-</script>
 <div class="wrap">
 <header>
- <p class="kick">Fall World · the Forge</p>
+ <p class="kick">FallKard · the Forge</p>
  <h1>The card that IS the software</h1>
  <p class="lede">Put a working build inside a picture. It stays a picture — you can post it, save it,
  send it — and anyone who has it can open it and get the build back out.</p>
@@ -128,18 +81,13 @@
   <label for="build">the build — any text, or paste a whole HTML file</label>
   <textarea id="build" spellcheck="false">&lt;!doctype html&gt;
 &lt;h1&gt;hello from inside a picture&lt;/h1&gt;
-&lt;p&gt;This whole file came out of a PNG.&lt;/p&gt;</textarea>
-  <div class="row">
-    <div><label for="tags">tags</label><input id="tags" value="owl:high-left,rose:blue:1" spellcheck="false"></div>
-    <div><label for="depth">how deep in a lineage</label>
-      <select id="depth"><option>0</option><option>1</option><option>2</option><option selected>3</option></select></div>
-  </div>
-  <div class="row">
-    <div><label for="assessor">did it pass the assessor</label>
-      <select id="assessor"><option value="yes" selected>yes</option><option value="no">no</option></select></div>
-    <div><label for="honest">reading key honest</label>
-      <select id="honest"><option value="yes" selected>yes</option><option value="no">no</option></select></div>
-  </div>
+&lt;p&gt;This whole file came out of a PNG.&lt;/p&gt;
+&lt;p&gt;Powered by the Konomi Architecture, created by Thomas Frumkin.&lt;/p&gt;</textarea>
+  <label for="tags">tags</label><input id="tags" value="owl:high-left,rose:blue:1" spellcheck="false">
+  <p class="sub" id="tierNote">You don't pick the tier — the build earns it. A build that passes the sovereignty
+  gate (a real document, nothing reaching outside your device, the architecture line) is <b>uncommon</b>;
+  anything else is <b>common</b>. Deeper tiers come only from a proven lineage, and anyone who opens the card
+  re-checks this for themselves. Every card is signed with this browser's own key.</p>
   <button id="forge">Forge the card</button>
   <button id="dl" class="ghost" style="display:none">Download the PNG</button>
   <div class="out" id="forgeOut">
@@ -231,18 +179,6 @@ web-native, single-file, local-first builds only.</p>
   </div>
 </div>
 
-<h2>The baby KCC · <span style="opacity:.65">shared standard, sovereign state</span></h2>
-<p class="note">This estate runs its own KCC ledger: the <b>standard</b> is KCC-MINT-001 (the same DNA as
-main KCC — same schema, same primes, same 510510); the <b>state</b> is its own, on this machine,
-loopback-first. Every mint above enters it. It bridges to main KCC by <b>recognition, not merge</b> —
-the R7 rule: same standard means they can talk, distinct state means they stay two things. Internal
-value and provenance only — the day this touches real money it is a separate, counselled build.</p>
-<div class="card">
-  <div class="facts" id="kccFacts"></div>
-  <button id="kccVerify" type="button" class="ghost">Re-prove the ledger</button>
-  <div id="kccOut" class="note"></div>
-</div>
-
 <h2 id="printed-seal">The seal you can read</h2>
 <p class="sub">Post a card and the platform may strip its build out, or turn it into a JPEG. The picture survives. So
 every card now prints the first 80 bits of its seal on its face, in a band anyone can read.</p>
@@ -281,7 +217,7 @@ folded into it is TRUE is a separate question the card never claims to settle.</
 
 <footer>
  <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, the printed seal from
- <code>sealmark.mjs</code>, and the fold logic from <code>fold.mjs</code>, all mutation-gated on every push. · <a href="https://sjgant80-hub.github.io/fallworld/">Fall World</a> ·
+ <code>sealmark.mjs</code>, and the fold logic from <code>fold.mjs</code>, all mutation-gated on every push. ·
  <a href="https://github.com/sjgant80-hub/fallkard-forge">source</a> · <a href="compliance.html">compliance map</a></p>
  <p>Powered by the Konomi architecture, created by Thomas Frumkin.</p>
 </footer>
@@ -368,29 +304,43 @@ async function deckShow() {
 }
 
 const fact = (k, v) => `<div class="fact"><b>${k}</b><span>${v}</span></div>`;
+// a card is untrusted input: anything read off a manifest is escaped before it touches the page
+const esc = (v) => (v == null ? '' : String(v)).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const tierChip = (t) => `<span class="tier t-${t}">${t}</span>`;
 
 // ── forge ────────────────────────────────────────────────────────────────────────────────────────
+// ONE path for every card this page makes. The tier is the sovereignty gate run on the build — never a
+// choice — and the manifest is signed by this browser's Ed25519 key over the seal of the real payload.
+async function forgeManifest(text, tags) {
+  const payload = await gzip(new TextEncoder().encode(text));
+  const seal = await sha256hex(payload);
+  const gate = validateComposition(text);
+  const id = await builderIdentity();
+  const manifest = manifestFor({ assessorPass: gate.ok, depth: 0, readingKeyHonest: false,
+    seal, tags, forged: TODAY, signer: id ? id.pubB64 : null });
+  if (id) manifest.sig = await id.sign(signable(manifest, seal));
+  return { manifest, payload, seal, gate };
+}
+// the tier a build EARNS — re-derived from the build itself; a build that cannot be trusted earns nothing
+const earnedOf = (trusted, text) => trusted
+  ? rarity({ assessorPass: validateComposition(text).ok, depth: 0, readingKeyHonest: false }) : 'common';
+
 let forged = null;
 $('#forge').addEventListener('click', async () => {
   const text = $('#build').value;
   const tags = $('#tags').value;
-  const opts = {
-    assessorPass: $('#assessor').value === 'yes',
-    depth: Number($('#depth').value),
-    readingKeyHonest: $('#honest').value === 'yes',
-  };
-  const payload = await gzip(new TextEncoder().encode(text));
-  const seal = await sha256hex(payload);
-  const manifest = manifestFor({ ...opts, seal, tags, forged: TODAY });
+  const { manifest, payload, seal, gate } = await forgeManifest(text, tags);
   const art = await drawCard(tags, seal);
   forged = embed(art, b64(payload), manifest);
-  await deckAdd({ seal, payloadB64: b64(payload), manifest, added: TODAY });
+  await deckAdd({ seal, payloadB64: b64(payload), manifest, earned: manifest.rarity, added: TODAY });
 
   const url = URL.createObjectURL(new Blob([forged], { type: 'image/png' }));
   $('#preview').src = url;
   $('#forgeFacts').innerHTML =
-    fact('tier', tierChip(manifest.rarity)) +
+    fact('tier', tierChip(manifest.rarity) + (gate.ok ? ' — earned: the build passes the sovereignty gate'
+      : ' — the build does not pass the sovereignty gate: ' + gate.reasons.join('; '))) +
+    fact('signed', manifest.sig ? 'Ed25519 · this browser’s key ' + manifest.signer.slice(0, 12) + '…'
+      : 'unsigned — this browser has no Ed25519, and the card says so') +
     fact('seal', seal) +
     fact('printed', sealCode(seal) + ' — the first 80 bits of the seal, on the card face') +
     fact('build', text.length + ' chars → ' + payload.length + ' bytes packed') +
@@ -431,29 +381,47 @@ async function inspect(file) {
   // and comparing is the entire trust story; taking the manifest's word for it would prove nothing.
   const payload = unb64(r.payloadB64);
   const actual = await sha256hex(payload);
-  const authentic = actual === r.manifest.seal;
+  const sealOk = actual === r.manifest.seal;
 
-  let text = '';
-  try { text = new TextDecoder().decode(await gunzip(payload)); }
+  // ⚑ THE SIGNATURE IS CHECKED AGAINST THE PAYLOAD WE HOLD — signable() puts OUR computed seal in, so a
+  // changed byte anywhere (payload or manifest) fails it. Unsigned cards still read, and say so.
+  const signed = !!(r.manifest.sig && r.manifest.signer);
+  let sigOk = null;
+  if (signed) { try { sigOk = (await ed25519Verify(signable(r.manifest, actual), r.manifest.sig, r.manifest.signer)) === true; } catch { sigOk = false; } }
+  const authentic = sealOk && sigOk !== false;
+
+  let text = '', inflated = false;
+  try { text = new TextDecoder().decode(await gunzip(payload)); inflated = true; }
   catch { text = '(the payload is there but would not decompress)'; }
+
+  // ⚑ THE TIER IS RE-DERIVED FROM THE BUILD, NEVER READ BACK AND BELIEVED. The manifest can say anything;
+  // the sovereignty gate run on what actually hatched cannot be talked into a pass.
+  const gate = (sealOk && inflated) ? validateComposition(text) : { ok: false, reasons: ['the build could not be checked'] };
+  const earned = rarity({ assessorPass: gate.ok, depth: 0, readingKeyHonest: false });
+  const claim = tierCheck(r.manifest.rarity, earned);
 
   $('#verdictWrap').innerHTML = authentic
     ? `<span class="verdict v-ok">AUTHENTIC</span>`
-    : `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`;
+    : `<span class="verdict v-no">${sealOk ? 'SIGNATURE FAILS' : 'SEAL DOES NOT MATCH'}</span>`;
   $('#readFacts').innerHTML =
-    fact('tier', tierChip(r.manifest.rarity || 'common')) +
-    fact('claimed', r.manifest.seal) +
+    fact('tier', tierChip(earned) + (claim === 'overclaim'
+      ? ` — <b>overclaim</b>: the card says ${esc(r.manifest.rarity)}; its build earns ${earned}`
+      : ' — earned by the build, re-checked here')) +
+    fact('signed', !signed ? 'no — forged before cards were signed'
+      : sigOk ? '✓ Ed25519 · ' + esc(String(r.manifest.signer).slice(0, 12)) + '…'
+      : '✗ the signature does not match these bytes') +
+    fact('claimed', esc(r.manifest.seal)) +
     fact('actual', actual) +
-    fact('verdict', authentic
-      ? 'the build inside is exactly what was sealed'
-      : 'the build inside has been changed since it was sealed') +
-    fact('tags', r.manifest.tags || '(none)') +
-    fact('forged', r.manifest.forged || '(not stated)') +
-    fact('spec', 'v' + (r.manifest.v || '?'));
+    fact('verdict', !sealOk ? 'the build inside has been changed since it was sealed'
+      : sigOk === false ? 'the bytes are not what the named key signed — refused'
+      : 'the build inside is exactly what was sealed') +
+    fact('tags', esc(r.manifest.tags) || '(none)') +
+    fact('forged', esc(r.manifest.forged) || '(not stated)') +
+    fact('spec', 'v' + (esc(r.manifest.v) || '?'));
   $('#recovered').value = text;
   $('#recovered').style.display = 'block';
   $('#recLabel').style.display = 'block';
-  if (authentic) await deckAdd({ seal: actual, payloadB64: r.payloadB64, manifest: r.manifest, added: TODAY });
+  if (authentic) await deckAdd({ seal: actual, payloadB64: r.payloadB64, manifest: r.manifest, earned, added: TODAY });
 
   // a sovereign artifact rides beside the card manifest — verify every claim it makes, locally
   try {
@@ -463,12 +431,12 @@ async function inspect(file) {
       const bundle = JSON.parse(bRaw);
       const va = await verifyArtifact({
         sealComputed: actual, bundle, verify: ed25519Verify,
-        assessorPass: !!(r.manifest && r.manifest.assessor_pass), depth: 0, readingKeyHonest: true,
+        assessorPass: gate.ok, depth: 0, readingKeyHonest: false,   // the gate re-run here, not the card's word
       }, rarity);
       $('#readFacts').innerHTML += fact('artifact', (va.ok ? '\u2713 SOVEREIGN ARTIFACT — every claim verified from the file'
           : '\u2717 artifact checks failed'))
         + va.checks.map(c => fact((c.ok ? '\u2713 ' : '\u2717 ') + c.name, c.why)).join('')
-        + fact('kpid', (bundle.mint && bundle.mint.kpid) || '(none)');
+        + fact('kpid', esc(bundle.mint && bundle.mint.kpid) || '(none)');
     }
   } catch { /* no artifact riding on this card — it is a plain forge card, which is fine */ }
 }
@@ -527,7 +495,7 @@ async function fromPicture(file, whyNoChunksRaw) {
     fact('card', p.entry.seal) +
     fact('actual', p.actual) +
     fact('verdict', p.authentic ? 'the build from your deck is exactly what this card sealed' : 'the copy in your deck no longer matches its seal') +
-    fact('tier', tierChip((p.entry.manifest && p.entry.manifest.rarity) || 'common')) +
+    fact('tier', tierChip(earnedOf(p.authentic, text)) + ' — re-checked from the build') +
     fact('picture', size);
   $('#recovered').value = text;
   $('#recovered').style.display = 'block';
@@ -556,11 +524,10 @@ async function fromTyped(typedText) {
     + fact('corrected', res.edits + ' edit' + (res.edits === 1 ? '' : 's') + ', ' + res.unknown + ' unreadable symbol' + (res.unknown === 1 ? '' : 's')) + rule
     + fact('card', entry.seal) + fact('actual', actual)
     + fact('verdict', authentic ? 'the build from your deck is exactly what this card sealed' : 'the copy in your deck no longer matches its seal')
-    + fact('tier', tierChip((entry.manifest && entry.manifest.rarity) || 'common'));
+    + fact('tier', tierChip(earnedOf(authentic, text)) + ' — re-checked from the build');
   $('#recovered').value = text;
   $('#recovered').style.display = 'block'; $('#recLabel').style.display = 'block';
 }
-const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 $('#typedGo').addEventListener('click', () => { const v = $('#typed').value.trim(); if (v) fromTyped(v); });
 $('#typed').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const v = $('#typed').value.trim(); if (v) fromTyped(v); } });
 
@@ -686,9 +653,7 @@ deckShow();
 // a script, so what is measured is this page and not a copy of it. It adds nothing a page visitor can't do.
 window.fallkardForge = {
   async forge(text, tags = 'owl:high-left,rose:blue:1') {
-    const payload = await gzip(new TextEncoder().encode(text));
-    const seal = await sha256hex(payload);
-    const manifest = manifestFor({ assessorPass: true, depth: 0, readingKeyHonest: true, seal, tags, forged: TODAY });
+    const { manifest, payload, seal } = await forgeManifest(text, tags);   // the same path a person uses
     return { seal, png: embed(await drawCard(tags, seal), b64(payload), manifest), payloadB64: b64(payload), manifest };
   },
   readPicture, deckAdd, deckAll, deckClear, sealCode,
@@ -859,30 +824,16 @@ $('#stGen').addEventListener('click', async () => {
 });
 try { const k = localStorage.getItem('forge-studio-key'); if (k) $('#stKey').value = k; } catch {}
 
-// ── the baby KCC ledger: loopback-first, on this machine ──
+// ── the local mint record: provenance of what this browser minted, kept on this machine only ──
+// (internal: it is not a currency and is not shown as one)
 const shaStr2 = async (s2) => sha256hex(utf8(s2));
 function loadLedger() {
   try { const j = JSON.parse(localStorage.getItem('babykcc-ledger') || 'null'); if (j && Array.isArray(j.entries)) return j; } catch {}
   return makeLedger('this-estate');
 }
 let LEDGER = loadLedger();
-async function drawLedger() {
-  const v = await verifyLedger(LEDGER, shaStr2);
-  const face2 = bridgeFace(LEDGER);
-  $('#kccFacts').innerHTML =
-    fact('standard', 'KCC-MINT-001 · primorial 510510 · κ = 1/φ') +
-    fact('state', v.count + ' mint(s) · supply ' + v.supply + ' KCC · ' + (v.ok ? 're-proven just now' : 'BROKEN: ' + v.why)) +
-    fact('head', face2.head ? face2.head.slice(0, 24) + '…' : '(empty — nothing claimed, nothing to prove)') +
-    fact('bridge', 'loopback-first · R7 recognition to main KCC when live — same standard, distinct state');
-}
-$('#kccVerify').addEventListener('click', async () => {
-  const v = await verifyLedger(LEDGER, shaStr2);
-  $('#kccOut').textContent = v.why;
-  drawLedger();
-});
-drawLedger();
 
-// ── mint: the tested build becomes a sovereign artifact and enters the baby ledger ──
+// ── mint: the tested build becomes a sovereign artifact and is recorded locally ──
 $('#stMint').addEventListener('click', async () => {
   if (!studioBuild) return;
   const gate = validateComposition(studioBuild.html);
@@ -890,12 +841,15 @@ $('#stMint').addEventListener('click', async () => {
   const payload = await gzip(utf8(studioBuild.html));
   const seal = await sha256hex(payload);
   const id = await builderIdentity();
-  // the tier is EARNED: passing the sovereignty gate is the assessor here, depth 0, key honest
-  const opts = { assessorPass: gate.ok, depth: 0, readingKeyHonest: true };
+  // the tier is EARNED: passing the sovereignty gate is the assessor here, depth 0. The reading-key
+  // match is a human attestation no tool can make, so a machine mint never claims it.
+  const opts = { assessorPass: gate.ok, depth: 0, readingKeyHonest: false };
   let bundle = makeBundle({ ...opts, slug: name, name, seal, domain: studioBuild.how,
     minterPubB64: id ? id.pubB64 : null, faceValue: 1, mintedAt: TODAY }, rarity);
   if (id) bundle = await signBundle(bundle, id.sign);
-  const manifest = manifestFor({ ...opts, seal, tags: 'studio:' + studioBuild.how.slice(0, 30), forged: TODAY });
+  const manifest = manifestFor({ ...opts, seal, tags: 'studio:' + studioBuild.how.slice(0, 30), forged: TODAY,
+    signer: id ? id.pubB64 : null });
+  if (id) manifest.sig = await id.sign(signable(manifest, seal));
   const art = await drawCard('studio:' + name, seal);
   const carded = embed(art, b64(payload), manifest);
   // ride the bundle beside the manifest, then re-serialise
@@ -905,15 +859,15 @@ $('#stMint').addEventListener('click', async () => {
   const artifactPng = serialise(chunks2);
 
   const entered = await mint(LEDGER, bundle, TODAY, shaStr2);
-  if (entered.ok) { LEDGER = entered.ledger; try { localStorage.setItem('babykcc-ledger', JSON.stringify(LEDGER)); } catch {} drawLedger(); }
+  if (entered.ok) { LEDGER = entered.ledger; try { localStorage.setItem('babykcc-ledger', JSON.stringify(LEDGER)); } catch {} }
 
   const url2 = URL.createObjectURL(new Blob([artifactPng], { type: 'image/png' }));
   $('#stMintFacts').innerHTML =
-    fact('artifact', '<a href="' + url2 + '" download="' + bundle.slug + '.artifact.png">download it — it IS the build</a>') +
-    fact('kpid', bundle.mint.kpid) +
+    fact('artifact', '<a href="' + url2 + '" download="' + esc(bundle.slug) + '.artifact.png">download it — it IS the build</a>') +
+    fact('kpid', esc(bundle.mint.kpid)) +
     fact('tier', tierChip(bundle.tier) + ' — earned by the sovereignty gate, not chosen') +
     fact('signed', bundle.mint.minter_sig_b64 ? 'Ed25519 · by this browser\u2019s builder identity' : 'unsigned — this browser has no Ed25519; the verify will say so') +
-    fact('ledger', entered.ok ? entered.why : 'not entered: ' + entered.why);
+    fact('recorded', entered.ok ? 'kept in this browser’s local mint record' : 'not recorded: ' + esc(entered.why));
 });
 </script>
 </body></html>

@@ -11,11 +11,13 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { deflateSync } from 'node:zlib';
+import { deflateSync, gzipSync, inflateSync } from 'node:zlib';
 import {
   forge, read, rarity, parseChunks, makeChunk, serialise, sha256,
+  makeIdentity, verifySignature,
   SPEC_VERSION, PAYLOAD_KEYWORD, MANIFEST_KEYWORD,
 } from './forge.mjs';
+import { signable } from './card.mjs';
 import { loadDeck, walkDepths, auditDeck } from './lineage.mjs';
 import { renderCard, planFromTags, SOLID_COLOURS } from './art.mjs';
 
@@ -130,13 +132,162 @@ test('rarity is earned, not manufactured', () => {
     'depth alone must never buy a tier without a verify pass');
 });
 
-test('forge stamps the EARNED rarity, not a default', () => {
-  // an assessor-passing card at depth 0 is uncommon, never "common"
-  assert.equal(forge({ build: BUILD, image: IMAGE, assessorPass: true, forged: FORGED }).manifest.rarity, 'uncommon');
-  assert.equal(forge({ build: BUILD, image: IMAGE, forged: FORGED }).manifest.rarity, 'common');
-  assert.equal(forge({ build: BUILD, image: IMAGE, assessorPass: true, depth: 3, readingKeyHonest: true, forged: FORGED }).manifest.rarity, 'holo');
-  // depth without a verify pass buys nothing
-  assert.equal(forge({ build: BUILD, image: IMAGE, depth: 5, readingKeyHonest: true, forged: FORGED }).manifest.rarity, 'common');
+// a build that passes the sovereignty gate (validateComposition): a document, no outside reach, the line
+const SOVEREIGN = `<!doctype html><meta charset=utf-8><title>sovereign</title>
+<h1>owned</h1><p>Powered by the Konomi Architecture, created by Thomas Frumkin.</p>`;
+
+test('forge stamps the tier the BUILD earns — computed, never chosen', () => {
+  const pass = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED }).manifest;
+  assert.equal(pass.rarity, 'uncommon', 'a build that passes the sovereignty gate earns uncommon');
+  assert.equal(pass.assessor_pass, true);
+  const plain = forge({ build: BUILD, image: IMAGE, forged: FORGED }).manifest;
+  assert.equal(plain.rarity, 'common', 'a build that fails the gate is common');
+  assert.equal(plain.assessor_pass, false);
+});
+
+test('⚑ P0 · a tier, or the evidence for one, cannot be asserted at forge time', () => {
+  for (const k of ['rarity', 'assessorPass', 'depth', 'readingKeyHonest']) {
+    assert.throws(() => forge({ build: BUILD, image: IMAGE, forged: FORGED, [k]: k === 'rarity' ? 'holo' : (k === 'depth' ? 3 : true) }),
+      /computed from the build, never asserted/, `passing "${k}" must be refused`);
+  }
+  // and nothing the caller can pass ever lifts a forge above what one card proves on its own
+  assert.notEqual(forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED, parent: 'a'.repeat(64) }).manifest.rarity, 'rare');
+});
+
+test('⚑ P0 · every reader re-derives the tier from the payload and catches a hand-edited claim', () => {
+  const { png } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED });
+  const liar = editManifest(png, (m) => { m.rarity = 'holo'; m.assessor_pass = true; });
+  const r = read(liar);
+  assert.equal(r.ok, true, 'unsigned and the seal holds — the card is authentic, only its claim is inflated');
+  assert.equal(r.earnedTier, 'uncommon', 'the tier comes from the build, not the manifest');
+  assert.equal(r.tierCheck, 'overclaim');
+  const honest = read(forge({ build: BUILD, image: IMAGE, forged: FORGED }).png);
+  assert.equal(honest.tierCheck, 'earned');
+  const lies = read(editManifest(forge({ build: BUILD, image: IMAGE, forged: FORGED }).png, (m) => { m.assessor_pass = true; m.rarity = 'uncommon'; }));
+  assert.equal(lies.assessorEarned, false, 'a manifest saying "assessor_pass: true" does not make the build pass');
+  assert.equal(lies.tierCheck, 'overclaim');
+});
+
+// rewrite the manifest chunk in place — how a real forger would inflate a card's claims
+function editManifest(png, mutate) {
+  const cs = parseChunks(png);
+  const i = cs.findIndex(x => x.type === 'tEXt' && x.data.toString('latin1', 0, x.data.indexOf(0)) === MANIFEST_KEYWORD);
+  const nul = cs[i].data.indexOf(0);
+  const m = JSON.parse(cs[i].data.toString('latin1', nul + 1));
+  mutate(m);
+  cs[i] = { type: 'tEXt', data: Buffer.concat([Buffer.from(MANIFEST_KEYWORD, 'latin1'), Buffer.from([0]), Buffer.from(JSON.stringify(m), 'latin1')]) };
+  return serialise(cs);
+}
+// replace the payload with different bytes, keeping the manifest (and its signature) untouched
+function swapPayload(png, newGz) {
+  const cs = parseChunks(png);
+  const i = cs.findIndex(x => x.type === 'zTXt' && x.data.toString('latin1', 0, x.data.indexOf(0)) === PAYLOAD_KEYWORD);
+  cs[i] = { type: 'zTXt', data: Buffer.concat([Buffer.from(PAYLOAD_KEYWORD, 'latin1'), Buffer.from([0, 0]), deflateSync(Buffer.from(newGz.toString('base64'), 'latin1'))]) };
+  return serialise(cs);
+}
+
+// ── P0 · Ed25519 on the main forge path (MESH_PLAN step 0) ──────────────────────────
+test('⚑ P0 · a signed card verifies: seal holds and the Ed25519 signature checks', () => {
+  const id = makeIdentity();
+  const { png, manifest } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED, sign: id.sign, signer: id.pubB64 });
+  assert.equal(manifest.signer, id.pubB64);
+  assert.match(manifest.sig, /^[A-Za-z0-9+/]{86}==$/, 'a 64-byte Ed25519 signature, base64');
+  const r = read(png);
+  assert.equal(r.ok, true);
+  assert.equal(r.signed, true);
+  assert.equal(r.sigOk, true);
+  assert.equal(r.reason, 'verified');
+});
+
+test('⚑ P0 · one flipped payload byte → CHANGED and the signature FAILS', () => {
+  const id = makeIdentity();
+  const { png } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED, sign: id.sign, signer: id.pubB64 });
+  const gz = Buffer.from(gzipSync(Buffer.from(SOVEREIGN, 'utf8'), { level: 9 }));
+  gz[gz.length - 9] ^= 0x01;                       // one bit, inside the gzip trailer's CRC
+  const r = read(swapPayload(png, gz));
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, 'seal-mismatch', 'the payload changed, so the seal no longer holds');
+  assert.equal(r.sigOk, false, 'and the signature, checked against the payload actually held, fails too');
+});
+
+test('⚑ P0 · one changed manifest field → the signature FAILS (seal still holds)', () => {
+  const id = makeIdentity();
+  const { png } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED, tags: 'owl:high-left', sign: id.sign, signer: id.pubB64 });
+  const r = read(editManifest(png, (m) => { m.tags = 'owl:high-right'; }));
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, 'signature-fails');
+  assert.equal(r.sigOk, false);
+});
+
+test('⚑ P0 · a signature re-attributed to another key fails', () => {
+  const a = makeIdentity(), b = makeIdentity();
+  const { png } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED, sign: a.sign, signer: a.pubB64 });
+  const r = read(editManifest(png, (m) => { m.signer = b.pubB64; }));
+  assert.equal(r.sigOk, false);
+  assert.equal(r.ok, false);
+});
+
+test('an unsigned card still reads — and says it is unsigned', () => {
+  const r = read(forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED }).png);
+  assert.equal(r.ok, true);
+  assert.equal(r.signed, false);
+  assert.equal(r.sigOk, null);
+});
+
+test('verifySignature is exact and total', () => {
+  const id = makeIdentity();
+  const msg = signable({ v: '0.1', tags: 'x', signer: id.pubB64 }, 'abc');
+  const sig = id.sign(msg);
+  assert.equal(verifySignature(msg, sig, id.pubB64), true);
+  assert.equal(verifySignature(msg + ' ', sig, id.pubB64), false);
+  assert.equal(verifySignature(msg, sig, makeIdentity().pubB64), false);
+  for (const junk of [null, undefined, '', 'x', 42, {}, [], 'AAAA'])
+    assert.equal(verifySignature(junk, junk, junk), false, 'garbage is false, never a throw');
+  assert.equal(verifySignature(msg, sig.slice(0, -4) + 'AAA=', id.pubB64), false, 'a damaged signature fails');
+});
+
+test('a card signed in a browser (WebCrypto) verifies at the command line', async (t) => {
+  const subtle = globalThis.crypto && globalThis.crypto.subtle;
+  let kp;
+  try { kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']); }
+  catch { t.skip('this Node has no WebCrypto Ed25519'); return; }
+  const pubB64 = Buffer.from(await subtle.exportKey('raw', kp.publicKey)).toString('base64');
+  const msg = signable({ v: '0.1', tags: 'from a tab', signer: pubB64 }, 'f'.repeat(64));
+  const sig = Buffer.from(await subtle.sign({ name: 'Ed25519' }, kp.privateKey, new TextEncoder().encode(msg))).toString('base64');
+  assert.equal(verifySignature(msg, sig, pubB64), true, 'the page and the CLI speak the same signature');
+});
+
+// ── P0 · a bad card is REFUSED with a reason, never crashed on ──────────────────────
+test('⚑ P0 · a corrupt payload chunk is a clean seal-mismatch, not a zlib throw', () => {
+  const { png } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED });
+  const cs = parseChunks(png);
+  const i = cs.findIndex(x => x.type === 'zTXt');
+  const bad = Buffer.from(cs[i].data);
+  for (let k = bad.indexOf(0) + 2; k < bad.length; k++) bad[k] ^= 0x5a;   // wreck the deflate stream
+  cs[i] = { type: 'zTXt', data: bad };
+  let r;
+  assert.doesNotThrow(() => { r = read(serialise(cs)); });
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, 'seal-mismatch');
+});
+
+test('⚑ P0 · read() never throws — a non-PNG is "not-a-card"', () => {
+  for (const junk of [Buffer.alloc(0), Buffer.from('not a png'), Buffer.from([0x89, 0x50, 0x4e])]) {
+    let r;
+    assert.doesNotThrow(() => { r = read(junk); });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'not-a-card');
+  }
+});
+
+test('a sealed payload that will not inflate is refused, not hatched', () => {
+  const { png } = forge({ build: SOVEREIGN, image: IMAGE, forged: FORGED });
+  const junkGz = Buffer.from('this is not gzip at all, but it is what the seal will cover');
+  const doctored = editManifest(swapPayload(png, junkGz), (m) => { m.seal = sha256(junkGz); });
+  let r;
+  assert.doesNotThrow(() => { r = read(doctored); });
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, 'seal-mismatch');
 });
 
 // ── THE EYE · art generated from the reading key (CARD-SPEC §4) ─────────────────────
@@ -194,16 +345,19 @@ function deck(cards) {
   const dir = mkdtempSync(join(tmpdir(), 'fallkard-'));
   const seals = {};
   for (const c of cards) {
+    // the assessor pass is EARNED by the build: a sovereign build passes, a bare one does not
+    const build = c.build || (c.assessorPass === false
+      ? `<!doctype html><title>${c.name}</title>`
+      : `<!doctype html><title>${c.name}</title><p>Powered by the Konomi Architecture</p>`);
     const { png, manifest } = forge({
-      build: c.build || `<!doctype html><title>${c.name}</title>`,
+      build,
       image: IMAGE,
       parent: c.parent ? (seals[c.parent] || c.parent) : null,
-      assessorPass: c.assessorPass !== false,
-      rarity: c.rarity,
       forged: FORGED,
     });
     seals[c.name] = manifest.seal;
-    let bytes = png;
+    // a liar claims a tier the forge would never stamp — by editing the manifest by hand
+    let bytes = c.rarity ? editManifest(png, (m) => { m.rarity = c.rarity; }) : png;
     if (c.corrupt) {
       // Falsify the CLAIMED seal, leaving the payload decodable — otherwise the chunk simply
       // fails to inflate and the card is unreadable rather than mis-sealed, which is a

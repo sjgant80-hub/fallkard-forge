@@ -51,15 +51,35 @@ the card chunks rather than appending, so a card never accumulates duplicates.
   "seal": "<sha256 hex of the GZIPPED payload bytes>",
   "parent": "<seal of the parent card | null>",
   "tags": "owl:high-left,rose:purple:5,geo:depth3",
-  "rarity": "holo",
+  "rarity": "uncommon",
   "assessor_pass": true,
-  "forged": "2026-07-23"
+  "forged": "2026-07-23",
+  "signer": "<base64 of the forger's raw 32-byte Ed25519 public key | null>",
+  "sig": "<base64 Ed25519 signature — present only when signer is>"
 }
 ```
 
 `seal` is taken over the **gzipped** payload bytes (what actually rides in the chunk), so a
 reader can verify without decompressing anything. Verification is: base64-decode the payload
 chunk, sha256 it, compare to `seal`. Mismatch ⇒ the card is tampered and **must not hatch**.
+
+### 3.1 · The signature (Ed25519)
+
+A card may be signed by its forger. `signer` is the public key; `sig` is an Ed25519 signature over
+the **signable string**: the manifest with `sig` removed and `seal` **replaced by the seal the
+verifier computed from the payload it actually holds**, serialised as canonical JSON (keys sorted
+at every depth, no whitespace). Because the verifier substitutes its own computed seal, one changed
+byte anywhere — in the payload or in the manifest, `signer` included — fails the signature.
+
+- A signed card is accepted only if the seal holds **and** the signature verifies.
+- An unsigned card (no `signer`) still reads; a reader must say it is unsigned. A node in the mesh
+  (MESH_PLAN) may refuse unsigned cards outright.
+- A signature proves **who** forged the bytes. It does not prove the build does what it claims —
+  only re-running it does (§5, and the edge re-run verify).
+
+The browser forge signs with a per-browser identity (WebCrypto Ed25519); the CLI signs with
+`~/.fallkard/identity.json` (or `--key`). Both export the raw 32-byte key, so a card signed in a
+tab verifies at the command line and the other way round.
 
 ## 4 · The reading key — composition → meaning
 
@@ -115,6 +135,19 @@ holo      assessor_pass + provenance depth >= 3 + honest reading-key match
 Depth is walked from `parent` links across the card graph. Rarity is **computed, never
 asserted** — `forge()` stamps the tier it can prove. Depth without a verify pass buys nothing.
 This is a real holo: openly special because it is checkable, not scarce because someone said so.
+
+**`assessor_pass` is computed from the build, and re-derived by every reader.** The assessor is
+the sovereignty gate `validateComposition` (studio.mjs): the payload must be a document, reach
+nothing outside the device, and carry the architecture line. It is a pure function of the build,
+so a reader re-runs it on the hatched payload and **ignores the manifest's own `assessor_pass`
+and `rarity`** — a hand-edited card can write anything there. A conformant forge:
+
+- accepts **no** tier and **no** tier evidence from its caller (`rarity`, `assessorPass`,
+  `depth`, `readingKeyHonest` are refused, loudly);
+- stamps at most `uncommon` (depth is proven later by walking a real deck; `holo` is never
+  machine-awarded).
+
+A reader shows the tier the build **earns**, and flags an **overclaim** when the manifest says more.
 
 **Depth must be PROVEN by a deck, not claimed by a card.** `lineage.mjs` walks the graph and
 reports what the deck can actually show:

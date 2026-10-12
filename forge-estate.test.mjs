@@ -16,7 +16,7 @@ import { gzipSync } from 'node:zlib';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
-import { forge, read, sha256, parseChunks, serialise, PNG_SIG } from './forge.mjs';
+import { forge, read, sha256, parseChunks, serialise, PNG_SIG, MANIFEST_KEYWORD } from './forge.mjs';
 import { renderCard } from './art.mjs';
 import { auditDeck, loadDeck } from './lineage.mjs';
 
@@ -143,9 +143,21 @@ test('forge CLI: usage arms, flag seating, (none)/(root) fallbacks, read and hat
 
 // ─── lineage.mjs ───
 
-const forgeTo = (dir, file, build, opts = {}) => {
+// a build that EARNS the assessor pass: a document carrying the architecture line, reaching nothing outside
+const sovereign = (b) => `<!doctype html><title>${b}</title><p>Powered by the Konomi Architecture</p>`;
+// a liar inflates its tier by editing the manifest by hand — the forge itself refuses to stamp one
+function claimTier(png, tier) {
+  const cs = parseChunks(png);
+  const i = cs.findIndex(x => x.type === 'tEXt' && x.data.toString('latin1', 0, x.data.indexOf(0)) === MANIFEST_KEYWORD);
+  const nul = cs[i].data.indexOf(0);
+  const m = JSON.parse(cs[i].data.toString('latin1', nul + 1));
+  m.rarity = tier;
+  cs[i] = { type: 'tEXt', data: Buffer.concat([Buffer.from(MANIFEST_KEYWORD, 'latin1'), Buffer.from([0]), Buffer.from(JSON.stringify(m), 'latin1')]) };
+  return serialise(cs);
+}
+const forgeTo = (dir, file, build, { claim, ...opts } = {}) => {
   const { png, manifest } = forge({ build, image: IMAGE, ...opts });
-  writeFileSync(join(dir, file), png);
+  writeFileSync(join(dir, file), claim ? claimTier(png, claim) : png);
   return manifest.seal;
 };
 
@@ -154,13 +166,13 @@ test('AUDIT: a clean deck, an overclaim, and a holo-eligible chain that is NOT a
   try {
     // clean root: claims exactly what it can prove
     forgeTo(dir, 'clean.png', 'clean-build');
-    // overclaimer: rare at depth 0 with no assessor pass
-    forgeTo(dir, 'over.png', 'over-build', { rarity: 'rare' });
-    // a 4-deep assessor-passed chain; the tip claims holo and is ELIGIBLE, not an overclaim
-    const s0 = forgeTo(dir, 'c0.png', 'chain-0', { assessorPass: true });
-    const s1 = forgeTo(dir, 'c1.png', 'chain-1', { assessorPass: true, parent: s0 });
-    const s2 = forgeTo(dir, 'c2.png', 'chain-2', { assessorPass: true, parent: s1 });
-    forgeTo(dir, 'c3.png', 'chain-3', { assessorPass: true, parent: s2, rarity: 'holo' });
+    // overclaimer: claims rare at depth 0, and its build does not pass the gate
+    forgeTo(dir, 'over.png', 'over-build', { claim: 'rare' });
+    // a 4-deep chain of builds that EARN the pass; the tip claims holo and is ELIGIBLE, not an overclaim
+    const s0 = forgeTo(dir, 'c0.png', sovereign('chain-0'));
+    const s1 = forgeTo(dir, 'c1.png', sovereign('chain-1'), { parent: s0 });
+    const s2 = forgeTo(dir, 'c2.png', sovereign('chain-2'), { parent: s1 });
+    forgeTo(dir, 'c3.png', sovereign('chain-3'), { parent: s2, claim: 'holo' });
 
     const a = auditDeck(dir);
     assert.deepEqual(a.overclaims.map(r => r.name), ['over.png'],
@@ -204,7 +216,7 @@ test('lineage CLI: exit codes are earned — clean 0 with the ✓ line, overclai
   const cyc = mkdtempSync(join(tmpdir(), 'ffl3-'));
   try {
     forgeTo(clean, 'ok.png', 'clean-build');
-    forgeTo(dirty, 'over.png', 'over-build', { rarity: 'rare' });
+    forgeTo(dirty, 'over.png', 'over-build', { claim: 'rare' });
     // a two-card cycle: each parent is the OTHER card's seal (seals depend only on the build)
     const sealOf = (b) => sha256(gzipSync(Buffer.from(b, 'utf8'), { level: 9 }));
     forgeTo(cyc, 'x.png', 'cycle-x', { parent: sealOf('cycle-y') });

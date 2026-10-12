@@ -1,8 +1,8 @@
 // card.test.mjs — PROOF-OF-PLAY for the card that carries a real build.
 import {
   crc32, parseChunks, makeChunk, serialise, textChunk, readText,
-  rarity, manifestFor, embed, read, concat, bytes, latin1,
-  PNG_SIG, PAYLOAD_KEYWORD, MANIFEST_KEYWORD,
+  rarity, manifestFor, canonical, signable, tierCheck, embed, read, concat, bytes, latin1,
+  PNG_SIG, PAYLOAD_KEYWORD, MANIFEST_KEYWORD, TIER_ORDER,
 } from './card.mjs';
 import { rarity as nodeRarity } from './forge.mjs';
 
@@ -219,12 +219,54 @@ console.log('\n=== §12 · a payload with nothing describing it ===');
   ok(/no manifest/.test(r.reason), '⚑ and the reason says which half is missing — "not a card" alone is no help');
 }
 
+console.log('\n=== §P0 · the tier cannot be asserted; the signature covers everything ===');
+{
+  const m = manifestFor({ seal: 's', assessorPass: false, rarity: 'holo' });
+  ok(m.rarity === 'common', '⚑ a rarity passed in is IGNORED — the manifest carries the computed tier');
+  ok(manifestFor({ seal: 's', assessorPass: true, rarity: 'common' }).rarity === 'uncommon', '⚑ …in both directions');
+  ok(manifestFor({ seal: 's', signer: 'PUB' }).signer === 'PUB', 'the signer rides inside the manifest');
+  ok(manifestFor({ seal: 's' }).signer === null, 'no signer is null, not a missing key');
+  ok(!('sig' in manifestFor({ seal: 's', sig: 'x' })), 'a sig is never copied in by manifestFor — only signing adds one');
+
+  ok(canonical({ b: 1, a: [2, { d: 3, c: 4 }] }) === '{"a":[2,{"c":4,"d":3}],"b":1}', 'canonical sorts keys at every depth, no whitespace');
+  ok(canonical('x') === '"x"' && canonical(5) === '5' && canonical(null) === 'null' && canonical(true) === 'true', 'canonical of scalars is their JSON');
+  ok(canonical(undefined) === 'null' && canonical(() => 1) === 'null', 'what JSON cannot say becomes null');
+  ok(canonical([]) === '[]' && canonical({}) === '{}', 'empty containers stay empty containers');
+  const cyc = { a: 1 }; cyc.self = cyc;
+  ok(canonical(cyc) === '{"a":1,"self":null}', '⚑ a cycle is cut, not recursed into forever');
+  ok(canonical(10n) === 'null', '⚑ a BigInt is null, not a throw');
+  const shared = { k: 1 };
+  ok(canonical({ x: shared, y: shared }) === '{"x":{"k":1},"y":{"k":1}}', 'a value seen twice (no cycle) is written twice');
+  const toxic = {}; Object.defineProperty(toxic, 'boom', { enumerable: true, get() { throw new Error('no'); } });
+  ok(canonical(toxic) === 'null', 'a getter that throws makes null, not a crash');
+
+  const man = { v: '0.1', seal: 'CLAIMED', tags: 't', sig: 'SIG', signer: 'P' };
+  const s = signable(man, 'ACTUAL');
+  ok(s === '{"seal":"ACTUAL","signer":"P","tags":"t","v":"0.1"}', '⚑ signable: sig removed, the VERIFIER’s seal put in, keys canonical');
+  ok(signable(man, 'ACTUAL') !== signable(man, 'OTHER'), 'a different payload seal → a different signable string');
+  ok(signable({ ...man, tags: 'u' }, 'ACTUAL') !== s, 'a different manifest field → a different signable string');
+  ok(signable(man, 42) === '{"seal":"","signer":"P","tags":"t","v":"0.1"}', 'a non-string seal signs as empty, never coerced');
+  ok(signable(null, 'A') === '{"seal":"A"}' && signable([1], 'A') === '{"seal":"A"}', 'garbage manifests sign as just the seal');
+  ok(man.sig === 'SIG' && man.seal === 'CLAIMED', 'signable never mutates the manifest it is given');
+
+  ok(JSON.stringify(TIER_ORDER) === '["common","uncommon","rare","holo"]', 'the tier order');
+  ok(tierCheck('uncommon', 'uncommon') === 'earned', 'equal tiers are earned');
+  ok(tierCheck('holo', 'uncommon') === 'overclaim', '⚑ claiming more than is earned is an overclaim');
+  ok(tierCheck('rare', 'uncommon') === 'overclaim' && tierCheck('uncommon', 'common') === 'overclaim', 'one step over is still over');
+  ok(tierCheck('common', 'uncommon') === 'underclaim', 'claiming less is an underclaim — harmless, but named');
+  ok(tierCheck('legendary', 'uncommon') === 'overclaim', 'a tier nobody defined is an overclaim');
+  ok(tierCheck(undefined, 'common') === 'overclaim', 'no claim at all is not an earned claim');
+  ok(tierCheck('common', 'mythic') === 'unknown' && tierCheck('common', null) === 'unknown', 'an unrecognised EARNED tier is unknown, never "earned"');
+  ok(tierCheck('common', 'common') === 'earned' && tierCheck('holo', 'holo') === 'earned', 'the ends of the order compare correctly');
+}
+
 console.log('\n=== §9 · pure under garbage ===');
 {
-  const junk = [null, undefined, '', 0, [], {}, NaN, 'x', new Uint8Array(0)];
+  const junk = [null, undefined, '', 0, [], {}, NaN, 'x', new Uint8Array(0), 10n, Symbol('s')];
   let threw = null;
   for (const j of junk) {
-    try { rarity(j); manifestFor(j); readText(j, j); crc32(j); concat([]); } catch (e) { threw = `${JSON.stringify(j)} → ${e.message}`; }
+    try { rarity(j); manifestFor(j); readText(j, j); crc32(j); concat([]); canonical(j); signable(j, j); tierCheck(j, j); }
+    catch (e) { threw = `${String(j && j.toString ? j.toString() : typeof j)} → ${e.message}`; }
   }
   ok(threw === null, 'the pure helpers never throw' + (threw ? ' — ' + threw : ''));
   // parseChunks/embed/read are ALLOWED to throw — a bad card must be refused loudly, not shrugged at.
