@@ -111,7 +111,12 @@ export function forge(opts) {
   for (const k of ASSERTED) {
     if (o[k] !== undefined) throw new Error(`the tier is computed from the build, never asserted — remove "${k}"`);
   }
-  const { build, image, tags = '', parent = null, forged, sign, signer } = o;
+  const { build, image, tags = '', parent = null, forged, sign, signer, extra = null } = o;
+  // extra: optional additional manifest fields (e.g. Genesis edition + claims). They sit under the
+  // Ed25519 signature like every other field; they can never override a core or tier field.
+  const RESERVED = ['v', 'seal', 'parent', 'tags', 'rarity', 'assessor_pass', 'forged', 'signer', 'sig', ...ASSERTED];
+  if (extra !== null && (typeof extra !== 'object' || Array.isArray(extra))) throw new Error('extra must be an object');
+  for (const k of Object.keys(extra || {})) if (RESERVED.includes(k)) throw new Error(`extra may not set "${k}"`);
   const buildBuf = Buffer.isBuffer(build) ? build : Buffer.from(build, 'utf8');
   const payload = gzipSync(buildBuf, { level: 9 });
   const seal = sha256(payload);
@@ -126,6 +131,7 @@ export function forge(opts) {
     assessor_pass: assessorPass,
     forged: forged || new Date().toISOString().slice(0, 10),
     signer: (typeof sign === 'function' && signer) ? String(signer) : null,
+    ...(extra || {}),
   };
   // the signature covers the whole manifest (signer included) with the seal of the real payload
   if (manifest.signer) manifest.sig = String(sign(signable(manifest, seal)));
