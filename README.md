@@ -269,4 +269,16 @@ Survival of PNG metadata through any given platform is an empirical, per-platfor
 spec therefore defines a hash-resolvable fallback (`CARD-SPEC` §7) from the start rather than
 bolting one on after the first stripped card.
 
+## Credit
+
+Never taking a card's word for itself — its tier is computed from what the build can prove, a
+doubtful read is refused rather than guessed, and an unsigned card is described only by what is
+known — draws on the Guided Entropy Principle (GEP) result that **a stable system can stabilize a
+wrong reference**, and on "I don't know" as an allowed verdict:
+
+> Gary W. Floyd, Lumiea Systems Research Division — ThunderStruck Service LLC — "From GEP Stabilization to Dual-Map Ethical Reasoning: A derivation of positive ethical evidence, negative ethical evidence, and non-legal moral reasoning," Derivation v0.2. Open Defensive Prior Art (Creative Commons).
+
+The card format and the Forge are the estate's own work. Powered by the Konomi architecture, created
+by Thomas Frumkin. See [NOTICE](NOTICE).
+
 Zero dependencies · MIT · single-file components.
