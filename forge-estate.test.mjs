@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { gzipSync } from 'node:zlib';
+import { gzipSync, inflateSync, deflateSync } from 'node:zlib';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
@@ -21,6 +21,14 @@ import { renderCard } from './art.mjs';
 import { auditDeck, loadDeck } from './lineage.mjs';
 
 const sha32 = (b) => createHash('sha256').update(b).digest('hex').slice(0, 32);
+// THE PIXELS, NOT THE COMPRESSOR. A pin over the PNG's bytes also pins the deflate stream, and deflate output is not
+// part of any contract: two correct zlib builds may compress the same scanlines differently. So the pin is the header
+// plus the scanlines the IDAT inflates to — exactly what every viewer draws — which inflation reproduces everywhere.
+const pixelPin = (png) => {
+  const cs = parseChunks(png);
+  return createHash('sha256').update(cs.find((c) => c.type === 'IHDR').data)
+    .update(inflateSync(Buffer.concat(cs.filter((c) => c.type === 'IDAT').map((c) => c.data)))).digest('hex').slice(0, 32);
+};
 const IMAGE = renderCard({ tags: '', seal: '' });
 const run = (file, args, cwd) => spawnSync(process.execPath, [join(process.cwd(), file), ...args.slice(0, 0), ...args], { encoding: 'utf8', cwd: cwd || process.cwd() });
 
@@ -70,18 +78,47 @@ test('THE FORGED DATE IS THE ONE GIVEN, and the parent seat is exact', () => {
 
 // ─── art.mjs · the render IS the spec ───
 
-test('THE RENDER IS CONTENT-ADDRESSED — three exact pixel pins', () => {
+test('THE RENDER IS CONTENT-ADDRESSED — exact pixel pins', () => {
   // Deterministic by contract, so the exact output is pinnable. Any surviving mutant in the
-  // painter that these three pins cannot see has provably no observable effect on any card.
-  assert.equal(sha32(renderCard({ tags: '', seal: '' })), '2e9c8f632813863d2d199d5e3048953e', 'the genesis card moved');
-  assert.equal(sha32(renderCard({ tags: 'geo:d4,plasma:12,rose:red+white:3,owl:high-left,wings:galaxy', seal: 'abc123' })),
-    'c0541355ffc6ed5e9537944bb80555e8', 'the full-vocabulary card moved');
-  assert.equal(sha32(renderCard({ tags: 'wings:galaxy' })), '1cb79d8e5d4e4116333d5537c02b1319',
+  // painter that these pins cannot see has provably no observable effect on any card.
+  // ⚑ These used to hash the whole PNG file, deflate stream included. Grok's box reported "the genesis card moved"
+  // (24 Oct, at 830f03d, 139 of 140) and was green again on 31 Oct (Node v24.22.1, at 769efb5, which does not touch
+  // art.mjs). art.mjs did not change between the red and the green, so the picture code had not moved — the machine
+  // had. A PNG's bytes include its deflate stream, and no contract fixes that stream: a Node built against a different
+  // zlib may compress the same scanlines differently. The pins now cover what the card SHOWS — header and scanlines —
+  // and the next test pins the compression setting on the machine that runs it, so nothing the old pins caught is lost.
+  assert.equal(pixelPin(renderCard({ tags: '', seal: '' })), 'c98b305131d236daa448e4f43df41ac4', 'the genesis card moved');
+  assert.equal(pixelPin(renderCard({ tags: 'geo:d4,plasma:12,rose:red+white:3,owl:high-left,wings:galaxy', seal: 'abc123' })),
+    '0be84a70e29e4fb880f01aeaa3808923', 'the full-vocabulary card moved');
+  assert.equal(pixelPin(renderCard({ tags: 'wings:galaxy' })), 'c69713b594e2592a7085be3993973ea3',
     'the unsealed galaxy card moved — the rng seed chain (seal || tags) is part of the contract');
   // seal k0 was HUNTED: its wing stars land at exactly x=0 (painted) and x=440 (clipped).
   // A guard flipped at either edge paints or drops a star and this hash moves.
-  assert.equal(sha32(renderCard({ tags: 'wings:galaxy', seal: 'k0' })), 'd7932578bcdfac62683527513b6ab088',
+  assert.equal(pixelPin(renderCard({ tags: 'wings:galaxy', seal: 'k0' })), 'fba3a0843dddd02033b6c8f069829ce5',
     'the edge-seal card moved — the canvas-edge clip boundary is part of the contract');
+});
+
+test('THE PIN IS THE PICTURE, NOT THE COMPRESSOR — re-encoded, the bytes move and the pin does not', () => {
+  const png = renderCard({ tags: 'geo:d4,plasma:12,rose:red+white:3,owl:high-left,wings:galaxy', seal: 'abc123' });
+  const cs = parseChunks(png);
+  const raw = inflateSync(Buffer.concat(cs.filter((c) => c.type === 'IDAT').map((c) => c.data)));
+  // the same scanlines through a different deflate — what another zlib, or another level, would write
+  const again = serialise([cs[0], { type: 'IDAT', data: deflateSync(raw, { level: 1 }) }, cs[cs.length - 1]]);
+  assert.notEqual(sha32(again), sha32(png), 'a different compressor writes different bytes');
+  assert.equal(pixelPin(again), pixelPin(png), 'and the pin, which is the picture, does not move');
+  // one changed pixel moves it
+  const one = Buffer.from(raw); one[1 + 3 * 7] ^= 1;
+  assert.notEqual(pixelPin(serialise([cs[0], { type: 'IDAT', data: deflateSync(one) }, cs[cs.length - 1]])), pixelPin(png), 'one pixel moves the pin');
+  // the setting the old byte pins also fixed: on THIS machine, the image chunk is exactly this zlib's level-9 deflate
+  // of the scanlines — true on every machine, whichever zlib it has, and false if the render's compression changes
+  for (const card of [png, renderCard({ tags: '', seal: '' }), renderCard({ tags: 'wings:galaxy', seal: 'k0' })]) {
+    const c2 = parseChunks(card), idat = c2.find((c) => c.type === 'IDAT').data;
+    assert.ok(Buffer.from(idat).equals(deflateSync(inflateSync(idat), { level: 9 })), 'the image chunk is the level-9 deflate of its scanlines');
+  }
+  // and on one machine the render is still byte-for-byte deterministic, and a well-formed PNG
+  assert.ok(renderCard({ tags: 'wings:galaxy', seal: 'k0' }).equals(renderCard({ tags: 'wings:galaxy', seal: 'k0' })));
+  assert.ok(serialise(parseChunks(png)).equals(png), 'every chunk CRC is valid');
+  assert.deepEqual(cs.map((c) => c.type), ['IHDR', 'IDAT', 'IEND'], 'header, one image chunk, end');
 });
 
 test('art CLI: a bad command exits 2, render lands at exactly --out', () => {
@@ -139,6 +176,14 @@ test('forge CLI: usage arms, flag seating, (none)/(root) fallbacks, read and hat
     assert.equal(r2.status, 0);
     assert.equal(readFileSync(h, 'utf8'), '<h1>the build</h1>', 'the hatch must be byte-identical to the build');
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('forge read says VERIFIED only when a key vouches — an unsigned card reads, and says it is unsigned', () => {
+  const r = run('forge.mjs', ['read', join(process.cwd(), 'examples', 'seal-000.png')]);
+  assert.equal(r.status, 0, 'an unsigned card whose seal holds still reads (CARD-SPEC §3.1)');
+  assert.ok(r.stdout.startsWith('✓ SEAL MATCHES — unsigned'), r.stdout.slice(0, 80));
+  assert.ok(!r.stdout.includes('VERIFIED'), 'never VERIFIED without a signature');
+  assert.ok(r.stdout.includes('signed  no — no key vouches for who forged it'));
 });
 
 // ─── lineage.mjs ───

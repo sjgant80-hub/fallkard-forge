@@ -156,7 +156,7 @@ export function forge(opts) {
 //   ok  ⇔  the seal holds  AND  (the card is unsigned, or its Ed25519 signature verifies)
 //
 // The signature is checked against the seal of the payload actually held, so one flipped byte anywhere
-// — payload or manifest — fails it. An unsigned card (forged before signing) still reads, and says so.
+// — payload or manifest — fails it. An unsigned card still reads, and says only what is known: no key vouches for who forged it.
 export function read(png) {
   const refuse = (reason, detail, manifest = null) => ({ ok: false, reason, detail, manifest, payload: null });
   let chunks;
@@ -276,11 +276,12 @@ async function cli(argv) {
     const cardPath = argv[3];
     if (!cardPath) { console.error('usage: read <card.png> [--hatch out.html]'); process.exit(2); }
     const r = read(readFileSync(cardPath));
-    console.log(`${r.ok ? '✓ VERIFIED' : '✗ ' + r.reason.toUpperCase()}${r.detail ? ' — ' + r.detail : ''}`);
+    // the headline says VERIFIED only when a key vouches for the bytes — the same words the browser reader uses
+    console.log(`${r.ok ? (r.signed ? '✓ VERIFIED' : '✓ SEAL MATCHES — unsigned') : '✗ ' + r.reason.toUpperCase()}${r.detail ? ' — ' + r.detail : ''}`);
     if (r.manifest) {
       console.log(`  seal    ${r.manifest.seal}`);
       if (!r.ok && r.actualSeal) console.log(`  actual  ${r.actualSeal}`);
-      console.log(`  signed  ${r.signed ? (r.sigOk ? '✓ Ed25519 by ' + r.manifest.signer : '✗ SIGNATURE FAILS') : 'no — forged before signing'}`);
+      console.log(`  signed  ${r.signed ? (r.sigOk ? '✓ Ed25519 by ' + r.manifest.signer : '✗ SIGNATURE FAILS') : 'no — no key vouches for who forged it'}`);
       if (r.earnedTier) {
         const note = r.tierCheck === 'overclaim' ? `  ✗ OVERCLAIM — the card says ${r.manifest.rarity}; this card alone proves ${r.earnedTier}` : '';
         console.log(`  tier    ${r.earnedTier} (earned from the build)${note}`);

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>fallkard reader · CARD-SPEC v0.1</title>
+<style>
+  :root{--bg:#0b0d12;--panel:#12151d;--line:#232838;--ink:#e8eaf0;--dim:#8b93a7;--ok:#4ade80;--bad:#f87171;--gold:#fbbf24;--acc:#a78bfa}
+  *{box-sizing:border-box}
+  html{overflow-x:clip}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px 16px;overflow-wrap:anywhere}
+  .wrap{max-width:900px;margin:0 auto}
+  a{color:var(--acc)}
+  h1{font-size:19px;margin:0 0 2px;letter-spacing:.02em}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:20px}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--dim);cursor:pointer;transition:.15s;background:var(--panel)}
+  .drop:hover,.drop.over,.drop:focus{border-color:var(--acc);color:var(--ink);outline:none}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:0 0 12px;font-weight:600}
+  img#pic{width:100%;image-rendering:pixelated;border-radius:8px;background:#000;display:block}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .row:last-child{border-bottom:0}
+  .row b{font-weight:600;color:var(--dim);flex:0 0 auto}
+  .row span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;text-align:right;word-break:break-all;min-width:0}
+  .verdict{font-weight:700;padding:10px 12px;border-radius:8px;margin-bottom:12px;font-size:14px}
+  .verdict.ok{background:rgba(74,222,128,.12);color:var(--ok);border:1px solid rgba(74,222,128,.3)}
+  .verdict.bad{background:rgba(248,113,113,.12);color:var(--bad);border:1px solid rgba(248,113,113,.3)}
+  .verdict.unsure{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.3)}
+  .tier{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .tier.common{background:#2a2f3d;color:#9aa3b8}.tier.uncommon{background:rgba(74,222,128,.15);color:var(--ok)}
+  .tier.rare{background:rgba(167,139,250,.16);color:var(--acc)}
+  .tier.holo{background:linear-gradient(90deg,#fbbf24,#a78bfa,#4ade80);color:#0b0d12}
+  ul.key{list-style:none;padding:0;margin:0;font-size:13px}
+  ul.key li{padding:6px 0;border-bottom:1px solid var(--line)}
+  ul.key li:last-child{border-bottom:0}
+  button{background:var(--acc);color:#0b0d12;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:13px}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  input[type=text]{width:100%;background:#0b0d12;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 11px;font-family:ui-monospace,monospace;font-size:12px}
+  iframe{width:100%;height:420px;border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:12px}
+  .muted{color:var(--dim);font-size:12px}
+  .warn{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--gold);padding:10px 12px;border-radius:8px;font-size:12.5px;margin-top:12px}
+  .hidden{display:none}
+  footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>fallkard reader <span class="muted">· CARD-SPEC v0.1</span></h1>
+  <div class="sub">Drop a card. It re-computes the seal, checks the Ed25519 signature if the card is signed, re-derives the
+    tier from the build, and prints the reading key. Nothing runs until you say so. Everything happens in this browser.</div>
+
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a card to read">drop a card .png here — or click to choose<input type="file" id="file" accept="image/png" hidden></div>
+
+  <div id="out" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>the eye</h2>
+        <img id="pic" alt="the card">
+        <div id="fluency" style="margin-top:14px">
+          <h2 style="margin-bottom:8px">fluency check</h2>
+          <div class="muted" style="margin-bottom:8px">Read the picture first. Predict its tags, then reveal.</div>
+          <input type="text" id="guess" aria-label="your guess at the tags" placeholder="owl:high-left,rose:purple:5,geo:depth3">
+          <div style="margin-top:9px;display:flex;gap:8px">
+            <button id="reveal">reveal</button>
+            <button id="skip" class="ghost">skip</button>
+          </div>
+          <div id="score" class="muted" style="margin-top:9px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>the manifest</h2>
+        <div id="verdict" class="verdict" role="status" aria-live="polite"></div>
+        <div id="rows"></div>
+        <div id="keyblock" class="hidden" style="margin-top:14px">
+          <h2>the reading key — what this card claims</h2>
+          <ul class="key" id="key"></ul>
+        </div>
+        <div id="hatchblock" style="margin-top:14px"></div>
+      </div>
+    </div>
+    <div id="frame"></div>
+  </div>
+
+  <footer>
+    This reader is generated by <code>scripts/build-page.mjs</code>: the card kernel (<code>card.mjs</code>) and the
+    sovereignty gate (<code>validateComposition</code> from <code>studio.mjs</code>) are inlined verbatim, the same
+    code the mutation gate attacks in CI. The full Forge — forge, read a stripped copy by its printed seal, trade —
+    is at https://sjgant80-hub.github.io/fallkard-forge/<br>
+    Powered by the Konomi architecture, created by Thomas Frumkin.
+  </footer>
+</div>
+
+<script>
+/* __CARD_KERNEL__ */
+/* __END_CARD_KERNEL__ */
+/* __GATE_KERNEL__ */
+/* __END_GATE_KERNEL__ */
+
+// ── CARD-SPEC v0.1 · the reading key. Tunable vocabulary, fixed mechanism. ──────────
+const KEY = {
+  owl:  (v) => `owl ${v.replace('-', ' ')} — witness weight: ${/high/.test(v) ? 'witness-heavy (strong κ)' : 'light witness'}; owl present ⇒ this build has a verify pass`,
+  rose: (v, n) => `roses ${v}${n ? ' ×' + n : ''} — solids firing: ${v.split('+').join(', ')}${n ? `; ${n} of 5 lifecycle stages held` : ''}`,
+  geo:  (v) => `background lattice ${v} — provenance depth ${String(v).replace(/\D/g, '') || '0'}`,
+  plasma: (v) => `${v} filaments — payload size band ${v}`,
+  wings: (v) => `${v} wings — ${/galaxy/.test(v) ? 'sovereign: fully local, zero dependencies' : 'dependent on an external service'}`,
+};
+const decodeTags = (tags) => (tags || '').split(',').map(s => s.trim()).filter(Boolean).map(t => {
+  const [k, a, b] = t.split(':');
+  return KEY[k] ? KEY[k](a || '', b || '') : `${k}: ${[a, b].filter(Boolean).join(':')} (unknown element — not in CARD-SPEC v0.1)`;
+});
+
+// ── PNG chunk reading: card.mjs's own parseChunks / readText / readZText, inlined above ───────
+// The judgement and every word of the verdict come from reader-core.mjs, inlined here verbatim (mutation-gated in CI).
+/* __READER_CORE__ */
+/* __END_READER_CORE__ */
+
+// ── state + UI ─────────────────────────────────────────────────────────────────────
+let CURRENT = null;
+const $ = (id) => document.getElementById(id);
+
+async function load(file){
+  const buf = await file.arrayBuffer();
+  $('pic').src = URL.createObjectURL(file);
+  $('out').classList.remove('hidden');
+  $('frame').innerHTML=''; $('score').textContent=''; $('guess').value='';
+  $('fluency').classList.remove('hidden'); $('keyblock').classList.add('hidden');
+  const j = await judge(new Uint8Array(buf));
+  if (!j.manifest || j.stage !== 'card') return fail(j);
+  CURRENT = j;
+  render();
+}
+
+function fail(j){
+  CURRENT = null;
+  const v = verdictOf(j);
+  $('verdict').className = 'verdict ' + v.cls;
+  $('verdict').textContent = v.text;
+  $('rows').innerHTML = factsHtml(j);
+  $('hatchblock').innerHTML = v.why ? `<div class="warn">${esc(v.why)}</div>` : '';
+  $('fluency').classList.add('hidden');
+}
+
+function render(){
+  const v = verdictOf(CURRENT);
+  $('verdict').className = 'verdict ' + v.cls;
+  $('verdict').textContent = v.text;
+  $('rows').innerHTML = factsHtml(CURRENT);
+  $('hatchblock').innerHTML = v.hatch
+    ? `<button id="hatch">hatch the build</button> <span class="muted">opens sandboxed · never automatic</span>`
+    : `<div class="warn">${esc(v.why || 'Refusing to hatch.')}</div>`;
+  const h = $('hatch');
+  if (h) h.onclick = hatch;
+}
+
+function showKey(){
+  $('key').innerHTML = keyHtml(CURRENT?.manifest.tags, decodeTags);
+  $('keyblock').classList.remove('hidden');
+}
+
+// fluency game — guess the tags from the picture, then compare
+function scoreGuess(guess, actual){
+  const norm = s => new Set((s||'').toLowerCase().split(/[,\s]+/).map(x=>x.trim()).filter(Boolean));
+  const g = norm(guess), a = norm(actual);
+  if (!a.size) return null;
+  let hit = 0; for (const t of a) if (g.has(t)) hit++;
+  return {hit, total:a.size};
+}
+$('reveal').onclick = () => {
+  if (!CURRENT) return;
+  const s = scoreGuess($('guess').value, CURRENT.manifest.tags);
+  $('score').textContent = !s ? 'This card declares no tags to check against.'
+    : s.hit===s.total ? `fluent — you read all ${s.total} elements correctly.`
+    : `${s.hit} of ${s.total} elements read correctly.`;
+  showKey();
+};
+$('skip').onclick = () => { if (CURRENT) showKey(); };
+
+// hatch — explicit, user-initiated, sandboxed. Never runs on load, and only for a card the verdict lets out.
+function hatch(){
+  if (!CURRENT || !verdictOf(CURRENT).hatch) return;
+  const f = document.createElement('iframe');
+  f.setAttribute('sandbox','allow-scripts');   // no same-origin: the build cannot reach this page
+  f.srcdoc = CURRENT.text;
+  $('frame').innerHTML = '';
+  $('frame').appendChild(f);
+}
+
+// drop plumbing
+const d = $('drop');
+d.onclick = () => $('file').click();
+d.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } };
+$('file').onchange = e => { if (e.target.files[0]) load(e.target.files[0]); e.target.value = ''; };
+d.ondragover = e => { e.preventDefault(); d.classList.add('over'); };
+d.ondragleave = () => d.classList.remove('over');
+d.ondrop = e => { e.preventDefault(); d.classList.remove('over'); const f=e.dataTransfer.files[0]; if(f) load(f); };
+</script>
+</body>
+</html>

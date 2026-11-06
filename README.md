@@ -3,6 +3,11 @@
 **LIVE: https://sjgant80-hub.github.io/fallkard-forge/** — forge a card, read one back, and fold a
 structure into a crease-pattern glyph, all in the browser, nothing leaves your machine.
 
+The page explains itself: what it is in plain words, START HERE in five steps, HOW IT WORKS (both paths drawn from
+the code, and a real card traced through it), the BLUEPRINT organ by organ with each one's gate read from the
+workflow, ADOPTION, the full brochure FOR A BUSINESS with a cost case computed from sourced figures on your own
+numbers, and a short WHITE PAPER. The standalone reader is at https://sjgant80-hub.github.io/fallkard-forge/reader.html.
+
 > An image that openly carries a real build. Four legible layers. Rarity by provenance.
 > **Nothing is hidden — the only barrier is fluency, and fluency is learnable.**
 
@@ -17,6 +22,41 @@ scanners is a non-goal and a non-feature.
 
 **The format is published in full: [`CARD-SPEC.md`](CARD-SPEC.md).** Learn it and you can read
 any card, verify it, and forge your own. That document *is* the initiation.
+
+## THE STANDALONE READER CHECKS THE SIGNATURE · and says VERIFIED only then
+
+`reader.html` — the one file anyone can save and open offline, and the file the quine card carries — printed
+"VERIFIED — seal matches the payload" without ever looking at the Ed25519 signature (open since 2026-10-31, raised
+by Grok). It also showed the tier a card *claimed* and put card text into the page unescaped. The command line did
+all three properly, so the two readers of one format disagreed about the same card.
+
+Now the reader is **built, not hand-written**: `scripts/build-page.mjs` makes `reader.html` from
+`reader.template.html` by inlining `card.mjs`, the sovereignty gate (`validateComposition` from `studio.mjs`)
+and `reader-core.mjs` verbatim — the same code the mutation gate attacks, and CI refuses a `reader.html` that does
+not match what the build writes. `reader-core.mjs` is the reader's whole judgement and every word of its verdict:
+
+| The card | The reader says | Opens on a click? |
+|---|---|---|
+| seal holds, signed, signature verifies | ✓ VERIFIED — seal matches the payload, and the Ed25519 signature checks | yes |
+| seal holds, unsigned | ✓ SEAL MATCHES — unsigned: no key vouches for who forged it | yes (CARD-SPEC §3.1) |
+| seal holds, signature does not verify | ✗ SIGNATURE FAILS | no |
+| seal holds, signed, browser has no Ed25519 | ⚠ SEAL MATCHES — signature NOT checked | no |
+| payload changed | ✗ SEAL MISMATCH | no |
+
+The tier shown is re-derived from the build (an inflated claim is called an overclaim), every text a card carries is
+escaped where it meets the page, and decompression is capped. `reader.test.mjs` holds the reader to the command
+line's verdict on cards the CLI forged, cards forged the browser's way (WebCrypto Ed25519, tEXt payload) and cards
+doctored every way a forger would try, and runs the *built* file too. `forge.mjs read` now heads its output the same
+way: `✓ VERIFIED` only for a signed card whose signature verifies, `✓ SEAL MATCHES — unsigned` otherwise (exit 0
+for both, 1 for any refusal). The Forge page's own reader now says AUTHENTIC only when a key vouches for the bytes,
+SEAL MATCHES · UNSIGNED for an unsigned card, and never counts a signature it could not check.
+
+**The pixel pin (Grok's other ask).** `forge-estate.test.mjs` pinned the render by hashing the whole PNG, deflate
+stream included. Grok's box reported "the genesis card moved" (24 Oct, at 830f03d) and was green on 31 Oct (Node
+v24.22.1) with no change to `art.mjs` between the two: the picture code had not moved, the machine had, and no
+contract fixes the bytes a given zlib writes. The pins now hash the header and the scanlines — what the card shows —
+and a second test pins the compression on the machine that runs it (the image chunk must be that zlib's level-9
+deflate of the scanlines), so nothing the old pins caught is lost.
 
 ## TRADE ONE · device to device, no server
 
@@ -218,7 +258,8 @@ node forge.mjs read seal-000.png --hatch out.html
 ```
 
 Open `reader.html` in a browser and drop a card on it for the full reveal ritual, including the
-**fluency check**: predict the tags from the picture alone, then reveal and see how you scored.
+**fluency check**: predict the tags from the picture alone, then reveal and see how you scored. It re-computes the
+seal, checks the Ed25519 signature, re-derives the tier, and opens the build only on a click, sandboxed.
 
 ```bash
 # walk a deck's fork-lineage and check every claimed tier against what it can prove
@@ -250,8 +291,11 @@ changes the pixels (asserted in the suite); an invisible element would be a key 
 cards.** Its parent is the genesis card, so the deck proves it at depth 1. Construction material
 and constructed surface are the same object.
 
+It carries the reader as it stood when the card was sealed — the hand-written one that said VERIFIED on a seal
+match alone. The card is a sealed record and is not re-forged; the reader to use is today's `reader.html`.
+
 ```bash
-npm test    # 29 assertions: round trip, pixel identity, tamper detection, provenance, art, reader conformance
+npm test    # the whole suite: round trip, pixel identity, tamper detection, provenance, art, the reader's verdicts, the cost case
 ```
 
 ## What is guaranteed

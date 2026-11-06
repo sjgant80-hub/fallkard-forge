@@ -173,6 +173,144 @@ out = out.slice(0, a2 + OPEN.length) + '\n' + kernel + '\n' + out.slice(b2);
   const ld = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }).replace(/</g, '\\u003c');
   out = out.slice(0, qa + QB.length) + '\n<script type="application/ld+json">' + ld + '</script>\n' + out.slice(qe);
 }
+
+const htmlEsc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const splice = (src, open, close, body, what) => {
+  const x = src.indexOf(open), y = src.indexOf(close);
+  if (x < 0 || y < 0) throw new Error('the ' + what + ' markers are missing from page.template.html');
+  return src.slice(0, x + open.length) + '\n' + body + '\n' + src.slice(y);
+};
+
+// THE COST CASE (For a business) — forgecase.mjs inlined verbatim and scoped, fed the basis entries it reads, taken
+// from the vendored, sourced file it is tested against. No figure in the case is typed into the page.
+{
+  const CASE_NAMES = ['DEFAULTS', 'BASIS_KEYS', 'sourcesOf', 'forgeCase'];
+  const body = readFileSync(new URL('../forgecase.mjs', import.meta.url), 'utf8')
+    .replace(/^#!.*\r?\n/, '')
+    .replace(/^import[^\n]*\n/gm, '')
+    .replace(/^export default[\s\S]*?;\s*$/m, '')
+    .replace(/^export (function|const|async function)/gm, '$1')
+    .replace(/^export \{[^}]*\};?\s*$/gm, '');
+  out = splice(out, '/* __CASE_KERNEL__ */', '/* __END_CASE_KERNEL__ */',
+    '// ── forgecase.mjs ──\nconst { ' + CASE_NAMES.join(', ') + ' } = (() => {\n' + body + '\nreturn { ' + CASE_NAMES.join(', ') + ' };\n})();', 'case-kernel');
+  const { BASIS_KEYS } = await import(new URL('../forgecase.mjs', import.meta.url).href);
+  const basis = JSON.parse(readFileSync(new URL('../vendor/sovereign-enterprise/data/basis.json', import.meta.url), 'utf8'));
+  const picked = Object.fromEntries(BASIS_KEYS.map((k) => [k, basis[k]]));
+  out = splice(out, '/* __CASE_DATA__ */', '/* __END_CASE_DATA__ */',
+    '// the basis entries the case reads, from vendor/sovereign-enterprise/data/basis.json\nconst CASE_BASIS = ' + JSON.stringify(picked).replace(/</g, '\\u003c') + ';', 'case-data');
+}
+
+// HOW IT WORKS, traced from a real card: the genesis card in examples/, read by the command line, by the standalone
+// reader's judgement and by the gate — every figure on the page comes out of that file here, none is typed.
+{
+  const { read: cliRead, parseChunks: chunksOf } = await import(new URL('../forge.mjs', import.meta.url).href);
+  const { sealCode } = await import(new URL('../sealmark.mjs', import.meta.url).href);
+  const { validateComposition } = await import(new URL('../studio.mjs', import.meta.url).href);
+  const RC = await import(new URL('../reader-core.mjs', import.meta.url).href);
+  const { spawnSync } = await import('node:child_process');
+  const { createHash } = await import('node:crypto');
+  const rel = 'examples/seal-000.png';
+  const file = readFileSync(new URL('../' + rel, import.meta.url));
+  const r = cliRead(file);
+  if (!r.manifest || !r.payload) throw new Error('the traced card does not read');
+  const build = r.hatch();
+  const recomputed = createHash('sha256').update(r.payload).digest('hex');
+  const gate = validateComposition(build);
+  const chunks = chunksOf(file).map((c) => {
+    const text = /^(tEXt|zTXt|iTXt)$/.test(c.type);
+    return c.type + (text ? ' “' + Buffer.from(c.data).toString('latin1', 0, Buffer.from(c.data).indexOf(0)) + '”' : '') + ' ' + c.data.length.toLocaleString('en-GB') + ' B';
+  });
+  const { fileURLToPath } = await import('node:url');
+  const cli = spawnSync(process.execPath, [fileURLToPath(new URL('../forge.mjs', import.meta.url)), 'read', rel],
+    { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8' });
+  const cliFirst = String(cli.stdout || '').split('\n')[0].trim();
+  if (cli.status !== 0 || !cliFirst) throw new Error('the command line did not read the traced card: ' + (cli.stderr || '').slice(0, 200));
+  const j = await RC.judge(new Uint8Array(file));
+  const v = RC.verdictOf(j);
+  const firstLine = build.split('\n').find((l) => l.trim()) || '';
+  const rows = [
+    ['the file', '<code>' + htmlEsc(rel) + '</code> · ' + file.length.toLocaleString('en-GB') + ' bytes, a PNG any viewer shows'],
+    ['its chunks, in order', chunks.map(htmlEsc).join(' · ') + ' — the picture is the IHDR and IDAT; the card adds only the two named chunks before IEND'],
+    ['the build inside', Buffer.byteLength(build, 'utf8').toLocaleString('en-GB') + ' bytes of HTML, starting <code>' + htmlEsc(firstLine.trim().slice(0, 60)) + '</code>'],
+    ['compressed', r.payload.length.toLocaleString('en-GB') + ' bytes of gzip — what the seal covers'],
+    ['the seal on its label', '<code>' + htmlEsc(r.manifest.seal) + '</code>'],
+    ['the seal worked out again', '<code>' + htmlEsc(recomputed) + '</code> — ' + (recomputed === r.manifest.seal ? 'the same, byte for byte' : 'DIFFERENT')],
+    ['the code printed on its face', '<code>' + htmlEsc(sealCode(r.manifest.seal)) + '</code> — the seal\'s first 80 bits, in Crockford base32'],
+    ['signature', r.signed ? (r.sigOk ? 'Ed25519, verifies' : 'present, and it FAILS') : 'none — this card carries no signature, so no key vouches for who forged it; cards forged on this page or by the command line today are signed'],
+    ['tier, re-derived from the build', htmlEsc(r.earnedTier) + (gate.ok ? ' — the build passes the sovereignty gate' : ' — the gate says: ' + htmlEsc(gate.reasons.join('; ')))],
+    ['parent', r.manifest.parent ? '<code>' + htmlEsc(r.manifest.parent) + '</code>' : '(root) — this is the genesis card; the quine in <code>examples/</code> names it as its parent'],
+    ['the command line says', '<code>' + htmlEsc(cliFirst) + '</code> (<code>node forge.mjs read ' + htmlEsc(rel) + '</code>, exit ' + cli.status + ')'],
+    ['the standalone reader says', '<code>' + htmlEsc(v.text) + '</code> — and it ' + (v.hatch ? 'will open the build on a click' : 'will not open the build')],
+  ];
+  const table = '<div class="tablewrap"><table class="t"><tbody>' + rows.map(([k, val]) => '<tr><td>' + htmlEsc(k) + '</td><td>' + val + '</td></tr>').join('') + '</tbody></table></div>';
+  const TB = '<!-- ⟦TRACE-BEGIN⟧ generated by scripts/build-page.mjs from examples/seal-000.png -->', TE = '<!-- ⟦TRACE-END⟧ -->';
+  out = splice(out, TB, TE, table, 'trace');
+}
+
+// THE BLUEPRINT — organ by organ. What each organ does is written here; which test files exercise it, how many tests
+// they hold, and how it is gated are READ from the repository (the test files' imports, the gate workflow, the
+// baseline files), so the table cannot claim a gate the workflow does not run.
+{
+  const { readdirSync } = await import('node:fs');
+  const ORGANS = [
+    ['card.mjs', 'The card kernel for the browser: PNG chunks, embedding, reading, the label, the signable string and the earned tier. Inlined into this page and the standalone reader.'],
+    ['forge.mjs', 'The command line and Node library: forge a card, sign it with the key in ~/.fallkard/identity.json, read one (it never throws), hatch only on request.'],
+    ['reader-core.mjs', 'The standalone reader\'s judgement and every word of its verdict: the seal worked out again, the Ed25519 signature checked, the tier re-derived, card text escaped.'],
+    ['studio.mjs', 'The sovereignty gate that earns a build its tier (a real document, nothing reaching outside, the architecture line), and the studio\'s catalogue and composer.'],
+    ['sealmark.mjs', 'The printed seal: the code on every card face, its dot font, the pixel reader, and the deck match that refuses rather than guesses.'],
+    ['art.mjs', 'The card picture drawn from its own tags and seal, so a picture cannot contradict its reading key.'],
+    ['png.mjs', 'The PNG chunk primitives — CRC, parse, serialise — shared by the forge and the art.'],
+    ['lineage.mjs', 'Walks a deck\'s parent links and reports what it can prove: depth, orphans, cycles, broken seals and overclaims.'],
+    ['trade.mjs', 'Trading cards device to device: parts and reassembly, the proof of key bound to this link, and the verdict order transit → parse → seal → signature.'],
+    ['vision.mjs', 'Grades a vision model\'s reads of the printed seal, for the sealed paid-read run.'],
+    ['artifact.mjs', 'Sovereign-artifact bundles: who minted a build and what it forks from, signed with Ed25519 and verified from the file alone.'],
+    ['babykcc.mjs', 'The studio\'s local, hash-chained record of what this browser minted. Accounting only: no network, no money, kept on the device.'],
+    ['fold.mjs', 'The fold glyph: a crease pattern that either closes or does not, carried by the Fold-one cards.'],
+    ['forgecase.mjs', 'The cost case in For a business, computed from the vendored, sourced basis.'],
+  ];
+  const root = new URL('..', import.meta.url);
+  const yml = readFileSync(new URL('../.github/workflows/gate.yml', import.meta.url), 'utf8');
+  const testFiles = readdirSync(root).filter((f) => /^(test|.+\.test)\.mjs$/.test(f)).sort();
+  const testSrc = Object.fromEntries(testFiles.map((f) => [f, readFileSync(new URL('../' + f, import.meta.url), 'utf8')]));
+  const counted = (src) => { const n = (src.match(/^test\(/gm) || []).length; return n ? n + ' test' + (n === 1 ? '' : 's') : 'a self-checking script'; };
+  const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // the test files a kernel's gate runs, read off the workflow: a matrix row (kernel: F, tests: …) or a step (mutate F … --test …)
+  const gateTests = (file) => {
+    const row = new RegExp('kernel: ' + reEsc(file) + ', tests: ([^,}]+)').exec(yml);
+    const step = new RegExp('mutate ' + reEsc(file) + ' [^\\n]*--test "?(?:node --test |node )?([^"\\n|]+)').exec(yml);
+    return [...new Set((row ? row[1] : step ? step[1] : '').trim().split(/\s+/).filter((t) => /\.mjs$/.test(t)))];
+  };
+  const baselineFor = (file) => {
+    const m = new RegExp('kernel: ' + reEsc(file) + ',[^}]*baseline: (\\S+?) ?\\}').exec(yml);
+    return m ? m[1] : 'witness.baseline.json';
+  };
+  const rowsB = ORGANS.map(([file, role]) => {
+    const src = readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+    const lines = src.replace(/\n$/, '').split('\n').length;
+    const importers = testFiles.filter((t) => new RegExp("from '(?:\\./)+" + reEsc(file) + "'").test(testSrc[t]));
+    const tests = gateTests(file).length ? gateTests(file) : importers;
+    for (const t of tests) if (!testSrc[t]) throw new Error('the gate for ' + file + ' runs ' + t + ', which is not in the repository');
+    const gated = [];
+    if (new RegExp('\\.witness6/witness\\.mjs mutate ' + reEsc(file) + ' ').test(yml) || new RegExp('kernel: ' + reEsc(file) + ',').test(yml)) gated.push('v0.6');
+    if (new RegExp('\\.witness/witness\\.mjs mutate ' + reEsc(file) + ' ').test(yml)) gated.push('v0.2');
+    let excused = 0;
+    if (gated.length) {
+      const bl = JSON.parse(readFileSync(new URL('../' + baselineFor(file), import.meta.url), 'utf8'));
+      const own = new Set(src.split('\n').map((l) => l.trim().slice(0, 90)));
+      excused = bl.filter((e) => e && own.has(e.snippet)).length;
+    }
+    const gate = gated.length
+      ? 'mutation-gated on every push (witness ' + gated.join(' and ') + '); ' + (excused ? excused + ' exemption' + (excused === 1 ? '' : 's') + ' on file, each with a written reason' : 'no exemptions')
+      : 'tested, not mutation-gated';
+    return '<tr><td><code>' + htmlEsc(file) + '</code><br><span class="sub">' + lines.toLocaleString('en-GB') + ' lines</span></td><td>' + htmlEsc(role) + '</td><td>'
+      + (tests.length ? tests.map((t) => '<code>' + htmlEsc(t) + '</code> (' + (testSrc[t] ? counted(testSrc[t]) : 'MISSING') + ')').join('<br>') : '—') + '</td><td>' + htmlEsc(gate) + '</td></tr>';
+  });
+  const table = '<div class="tablewrap"><table class="t"><thead><tr><th>organ</th><th>what it does</th><th>the tests its gate runs</th><th>gate</th></tr></thead><tbody>'
+    + rowsB.join('') + '</tbody></table></div>'
+    + '<p class="sub">Also built from these on every push and required to match what is committed: this page (<code>index.html</code>, from <code>page.template.html</code>) and the standalone reader (<code>reader.html</code>, from <code>reader.template.html</code>). Vendored, with provenance: <code>vendor/fall-os/webrtc.mjs</code> (the WebRTC link), <code>vendor/fall-federate/signaling.mjs</code> (the invite check), <code>vendor/sovereign-enterprise/data/basis.json</code> (the cost case\'s sources).</p>';
+  const BB = '<!-- ⟦BLUEPRINT-BEGIN⟧ generated by scripts/build-page.mjs from the repository -->', BE = '<!-- ⟦BLUEPRINT-END⟧ -->';
+  out = splice(out, BB, BE, table, 'blueprint');
+}
 writeFileSync(new URL('../index.html', import.meta.url), out);
 
 // README's survival block, generated from the same raw reads by the same kernel — never typed
@@ -265,6 +403,45 @@ writeFileSync(new URL('../index.html', import.meta.url), out);
   }
   readme2 = readme2.slice(0, ub + UB.length) + '\n' + U.join('\n') + '\n' + readme2.slice(ue);
   writeFileSync(new URL('../README.md', import.meta.url), readme2);
+}
+
+// THE STANDALONE READER (reader.html) — the single file the quine card carries and anyone can save and open offline.
+// ⚑ It used to be hand-written, and it fell behind: it said "VERIFIED" on a seal match alone, never checked the
+// Ed25519 signature, showed the tier the card CLAIMED, and put card text into the page unescaped. Now it is built
+// like the page — card.mjs inlined verbatim, and the sovereignty gate (validateComposition, lifted whole from
+// studio.mjs) scoped in its own block — so the reader runs the same gated code as the Forge and the CLI.
+{
+  const R_OPEN = '/* __GATE_KERNEL__ */', R_CLOSE = '/* __END_GATE_KERNEL__ */';
+  const studioSrc = readFileSync(new URL('../studio.mjs', import.meta.url), 'utf8');
+  const g = /^export function validateComposition\(html\) \{\n[\s\S]*?\n\}\n/m.exec(studioSrc);
+  if (!g) throw new Error('validateComposition was not found whole in studio.mjs');
+  const gateKernel = '// ── studio.mjs · validateComposition, verbatim ──\nconst { validateComposition } = (() => {\n'
+    + g[0].replace(/^export function/, 'function') + 'return { validateComposition };\n})();';
+  let reader = readFileSync(new URL('../reader.template.html', import.meta.url), 'utf8');
+  const ra = reader.indexOf(R_OPEN), rb = reader.indexOf(R_CLOSE);
+  if (ra < 0 || rb < 0) throw new Error('the gate-kernel markers are missing from reader.template.html');
+  reader = reader.slice(0, ra + R_OPEN.length) + '\n' + gateKernel + '\n' + reader.slice(rb);
+  // the reader's judgement and its wording — reader-core.mjs, scoped, its imports satisfied by the two blocks above
+  const C_OPEN = '/* __READER_CORE__ */', C_CLOSE = '/* __END_READER_CORE__ */';
+  const CORE_NAMES = ['esc', 'judge', 'verdictOf', 'factsHtml', 'keyHtml', 'tierChip'];
+  const coreBody = readFileSync(new URL('../reader-core.mjs', import.meta.url), 'utf8')
+    .replace(/^#!.*\r?\n/, '')
+    .replace(/^import[^\n]*\n/gm, '')
+    .replace(/^export default[\s\S]*?;\s*$/m, '')
+    .replace(/^export (function|const|async function|let)/gm, '$1')
+    .replace(/^export \{[^}]*\};?\s*$/gm, '');
+  const coreKernel = '// ── reader-core.mjs ──\nconst { ' + CORE_NAMES.join(', ') + ' } = (() => {\n' + coreBody + '\nreturn { ' + CORE_NAMES.join(', ') + ' };\n})();';
+  const ca = reader.indexOf(C_OPEN), cb = reader.indexOf(C_CLOSE);
+  if (ca < 0 || cb < 0) throw new Error('the reader-core markers are missing from reader.template.html');
+  reader = reader.slice(0, ca + C_OPEN.length) + '\n' + coreKernel + '\n' + reader.slice(cb);
+  const ka = reader.indexOf(OPEN), kb = reader.indexOf(CLOSE);
+  if (ka < 0 || kb < 0) throw new Error('the card-kernel markers are missing from reader.template.html');
+  reader = reader.slice(0, ka + OPEN.length) + '\n' + kernel + '\n' + reader.slice(kb);
+  for (const fn of ['function read', 'function signable', 'function tierCheck', 'function rarity', 'function validateComposition', 'function parseChunks', 'function readZText', 'async function judge', 'function verdictOf']) {
+    if (!reader.includes(fn)) throw new Error(`reader.html does not contain ${fn} — the inline did not take`);
+  }
+  if (/^export /m.test(reader)) throw new Error('module syntax survived into reader.html');
+  writeFileSync(new URL('../reader.html', import.meta.url), reader);
 }
 
 for (const fn of ['function embed', 'function read', 'function rarity', 'function crc32', 'function sealCode', 'function readBand', 'function resolveCode', 'function admit', 'function makeAssembler', 'function makeLink', 'function readInvite']) {

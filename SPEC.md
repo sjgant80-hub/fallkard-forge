@@ -28,7 +28,7 @@ reference (`CARD-SPEC` §7) rather than to a corrupted image.
 | File | Role |
 |---|---|
 | `forge.mjs` | library + CLI. Chunk plumbing, forge, read, rarity. Zero dependencies. |
-| `reader.html` | single-file reader. Decode, verify, reading-key, fluency check, sandboxed hatch. |
+| `reader.html` | single-file reader, built by `scripts/build-page.mjs` from `reader.template.html` + `reader-core.mjs` (with `card.mjs` and the sovereignty gate inlined). Decode, re-compute the seal, check the Ed25519 signature, re-derive the tier, reading-key, fluency check, sandboxed hatch. |
 | `CARD-SPEC.md` | the normative wire format — the published "language". |
 | `test.mjs` | the round trip and the conformance assertions. |
 

@@ -88,4 +88,38 @@ jobs:
       - name: The shipped page must match the gated kernel
         run: |
           node scripts/build-page.mjs
-          git diff --exit-code index.html README.md || (echo "index.html or README.md is stale — run node scripts/build-page.mjs and commit it" && exit 1)
+          git diff --exit-code index.html README.md reader.html || (echo "index.html, README.md or reader.html is stale — run node scripts/build-page.mjs and commit it" && exit 1)
+
+  # EVERY ORGAN, GATED ON THIS RUNNER. Each kernel the page, the standalone reader or the command line runs is
+  # mutation-tested here with the pinned witness v0.6, against the test files that exercise it. A survivor is a line
+  # no test checks, and it turns this push red. Exemptions live beside the code with a written reason:
+  # witness.card.baseline.json for card.mjs, and witness.baseline.json (auto-detected beside the source) for the rest.
+  kernels:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { kernel: reader-core.mjs, tests: reader.test.mjs }
+          - { kernel: forgecase.mjs, tests: forgecase.test.mjs }
+          - { kernel: card.mjs, tests: card.test.mjs, baseline: witness.card.baseline.json }
+          - { kernel: forge.mjs, tests: test.mjs card.test.mjs forge-estate.test.mjs forge.green.test.mjs reader.test.mjs }
+          - { kernel: art.mjs, tests: test.mjs forge-estate.test.mjs art-band.test.mjs }
+          - { kernel: png.mjs, tests: test.mjs forge-estate.test.mjs art-band.test.mjs }
+          - { kernel: lineage.mjs, tests: test.mjs forge-estate.test.mjs }
+          - { kernel: fold.mjs, tests: fold.test.mjs }
+          - { kernel: studio.mjs, tests: studio-suite.test.mjs reader.test.mjs }
+          - { kernel: artifact.mjs, tests: studio-suite.test.mjs page-safety.test.mjs }
+          - { kernel: babykcc.mjs, tests: studio-suite.test.mjs }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch witness @v0.6
+        run: git clone --depth 1 --branch v0.6 https://github.com/sjgant80-hub/witness.git .witness6
+      - name: ${{ matrix.kernel }} — its tests pass, then every mutant must be killed
+        run: |
+          node --test ${{ matrix.tests }}
+          node .witness6/witness.mjs mutate ${{ matrix.kernel }} --timeout 180000 --cap 400 ${{ matrix.baseline && format('--baseline {0}', matrix.baseline) || '' }} --test node --test ${{ matrix.tests }} | tee gate.out
+          grep -q '"clean": true' gate.out || { echo "::error::mutants survived in ${{ matrix.kernel }}"; exit 1; }

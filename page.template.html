@@ -66,6 +66,39 @@
  .drop{border:2px dashed var(--line);border-radius:12px;padding:1.6rem;text-align:center;color:var(--dim);cursor:pointer}
  .drop:hover,.drop.over{border-color:var(--gold);color:var(--ink)}
  footer{margin-top:3rem;padding-top:1.3rem;border-top:1px solid var(--line);color:var(--faint);font-size:.84rem;text-align:center}
+ /* the explainer: contents, steps, the two flow diagrams, tables, the brochure */
+ nav.toc{display:flex;flex-wrap:wrap;gap:.35rem .9rem;justify-content:center;font-family:var(--mono);font-size:.7rem;
+   letter-spacing:.08em;text-transform:uppercase;margin:0 0 .4rem}
+ nav.toc a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:.1rem}
+ nav.toc a:hover,nav.toc a:focus{color:var(--soft);border-color:var(--gold)}
+ ol.steps,.panel ul{margin:.4rem 0 0;padding-left:1.3rem}
+ ol.steps li,.panel ul li{margin:.45rem 0}
+ .h3{font-family:var(--serif);color:var(--soft);font-weight:500;font-size:1.1rem;margin:1.6rem 0 .3rem}
+ .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.2rem 1.2rem;margin-top:.4rem}
+ .roles .h3{margin:.8rem 0 .1rem;font-size:1rem}
+ .roles p{margin:0;color:var(--dim);font-size:.93rem}
+ .diagrams{display:flex;flex-wrap:wrap;gap:1.2rem;justify-content:center;margin-top:.6rem}
+ .diagrams figure{flex:1 1 17rem;max-width:24rem;margin:0}
+ .diagrams figcaption{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+   text-align:center;margin-bottom:.4rem}
+ svg.flow{width:100%;height:auto;display:block}
+ svg.flow .bx{fill:var(--panel);stroke:var(--line);stroke-width:1.3}
+ svg.flow .bx.key{stroke:var(--gold)}
+ svg.flow .bx.ok{stroke:var(--ok)}
+ svg.flow text{fill:var(--ink);font-family:var(--sans);font-size:13px}
+ svg.flow text.s{fill:var(--dim);font-size:11.5px}
+ svg.flow text.no{fill:var(--no);font-size:11.5px}
+ svg.flow .ln{stroke:var(--faint);stroke-width:1.5;fill:none}
+ svg.flow .ah{fill:var(--faint)}
+ .tablewrap{overflow-x:auto;max-width:100%;margin:.5rem 0}
+ table.t{width:100%;border-collapse:collapse;font-size:.85rem}
+ table.t th,table.t td{text-align:left;vertical-align:top;padding:.45rem .5rem;border-bottom:1px solid var(--line)}
+ table.t th{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600}
+ table.t td:first-child{white-space:nowrap}
+ table.t td.n{font-family:var(--mono);font-size:.8rem;white-space:nowrap}
+ .calc .row>*{min-width:11rem}
+ .money{font-family:var(--mono);font-size:1.25rem;color:var(--ok)}
+ .paper p{max-width:46rem}
 </style></head><body>
 <div class="wrap">
 <header>
@@ -75,7 +108,49 @@
  send it — and anyone who has it can open it and get the build back out.</p>
 </header>
 
-<h2>Forge one</h2>
+<nav class="toc" aria-label="On this page">
+ <a href="#what">What it is</a><a href="#start">Start here</a><a href="#forge-one">Forge</a><a href="#read-one">Read</a><a href="#trade">Trade</a>
+ <a href="#how">How it works</a><a href="#blueprint">Blueprint</a><a href="#adoption">Adoption</a><a href="#business">For a business</a><a href="#paper">White paper</a>
+ <a href="reader.html">Standalone reader</a>
+</nav>
+
+<h2 id="what">What it is</h2>
+<div class="panel">
+ <p style="margin-top:0"><b>The Forge turns a file into a picture that carries it.</b> The file can be a web page, a
+ report, a small app, the log of an automated run — anything that is one file of text. The picture is an ordinary PNG:
+ it shows in any viewer, and you can post it, email it or drop it into a chat.</p>
+ <p>Inside, in two named slots every PNG is allowed to carry, sit the file (compressed) and a short label. The label
+ holds the file's <b>seal</b>, a fingerprint of its exact bytes, and a <b>signature</b> from the key of whoever made
+ the card. Anyone who has the picture can drop it on this page: it works the fingerprint out again from the bytes it
+ actually holds, checks the signature, and tells you whether the file is exactly what was signed. Change one byte and
+ it says so, and refuses to open it.</p>
+ <p style="margin-bottom:0">Nothing is hidden in the picture, nothing is uploaded, and nothing runs until you click.
+ Everything on this page happens in your browser. The format is published in full in
+ <a href="https://github.com/sjgant80-hub/fallkard-forge/blob/main/CARD-SPEC.md">CARD-SPEC.md</a>.</p>
+</div>
+
+<h2 id="start">Start here</h2>
+<p class="sub">Five minutes, in this browser, with nothing to install.</p>
+<div class="panel">
+ <ol class="steps">
+  <li><b>Forge a card.</b> In <a href="#forge-one">Forge one</a>, leave the sample build or paste your own single HTML
+   file, then press <i>Forge the card</i>. The page shows the seal, the tier the build earned and the signature. Press
+   <i>Download the PNG</i>.</li>
+  <li><b>Read it back.</b> In <a href="#read-one">Read one back</a>, drop the PNG you downloaded. You should see
+   <b>AUTHENTIC</b>, the same seal worked out again, the signature checked, and the build you typed, back out.</li>
+  <li><b>Watch it refuse a fake.</b> In <a href="#trade">Trade one</a>, pair this tab with a second browser or a second
+   device (one makes an invite, the other a reply), then press <i>Send a copy with its build swapped</i>. The other side
+   re-checks the card, refuses it at the seal, and shows nothing of it.</li>
+  <li><b>Strip it and find it again.</b> Screenshot the card, or save it as a JPEG, and drop that copy into Read one
+   back. The build is gone from the copy, so the page reads the code printed on the card's face and finds the card in
+   your deck — the cards this browser already holds — then checks the build against the full seal.</li>
+  <li><b>Take the reader with you.</b> Save the <a href="reader.html">standalone reader</a>: one HTML file that reads
+   and checks cards with no network. For a team, the same checks run from the command line:
+   <code>node forge.mjs read card.png</code> exits 0 only when the card verifies.</li>
+ </ol>
+</div>
+
+<h2 id="forge-one">Forge one</h2>
 <p class="sub">Type anything below. It gets compressed, sealed with a hash, and tucked inside a real PNG.</p>
 <div class="panel">
   <label for="build">the build — any text, or paste a whole HTML file</label>
@@ -98,11 +173,12 @@
   </div>
 </div>
 
-<p class="note warn"><b>The tier is worked out, not chosen.</b> Passing the assessor is the floor —
-set it to <i>no</i> and the card comes out <code>common</code> however deep the lineage or how honest
-the key. That is the whole point of a card: you cannot claim a grade, only earn one.</p>
+<p class="note warn"><b>The tier is worked out, not chosen.</b> There is no control for it: the sovereignty
+gate runs on the build when the card is forged, and every reader runs it again on what comes out. A build that fails
+it is <code>common</code> however deep its lineage, and a card whose label claims more is called an overclaim. That is
+the whole point of a card: you cannot claim a grade, only earn one.</p>
 
-<h2>Read one back</h2>
+<h2 id="read-one">Read one back</h2>
 <p class="sub">Drop the card you just downloaded — or any picture — and see what it is really carrying. Even a copy a
 platform stripped, or turned into a JPEG: if the card is in your deck, its printed seal finds it.</p>
 <div class="panel">
@@ -254,6 +330,250 @@ There is no server to send it to.</p>
 <p class="note"><b>The fold teaches the structure, not its truth.</b> A crease pattern that closes earns
 its tier by geometry — the medium physically cannot draw an apex at the center. Whether the structure
 folded into it is TRUE is a separate question the card never claims to settle.</p>
+
+<h2 id="how">How it works</h2>
+<p class="sub">The two paths a card takes, drawn from the code that runs on this page: <code>card.mjs</code>,
+<code>studio.mjs</code>'s sovereignty gate, <code>sealmark.mjs</code> and the reader's judgement.</p>
+<div class="diagrams">
+ <figure>
+  <figcaption>Forging a card</figcaption>
+  <svg class="flow" viewBox="0 0 340 548" role="img" aria-labelledby="fgT fgD">
+   <title id="fgT">Forging a card, in six steps</title>
+   <desc id="fgD">The build is compressed, sealed with sha256, given the tier the sovereignty gate earns it, signed with Ed25519, and written into a PNG beside the untouched picture, with the seal's code printed on the face.</desc>
+   <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+   <rect class="bx" x="20" y="8" width="300" height="56" rx="9"/>
+   <text x="34" y="30">1 · your build</text><text class="s" x="34" y="50">one HTML file, or any text</text>
+   <path class="ln" d="M170 64V88" marker-end="url(#ah)"/>
+   <rect class="bx" x="20" y="92" width="300" height="56" rx="9"/>
+   <text x="34" y="114">2 · compress</text><text class="s" x="34" y="134">gzip, in this browser (CompressionStream)</text>
+   <path class="ln" d="M170 148V172" marker-end="url(#ah)"/>
+   <rect class="bx key" x="20" y="176" width="300" height="70" rx="9"/>
+   <text x="34" y="198">3 · seal = sha256 of the compressed bytes</text>
+   <text class="s" x="34" y="218">the file's fingerprint: change one byte</text><text class="s" x="34" y="234">anywhere and it no longer matches</text>
+   <path class="ln" d="M170 246V270" marker-end="url(#ah)"/>
+   <rect class="bx" x="20" y="274" width="300" height="70" rx="9"/>
+   <text x="34" y="296">4 · tier, earned — never chosen</text>
+   <text class="s" x="34" y="316">the sovereignty gate runs on the build:</text><text class="s" x="34" y="332">passes → uncommon, fails → common</text>
+   <path class="ln" d="M170 344V368" marker-end="url(#ah)"/>
+   <rect class="bx" x="20" y="372" width="300" height="70" rx="9"/>
+   <text x="34" y="394">5 · sign with Ed25519</text>
+   <text class="s" x="34" y="414">over the label, with the seal inside it, by</text><text class="s" x="34" y="430">a key this page can use but never read out</text>
+   <path class="ln" d="M170 442V466" marker-end="url(#ah)"/>
+   <rect class="bx ok" x="20" y="470" width="300" height="70" rx="9"/>
+   <text x="34" y="492">6 · the card: a real PNG</text>
+   <text class="s" x="34" y="512">picture chunks untouched · label + build in two</text><text class="s" x="34" y="528">named text chunks · the seal's code on the face</text>
+  </svg>
+ </figure>
+ <figure>
+  <figcaption>Reading a card</figcaption>
+  <svg class="flow" viewBox="0 0 340 632" role="img" aria-labelledby="rdT rdD">
+   <title id="rdT">Reading a card, in seven steps, with the three places it refuses</title>
+   <desc id="rdD">A card arrives. If its chunks are gone, the printed seal is read off the picture and matched in the deck. The seal is computed again, the signature checked, the build inflated under a cap and its tier re-derived; only then is a verdict given, and the build opens only on a click, sandboxed.</desc>
+   <rect class="bx" x="20" y="8" width="300" height="56" rx="9"/>
+   <text x="34" y="30">1 · a card arrives</text><text class="s" x="34" y="50">dropped here, received in a trade, or saved</text>
+   <path class="ln" d="M170 64V88" marker-end="url(#ah)"/>
+   <rect class="bx" x="20" y="92" width="300" height="70" rx="9"/>
+   <text x="34" y="114">2 · are its chunks still there?</text>
+   <text class="s" x="34" y="134">no → read the code printed on its face, find</text><text class="s" x="34" y="150">that card in your deck, use the deck's copy</text>
+   <path class="ln" d="M170 162V186" marker-end="url(#ah)"/>
+   <rect class="bx key" x="20" y="190" width="300" height="70" rx="9"/>
+   <text x="34" y="212">3 · work the seal out again</text>
+   <text class="s" x="34" y="232">from the bytes actually held, never read off</text><text class="no" x="34" y="248">differs → REFUSED, nothing shown</text>
+   <path class="ln" d="M170 260V284" marker-end="url(#ah)"/>
+   <rect class="bx key" x="20" y="288" width="300" height="70" rx="9"/>
+   <text x="34" y="310">4 · check the signature</text>
+   <text class="s" x="34" y="330">over the label + the seal worked out here</text><text class="no" x="34" y="346">fails → REFUSED · cannot check → not let out</text>
+   <path class="ln" d="M170 358V382" marker-end="url(#ah)"/>
+   <rect class="bx" x="20" y="386" width="300" height="70" rx="9"/>
+   <text x="34" y="408">5 · open the build, under a size cap</text>
+   <text class="s" x="34" y="428">a small file built to inflate enormously</text><text class="no" x="34" y="444">past the cap → REFUSED</text>
+   <path class="ln" d="M170 456V480" marker-end="url(#ah)"/>
+   <rect class="bx" x="20" y="484" width="300" height="56" rx="9"/>
+   <text x="34" y="506">6 · re-derive the tier from the build</text><text class="s" x="34" y="526">a label claiming more is an overclaim</text>
+   <path class="ln" d="M170 540V564" marker-end="url(#ah)"/>
+   <rect class="bx ok" x="20" y="568" width="300" height="56" rx="9"/>
+   <text x="34" y="590">7 · the verdict, then your click</text><text class="s" x="34" y="610">opens only when you say, sandboxed</text>
+  </svg>
+ </figure>
+</div>
+<h3 class="h3">Traced from a real card</h3>
+<p class="sub">The genesis card in the repository (<code>examples/seal-000.png</code>), read by the same code when
+this page was built. Every figure below comes out of that file.</p>
+<!-- ⟦TRACE-BEGIN⟧ generated by scripts/build-page.mjs from examples/seal-000.png -->
+<!-- ⟦TRACE-END⟧ -->
+
+<h2 id="blueprint">Blueprint</h2>
+<p class="sub">The organs, one file each, zero dependencies. Which tests guard each one and how it is gated are read
+from the repository when this page is built — the test files and <code>.github/workflows/gate.yml</code>.</p>
+<!-- ⟦BLUEPRINT-BEGIN⟧ generated by scripts/build-page.mjs from the repository -->
+<!-- ⟦BLUEPRINT-END⟧ -->
+<p class="note"><b>What "mutation-gated" means here.</b> On every push, GitHub's runner fetches a pinned copy of
+<a href="https://github.com/sjgant80-hub/witness">witness</a>, flips one operator at a time in the organ
+(<code>&lt;</code> to <code>&lt;=</code>, <code>&amp;&amp;</code> to <code>||</code>, <code>===</code> to
+<code>!==</code> …) and runs that organ's tests against each change. Every change must make a test fail. One that
+does not is a line no test really checks, and the push goes red. A change that cannot alter behaviour may be
+excused only with a written reason, kept in the repository beside the code.</p>
+
+<h2 id="adoption">Adoption</h2>
+<p class="sub">What it does for a team, and how a team starts using it.</p>
+<div class="panel">
+ <p style="margin-top:0"><b>What it does.</b> Any file a team sends out — a report, a release, a dashboard, a quote,
+ the log of an automated run — goes out as a card. Whoever receives it checks it themselves, in seconds, with no
+ account and no server: it is exactly what was signed, by the key that signed it, or it is refused. Copies keep that
+ property wherever they travel, and a copy a platform stripped still finds its build in the receiver's deck.</p>
+ <p><b>Where it fits first.</b></p>
+ <ul>
+  <li>Hand-offs where "is this the version we approved?" costs a phone call: client deliverables, sign-offs, board packs.</li>
+  <li>Results from automated runs and AI agents, sealed as they finish, so an edited copy of the result is caught by
+   anyone who reads it.</li>
+  <li>Small internal tools passed around as files: the tool and its proof travel together, and it opens sandboxed.</li>
+ </ul>
+ <p><b>Rolling it out.</b></p>
+ <ol class="steps">
+  <li><b>Pick one recurring file</b> a team already sends — a weekly report, release notes, a run log — and one team that receives it.</li>
+  <li><b>Seal it where it is made.</b> In the browser, on this page; in a build or a scheduled job, with
+   <code>node forge.mjs forge --build report.html --art --out report.png</code>. Each person or machine has its own
+   key (<code>~/.fallkard/identity.json</code>, made on first use).</li>
+  <li><b>Publish the public keys</b> of the people and machines whose cards count, somewhere the team already trusts — an intranet page, the repository.</li>
+  <li><b>Check it where it lands.</b> Receivers drop it on this page or on the saved <a href="reader.html">standalone
+   reader</a>; a pipeline runs <code>node forge.mjs read card.png</code> and stops on a non-zero exit.</li>
+  <li><b>Measure it</b> with the cost case below, using your own counts from the pilot, then widen it to the next file.</li>
+ </ol>
+ <p style="margin-bottom:0">Everything runs from the files in the repository: the page is one HTML file, the reader is
+ one HTML file, the command line is Node with no packages. A team can host its own copy on its own origin, which also
+ gives its builder keys an origin no other page shares.</p>
+</div>
+
+<h2 id="business">For a business</h2>
+<p class="sub">The brochure: what it does, what it is worth to each role, what it costs to run, how it is kept
+safe, how it rolls out, who supports it, and the risks, answered straight.</p>
+<div class="panel">
+ <p style="margin-top:0"><b>What it does, in one line.</b> It makes every file a team sends prove itself: anyone who
+ receives it can check, in seconds and without asking anyone, that it is exactly the file its signer signed.</p>
+ <div class="roles">
+  <div><h3 class="h3">CEO</h3><p>What goes out under the company's name can be shown to be what was approved. A doctored
+   copy — a changed figure, a swapped attachment — is refused by whoever opens it, without a call to you.</p></div>
+  <div><h3 class="h3">CFO</h3><p>The cost case below counts the staff time spent confirming files today, at the UK
+   median wage from a cited source. There is no licence fee (MIT), no per-seat bill and no server to pay for; the
+   running cost is the laptop time a check takes.</p></div>
+  <div><h3 class="h3">COO</h3><p>Hand-offs stop needing a confirmation loop: the receiver checks the card themselves,
+   over whatever channel it came by. A copy a platform stripped still resolves from the code printed on it, if the
+   receiver holds the card.</p></div>
+  <div><h3 class="h3">CTO / CISO</h3><p>No server, no dependencies, no account. sha256 seal, Ed25519 signature,
+   decompression capped, card text escaped where it meets the page, builds opened only on a click in a sandbox with no
+   access to this page. Every organ is mutation-gated on GitHub's runner (see the <a href="#blueprint">blueprint</a>).</p></div>
+  <div><h3 class="h3">Delivery and client teams</h3><p>Send the deliverable and its proof as one file. The client
+   checks it on their own machine; a dispute about "which version" is settled by the file itself.</p></div>
+  <div><h3 class="h3">QA, compliance and audit</h3><p>Seal evidence as it is produced. A copy that has been edited
+   since fails its seal for any reader, and an unsigned card is always labelled unsigned.</p></div>
+  <div><h3 class="h3">Automation and AI teams</h3><p>Seal each agent or pipeline result as it finishes, signed by the
+   machine that produced it; an edited result is caught by anyone downstream.</p></div>
+ </div>
+</div>
+
+<h3 class="h3" id="cost">The cost case, on your numbers</h3>
+<p class="sub">Put in your own figures. The wage, inflation, electricity and laptop power come from the cited
+sources listed under the result; nothing here is a price of ours.</p>
+<div class="panel calc">
+ <div class="row">
+  <div><label for="cFiles">files a week someone has to confirm</label><input id="cFiles" type="number" min="0" step="1"></div>
+  <div><label for="cMin">minutes to confirm one today</label><input id="cMin" type="number" min="0" max="480" step="0.5"></div>
+  <div><label for="cShare">share of that a seal check replaces (%)</label><input id="cShare" type="number" min="0" max="100" step="5"></div>
+ </div>
+ <div class="row">
+  <div><label for="cSec">seconds of laptop time per card read</label><input id="cSec" type="number" min="0" max="3600" step="1"></div>
+  <div><label for="cTool">a tool you pay for this today, £ a month</label><input id="cTool" type="number" min="0" step="1"></div>
+  <div><label for="cYears">years</label><input id="cYears" type="number" min="1" max="10" step="1"></div>
+ </div>
+ <p class="sub" style="margin:.6rem 0 0">Filled in with example inputs — they are not measurements. Confirming a file
+ means what your team does today: open it, compare it with the approved one, ask the sender, wait for the answer.</p>
+ <div id="caseOut" aria-live="polite"></div>
+</div>
+
+<div class="panel" style="margin-top:1rem">
+ <p style="margin-top:0"><b>Against what you pay now.</b> The comparison is with your own costs: the staff time above
+ and, if you enter it, whatever tool you pay for this today. We do not quote a rival's price here, because we hold no
+ sourced price for one. What differs is where the proof lives: a shared drive or a document system keeps the record
+ of what was approved on a server, while a card carries its proof inside the file, so it checks the same way after it
+ has left every system, with nothing to install and no account to ask.</p>
+ <p><b>Security and data protection.</b></p>
+ <ul>
+  <li><b>Nothing is uploaded.</b> Forging, reading and checking run in the browser; the page has no server and collects
+   nothing. Cards you open are kept in this browser's own storage (the deck), and you can clear it with one button.</li>
+  <li><b>Two optional features reach out, and say so.</b> Trade one can use a public STUN server to find a route
+   between networks; it sees your IP address and no card. The studio's generator sends your own prompt with your own
+   Anthropic key straight from your browser to Anthropic. Both are off unless you use them; Trade's STUN can be unticked.</li>
+  <li><b>Keys.</b> Each browser's signing key is made non-extractable and kept in IndexedDB: the page can ask it to sign
+   but can never read it out. Other pages on the same origin could also ask it to sign — host your own copy for an
+   origin of your own. The command line keeps its key in a file only you can read.</li>
+  <li><b>A card is untrusted input.</b> Its text is escaped before it reaches the page, its build inflates only up to a
+   cap, and the build opens only on your click, in a sandbox without access to this page. Tests in the repository pin
+   each of these (<code>page-safety.test.mjs</code>, <code>reader.test.mjs</code>).</li>
+  <li><b>Regulation.</b> The repository carries a compliance map generated from verified law
+   (<a href="compliance.html">compliance map</a>): personal data is not processed by the page, and the one generative
+   feature is the optional studio generator.</li>
+  <li><b>Nothing hidden.</b> The build sits in named chunks any PNG tool lists; the picture's own data is never used to
+   carry anything. That is a rule of the format, enforced by its tests.</li>
+ </ul>
+ <p><b>Deployment and roll-out.</b> Use this page as it is, or host the two HTML files on your own origin — they are
+ static files. Put <code>forge.mjs</code> in a build step to seal what the build produces, and <code>forge.mjs read</code>
+ in the step that receives it. The <a href="#adoption">roll-out</a> above starts with one file and one team.</p>
+ <p><b>Ownership, support and exit.</b> Supplied by AI Native Solutions
+ (<a href="https://www.ai-nativesolutions.com">ai-nativesolutions.com</a>; contact through that site). The code is MIT:
+ you own your copy, and it keeps running without us — no account, no licence server, nothing to renew. Support, any
+ service level, warranty and liability are agreed per deployment. Exit costs nothing: cards stay ordinary PNGs, and
+ the format is published in full, so any team can write its own reader.</p>
+ <p><b>Risks, answered straight.</b></p>
+ <ul>
+  <li><b>A signature proves who signed, not that the file is right.</b> The tier the build earns says only that it
+   passes the sovereignty gate; whether its contents are true is still for people to judge, and no tool awards the top tier.</li>
+  <li><b>The build is not secret.</b> Anyone who holds a card can read what it carries. Do not put anything confidential
+   in one; this is proof, not encryption.</li>
+  <li><b>Platforms strip and recompress pictures.</b> Then the build is gone from that copy. The code printed on the
+   card finds it again only for someone whose deck already holds the card; the sealed survival run on this page says
+   how far that holds and where it stops.</li>
+  <li><b>Keys can be lost or misused.</b> A lost key means new cards are signed by a new key, which you publish; a
+   stolen one is a reason to publish that it no longer counts. Cards carry the signer's public key, so a team can
+   always see which key signed what.</li>
+  <li><b>Device-to-device trade has been measured on one machine with two browser identities, not yet on two devices.</b>
+   That run waits on a second device and is on the record as not done.</li>
+  <li><b>An old browser without Ed25519</b> cannot check signatures. It says so, and does not open, keep or accept a
+   signed card it could not check.</li>
+ </ul>
+ <p style="margin-bottom:0"><b>The case for the board.</b> Files are where trust is hardest to keep: they are copied,
+ edited and forwarded, and the record of what was approved usually lives somewhere else. The Forge puts the proof inside the
+ file, so anyone can check it, anywhere, without asking anyone. It costs no licence and no server, the code is open
+ and owned, every organ is mutation-tested on infrastructure we do not control, and a pilot needs one team and one
+ recurring file. The question for the board is only which file to start with.</p>
+</div>
+
+<h2 id="paper">White paper · <span style="opacity:.65">the card that carries its own proof</span></h2>
+<div class="panel paper">
+ <p style="margin-top:0"><b>The problem.</b> A file's history is not in the file. When a report, a build or a result
+ is forwarded, edited or re-saved, the only way to know it is still the approved one is to ask the person who sent it,
+ or a system that recorded it. Neither travels with the file.</p>
+ <p><b>The design.</b> A card is a PNG that openly carries a single-file build in two declared text chunks, placed
+ before the image's end marker, beside image data that is never changed (CARD-SPEC §2). The label records a seal — the
+ sha256 of the compressed build — and is signed with Ed25519 over a canonical form in which the verifier puts the seal
+ it computed itself, so one changed byte anywhere, build or label, fails the signature (§3.1). The card's tier is
+ never written by its maker: it is earned by running the sovereignty gate on the build, and every reader runs it again
+ (§5). The picture is drawn from the card's own tags, so it cannot contradict them (§4), and it prints the first 80
+ bits of the seal as a code a person or a camera can read (§7.1).</p>
+ <p><b>The trust argument.</b> Nothing on a card is taken on the card's word. The seal is recomputed, the signature
+ is checked against the recomputed seal, the tier is re-derived from the build, and a read of the printed code that
+ could match two cards is refused rather than guessed. A stable process can still settle on a wrong reference; the
+ reader's defence is to check the reference itself every time and to allow "I don't know" as an answer. That stance
+ follows Gary W. Floyd's work on the Guided Entropy Principle (credited below).</p>
+ <p><b>What was measured.</b> The printed seal was tested before it was trusted: a sealed survival run through
+ platform-style damage, a paid read by a vision model, and the read rule that the kard-evolve creatures found, each
+ sealed before it ran and published as it landed. The results are re-derived on this page by the same kernels, in
+ <a href="#printed-seal">The seal you can read</a>, rather than typed here.</p>
+ <p><b>What it does not do.</b> It does not keep a build secret, does not prove a build correct, and cannot bring
+ back a stripped build for someone who never held the card. It never hides anything in the picture.</p>
+ <p style="margin-bottom:0"><b>Read further.</b> The wire format: <a href="https://github.com/sjgant80-hub/fallkard-forge/blob/main/CARD-SPEC.md">CARD-SPEC.md</a>.
+ The implementation note: <a href="https://github.com/sjgant80-hub/fallkard-forge/blob/main/SPEC.md">SPEC.md</a>.
+ The code, tests and sealed runs: <a href="https://github.com/sjgant80-hub/fallkard-forge">the repository</a>.</p>
+</div>
 
 <footer>
  <p>The card logic on this page is inlined verbatim from <code>card.mjs</code>, the printed seal from
@@ -447,8 +767,13 @@ async function judgeCard(u8) {
   // ⚑ THE SIGNATURE IS CHECKED AGAINST THE PAYLOAD WE HOLD — signable() puts OUR computed seal in, so a
   // changed byte anywhere (payload or manifest) fails it. Unsigned cards still read, and say so.
   const signed = !!(r.manifest.sig && r.manifest.signer);
-  let sigOk = null;
-  if (signed) { try { sigOk = (await ed25519Verify(signable(r.manifest, actual), r.manifest.sig, r.manifest.signer)) === true; } catch { sigOk = false; } }
+  // "cannot check" is not "fails": a browser with no Ed25519 leaves sigOk null and says so, and a signed card it
+  // cannot check is never called authentic, kept in the deck, or accepted from a trade (admit wants sigOk === true)
+  let sigOk = null, sigUnchecked = false;
+  if (signed) {
+    if (!(await ed25519Here())) sigUnchecked = true;
+    else { try { sigOk = (await ed25519Verify(signable(r.manifest, actual), r.manifest.sig, r.manifest.signer)) === true; } catch { sigOk = false; } }
+  }
 
   let text = '', inflated = false;
   try { text = new TextDecoder().decode(await gunzip(payload)); inflated = true; }
@@ -458,8 +783,14 @@ async function judgeCard(u8) {
   // the sovereignty gate run on what actually hatched cannot be talked into a pass.
   const gate = (sealOk && inflated) ? validateComposition(text) : { ok: false, reasons: ['the build could not be checked'] };
   const earned = rarity({ assessorPass: gate.ok, depth: 0, readingKeyHonest: false });
-  return { isCard: true, r, actual, sealOk, signed, sigOk, signer: signed ? String(r.manifest.signer) : null,
+  return { isCard: true, r, actual, sealOk, signed, sigOk, sigUnchecked, signer: signed ? String(r.manifest.signer) : null,
     text, gate, earned, claim: tierCheck(r.manifest.rarity, earned) };
+}
+// probed once, with a throwaway key — the same probe the standalone reader makes
+let edHere = null;
+async function ed25519Here() {
+  if (edHere === null) { try { await crypto.subtle.generateKey({ name: 'Ed25519' }, false, ['sign', 'verify']); edHere = true; } catch { edHere = false; } }
+  return edHere;
 }
 
 async function inspect(file) {
@@ -470,23 +801,28 @@ async function showRead(u8, blob) {
   $('#recovered').style.display = 'none'; $('#recLabel').style.display = 'none';
   const j = await judgeCard(u8);
   if (!j.isCard) return fromPicture(blob, j.reason);
-  const { r, actual, sealOk, signed, sigOk, text, gate, earned, claim } = j;
-  const authentic = sealOk && sigOk !== false;
+  const { r, actual, sealOk, signed, sigOk, sigUnchecked, text, gate, earned, claim } = j;
+  // AUTHENTIC only when a key vouches for the bytes; an unsigned card whose seal holds still reads, and says so
+  const authentic = sealOk && (signed ? sigOk === true : true);
 
-  $('#verdictWrap').innerHTML = authentic
-    ? `<span class="verdict v-ok">AUTHENTIC</span>`
-    : `<span class="verdict v-no">${sealOk ? 'SIGNATURE FAILS' : 'SEAL DOES NOT MATCH'}</span>`;
+  $('#verdictWrap').innerHTML = !sealOk ? `<span class="verdict v-no">SEAL DOES NOT MATCH</span>`
+    : sigUnchecked ? `<span class="verdict v-no">SEAL MATCHES · SIGNATURE NOT CHECKED</span>`
+    : signed && sigOk !== true ? `<span class="verdict v-no">SIGNATURE FAILS</span>`
+    : signed ? `<span class="verdict v-ok">AUTHENTIC</span>`
+    : `<span class="verdict v-ok">SEAL MATCHES · UNSIGNED</span>`;
   $('#readFacts').innerHTML =
     fact('tier', tierChip(earned) + (claim === 'overclaim'
       ? ` — <b>overclaim</b>: the card says ${esc(r.manifest.rarity)}; its build earns ${earned}`
       : ' — earned by the build, re-checked here')) +
     fact('signed', !signed ? 'no — no key vouches for who forged it'
+      : sigUnchecked ? 'names ' + esc(String(r.manifest.signer).slice(0, 12)) + '… — not checked: this browser has no Ed25519'
       : sigOk ? '✓ Ed25519 · ' + esc(String(r.manifest.signer).slice(0, 12)) + '…'
       : '✗ the signature does not match these bytes') +
     fact('claimed', esc(r.manifest.seal)) +
     fact('actual', actual) +
     fact('verdict', !sealOk ? 'the build inside has been changed since it was sealed'
       : sigOk === false ? 'the bytes are not what the named key signed — refused'
+      : sigUnchecked ? 'the seal holds, but who signed it cannot be checked in this browser — not kept, not traded'
       : 'the build inside is exactly what was sealed') +
     fact('tags', esc(r.manifest.tags) || '(none)') +
     fact('forged', esc(r.manifest.forged) || '(not stated)') +
@@ -1175,5 +1511,46 @@ $('#stMint').addEventListener('click', async () => {
     fact('signed', bundle.mint.minter_sig_b64 ? 'Ed25519 · by this browser\u2019s builder identity' : 'unsigned — this browser has no Ed25519; the verify will say so') +
     fact('recorded', entered.ok ? 'kept in this browser’s local mint record' : 'not recorded: ' + esc(entered.why));
 });
+</script>
+<script type="module">
+// ── the cost case (For a business) — forgecase.mjs inlined verbatim, fed the sourced basis it is tested against ──
+/* __CASE_KERNEL__ */
+/* __END_CASE_KERNEL__ */
+/* __CASE_DATA__ */
+/* __END_CASE_DATA__ */
+const g = (id) => document.getElementById(id);
+const escC = (v) => String(v).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const gbp = (n) => '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const hrs = (n) => n.toLocaleString('en-GB', { maximumFractionDigits: 1 }) + ' h';
+// how each sourced figure is written — the units only; every number is the basis's own
+const UNIT = { wageMedianHourly: (v) => '£' + v + ' an hour', cpi: (v) => (v * 100).toFixed(1) + '% a year',
+  electricityPencePerKwh: (v) => v + 'p per kWh', laptopExtraWatts: (v) => v + ' W' };
+const FIELDS = [['cFiles', 'filesPerWeek', 1], ['cMin', 'minutesPerCheck', 1], ['cShare', 'share', 100], ['cSec', 'secondsPerRead', 1], ['cTool', 'toolPerMonth', 1], ['cYears', 'years', 1]];
+for (const [id, key, scale] of FIELDS) { const el = g(id); if (el) el.value = String(DEFAULTS[key] * scale); }
+function caseRender() {
+  const input = {};
+  for (const [id, key, scale] of FIELDS) { const el = g(id); input[key] = el && el.value !== '' ? Number(el.value) / scale : NaN; }
+  const r = forgeCase(CASE_BASIS, input), out = g('caseOut');
+  if (!out) return;
+  if (!r.ok) { out.innerHTML = '<p class="note warn"><b>Check the inputs:</b> ' + escC(r.why) + '</p>'; return; }
+  const y = r.inputs.years, rowH = (k, v) => '<tr><td>' + k + '</td><td class="n">' + v + '</td></tr>';
+  out.innerHTML = '<div class="tablewrap"><table class="t"><thead><tr><th>a year</th><th>today</th></tr></thead><tbody>'
+    + rowH('staff hours spent confirming files', hrs(r.lines.hoursToday))
+    + rowH('that time, at the UK median hourly wage', gbp(r.lines.staff))
+    + rowH('your current tool, if you entered one', gbp(r.lines.tool))
+    + rowH('<b>today, a year</b>', '<b>' + gbp(r.perYear.today) + '</b>')
+    + rowH('hours a seal check gives back', hrs(r.lines.hoursBack))
+    + rowH('laptop electricity for the card reads', gbp(r.lines.power))
+    + rowH('<b>with the Forge, a year</b>', '<b>' + gbp(r.perYear.withForge) + '</b>')
+    + '</tbody></table></div>'
+    + '<p style="margin:.6rem 0 0">Saving: <span class="money">' + gbp(r.savingPerYear) + '</span> a year, <span class="money">'
+    + gbp(r.savingOver) + '</span> over ' + y + ' year' + (y === 1 ? '' : 's') + ' with each later year raised by UK CPI.'
+    + ' No licence fee is in the Forge column because there is none; support, where you want it, is agreed per deployment and is not included.</p>'
+    + '<p class="sub" style="margin:.7rem 0 0">Sources, read from the vendored basis (<code>vendor/sovereign-enterprise/data/basis.json</code>):</p><ul class="sub">'
+    + sourcesOf(CASE_BASIS).map((s) => '<li>' + escC(s.what) + ' — <b>' + escC(UNIT[s.key] ? UNIT[s.key](s.value) : s.value) + '</b> · <a href="' + escC(s.source) + '">source</a></li>').join('')
+    + '</ul>';
+}
+for (const [id] of FIELDS) { const el = g(id); if (el) el.addEventListener('input', caseRender); }
+caseRender();
 </script>
 </body></html>
