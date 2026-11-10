@@ -285,3 +285,95 @@ test('lineage CLI: exit codes are earned — clean 0 with the ✓ line, overclai
     for (const d of [clean, dirty, cyc]) rmSync(d, { recursive: true, force: true });
   }
 });
+
+// ─── the gate's own survivors (6 Nov run): each test below kills a mutant witness v0.6 found alive ───
+import { crc32 } from './png.mjs';
+import { verifySignature, makeIdentity } from './forge.mjs';
+import { chmodSync } from 'node:fs';
+
+test('png: crc32 matches the published check values, not just itself', () => {
+  // the standard CRC-32 check value, and the CRC every PNG's IEND chunk carries
+  assert.equal(crc32(Buffer.from('123456789', 'latin1')), 0xCBF43926);
+  assert.equal(crc32(Buffer.from('IEND', 'latin1')), 0xAE426082);
+  assert.equal(crc32(Buffer.alloc(0)), 0);
+});
+
+test('forge: verifySignature is false, never true, when the message cannot even be read', () => {
+  const id = makeIdentity();
+  const sig = id.sign('m');
+  assert.equal(verifySignature('m', sig, id.pubB64), true);
+  assert.equal(verifySignature(Object.create(null), sig, id.pubB64), false);
+});
+
+test('forge: no options is treated as empty options, and a signer name without a key is not stamped', () => {
+  let want;
+  try { forge({}); } catch (e) { want = e.message; }
+  assert.throws(() => forge(null), (e) => e.message === want);
+  const { manifest } = forge({ build: 'b', image: IMAGE, signer: 'someone' });
+  assert.equal(manifest.signer, null);
+});
+
+// rewrite the manifest chunk with any raw text (forge itself never writes these)
+function withManifestText(png, text) {
+  const cs = parseChunks(png);
+  const i = cs.findIndex(x => x.type === 'tEXt' && x.data.toString('latin1', 0, x.data.indexOf(0)) === MANIFEST_KEYWORD);
+  cs[i] = { type: 'tEXt', data: Buffer.concat([Buffer.from(MANIFEST_KEYWORD, 'latin1'), Buffer.from([0]), Buffer.from(text, 'latin1')]) };
+  return serialise(cs);
+}
+test('read: a manifest that is JSON but not an object is refused as bad-manifest', () => {
+  const { png } = forge({ build: 'b', image: IMAGE });
+  for (const text of ['5', '"x"', '[]', '[1,2]', 'null', 'true']) {
+    const r = read(withManifestText(png, text));
+    assert.equal(r.ok, false, text);
+    assert.equal(r.reason, 'bad-manifest', text);
+  }
+});
+
+test('read CLI: OVERCLAIM is printed for an inflated card and never for an honest one', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ffcli-'));
+  try {
+    forgeTo(dir, 'honest.png', 'honest-build');
+    forgeTo(dir, 'over.png', 'over-build', { claim: 'rare' });
+    const h = run('forge.mjs', ['read', join(dir, 'honest.png')]);
+    const o = run('forge.mjs', ['read', join(dir, 'over.png')]);
+    assert.ok(!h.stdout.includes('OVERCLAIM'), h.stdout);
+    assert.ok(o.stdout.includes('OVERCLAIM'), o.stdout);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('AUDIT: a cycle proves nothing, even when every build in it passes the assessor', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ffcyc-'));
+  try {
+    const sealOf = (b) => sha256(gzipSync(Buffer.from(b, 'utf8'), { level: 9 }));
+    forgeTo(dir, 'x.png', sovereign('cx'), { parent: sealOf(sovereign('cy')) });
+    forgeTo(dir, 'y.png', sovereign('cy'), { parent: sealOf(sovereign('cx')) });
+    const { rows } = auditDeck(dir);
+    assert.deepEqual(rows.map(r => [r.status, r.provable]), [['cycle', 'common'], ['cycle', 'common']]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('AUDIT: rows come deepest first, then by name', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ffsort-'));
+  try {
+    const b = forgeTo(dir, 'b.png', 'root-b');
+    forgeTo(dir, 'a.png', 'root-a');
+    forgeTo(dir, 'c.png', 'child-of-b', { parent: b });
+    assert.deepEqual(auditDeck(dir).rows.map(r => [r.name, r.depth]), [['c.png', 1], ['a.png', 0], ['b.png', 0]]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+// A file that cannot be opened at all reaches loadDeck's catch. Only a POSIX non-root user can make one
+// (chmod 000), so this runs on the Linux CI runner, where the gate's receipt is made.
+const canLock = process.platform !== 'win32' && !(process.getuid && process.getuid() === 0);
+test('AUDIT: a file that cannot be opened carries err.message itself, not String(err)', { skip: !canLock && 'needs a POSIX non-root user' }, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'fflock-'));
+  try {
+    const f = join(dir, 'locked.png');
+    writeFileSync(f, Buffer.alloc(64));
+    chmodSync(f, 0o000);
+    let want;
+    try { readFileSync(f); } catch (e) { want = e.message; }
+    const { unreadable } = loadDeck(dir);
+    assert.deepEqual(unreadable, [{ name: 'locked.png', reason: want }]);
+  } finally { try { chmodSync(join(dir, 'locked.png'), 0o600); } catch {} rmSync(dir, { recursive: true, force: true }); }
+});
