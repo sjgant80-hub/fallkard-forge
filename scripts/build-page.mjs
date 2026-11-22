@@ -6,11 +6,15 @@
 // Shipping a copy of zlib to a page that already has one would be worse than useless.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
+// Every text source is read as LF. Git stores these files LF; a Windows checkout with core.autocrlf makes them CRLF,
+// and then the verbatim lifts below either fail or build a reader.html that differs from the one CI builds.
+const readText = (u) => readFileSync(u, 'utf8').replace(/\r\n/g, '\n');
+
 const OPEN = '/* __CARD_KERNEL__ */';
 const CLOSE = '/* __END_CARD_KERNEL__ */';
 
 // Only the export KEYWORD goes. The \r? matters — these files are CRLF and `.` stops at \r.
-const kernel = readFileSync(new URL('../card.mjs', import.meta.url), 'utf8')
+const kernel = readText(new URL('../card.mjs', import.meta.url))
   .replace(/^#!.*\r?\n/, '')
   .replace(/^import[^\n]*\n/gm, '')
   .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -19,7 +23,7 @@ const kernel = readFileSync(new URL('../card.mjs', import.meta.url), 'utf8')
 
 const FOLD_OPEN = '/* __FOLD_KERNEL__ */';
 const FOLD_CLOSE = '/* __END_FOLD_KERNEL__ */';
-const foldKernel = readFileSync(new URL('../fold.mjs', import.meta.url), 'utf8')
+const foldKernel = readText(new URL('../fold.mjs', import.meta.url))
   .replace(/^#!.*\r?\n/, '')
   .replace(/^import[^\n]*\n/gm, '')
   .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -36,7 +40,7 @@ const STUDIO_EXPORTS = {
   'studio.mjs': ['ORGANS', 'compose', 'validateComposition'],
 };
 const studioKernel = Object.entries(STUDIO_EXPORTS).map(([f, names]) => {
-  const body = readFileSync(new URL('../' + f, import.meta.url), 'utf8')
+  const body = readText(new URL('../' + f, import.meta.url))
     .replace(/^#!.*\r?\n/, '')
     .replace(/^import[^\n]*\n/gm, '')
     .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -53,7 +57,7 @@ const SEAL_NAMES = ['ALPHABET', 'READ_RULES', 'READ_RULE', 'sealCode', 'normaliz
 // the survival run: its sealed pre-registration always, and its raw reads once they exist — the page tallies
 // them itself with the inlined kernel, so no survival number on the page is typed or trusted
 const SURV_OPEN = '/* __SURVIVE_DATA__ */', SURV_CLOSE = '/* __END_SURVIVE_DATA__ */';
-const readJson = (f) => { const u = new URL('../' + f, import.meta.url); return existsSync(u) ? JSON.parse(readFileSync(u, 'utf8')) : null; };
+const readJson = (f) => { const u = new URL('../' + f, import.meta.url); return existsSync(u) ? JSON.parse(readText(u)) : null; };
 const survPre = readJson('data/survive-prereg.json'), survRun = readJson('data/survive.json');
 const SURVIVE = survPre && {
   prereg: { rules: survPre.rules, predictions: survPre.predictions, transforms: survPre.transforms, pilot: survPre.pilot, notMeasured: survPre.notMeasured, n: survPre.cards.n },
@@ -66,7 +70,7 @@ const survBlock = 'const SURVIVE = ' + JSON.stringify(SURVIVE || null).replace(/
 // and prices them itself with the inlined kernel — no paid-read number is typed.
 const VIS_OPEN = '/* __VISION_KERNEL__ */', VIS_CLOSE = '/* __END_VISION_KERNEL__ */';
 const VIS_NAMES = ['extractCode', 'tallyVision', 'judgeVision', 'spend'];
-const visBody = readFileSync(new URL('../vision.mjs', import.meta.url), 'utf8')
+const visBody = readText(new URL('../vision.mjs', import.meta.url))
   .replace(/^#!.*\r?\n/, '')
   .replace(/^import[^\n]*\n/gm, '')
   .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -101,7 +105,7 @@ const SH_OPEN = '/* __SHIP_DATA__ */', SH_CLOSE = '/* __END_SHIP_DATA__ */';
 const uvPre = readJson('data/uv-prereg.json'), uvRun = readJson('data/uv-run.json');
 const SHIP = uvPre && { prereg: { rules: uvPre.rules, predictions: uvPre.predictions, credit: uvPre.credit, change: uvPre.change }, run: uvRun && { sealedIn: uvRun.sealedIn.slice(0, 7) } };
 const shipData = 'const SHIP = ' + JSON.stringify(SHIP || null).replace(/</g, '\\u003c') + ';';
-const sealBody = readFileSync(new URL('../sealmark.mjs', import.meta.url), 'utf8')
+const sealBody = readText(new URL('../sealmark.mjs', import.meta.url))
   .replace(/^#!.*\r?\n/, '')
   .replace(/^import[^\n]*\n/gm, '')
   .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -118,7 +122,7 @@ const TRADE_PARTS = {
   'vendor/fall-federate/signaling.mjs': ['makeInvite', 'readInvite'],
 };
 const tradeKernel = Object.entries(TRADE_PARTS).map(([f, names]) => {
-  const body = readFileSync(new URL('../' + f, import.meta.url), 'utf8')
+  const body = readText(new URL('../' + f, import.meta.url))
     .replace(/^#!.*\r?\n/, '')
     .replace(/^import[^\n]*\n/gm, '')
     .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -127,7 +131,7 @@ const tradeKernel = Object.entries(TRADE_PARTS).map(([f, names]) => {
   return '// ── ' + f + ' ──\nconst { ' + names.join(', ') + ' } = (() => {\n' + body + '\nreturn { ' + names.join(', ') + ' };\n})();';
 }).join('\n');
 
-const html = readFileSync(new URL('../page.template.html', import.meta.url), 'utf8');
+const html = readText(new URL('../page.template.html', import.meta.url));
 const a = html.indexOf(OPEN), b = html.indexOf(CLOSE);
 if (a < 0 || b < 0) throw new Error('the kernel markers are missing from page.template.html');
 const fa = html.indexOf(FOLD_OPEN), fb = html.indexOf(FOLD_CLOSE);
@@ -185,7 +189,7 @@ const splice = (src, open, close, body, what) => {
 // from the vendored, sourced file it is tested against. No figure in the case is typed into the page.
 {
   const CASE_NAMES = ['DEFAULTS', 'BASIS_KEYS', 'sourcesOf', 'forgeCase'];
-  const body = readFileSync(new URL('../forgecase.mjs', import.meta.url), 'utf8')
+  const body = readText(new URL('../forgecase.mjs', import.meta.url))
     .replace(/^#!.*\r?\n/, '')
     .replace(/^import[^\n]*\n/gm, '')
     .replace(/^export default[\s\S]*?;\s*$/m, '')
@@ -194,7 +198,7 @@ const splice = (src, open, close, body, what) => {
   out = splice(out, '/* __CASE_KERNEL__ */', '/* __END_CASE_KERNEL__ */',
     '// ── forgecase.mjs ──\nconst { ' + CASE_NAMES.join(', ') + ' } = (() => {\n' + body + '\nreturn { ' + CASE_NAMES.join(', ') + ' };\n})();', 'case-kernel');
   const { BASIS_KEYS } = await import(new URL('../forgecase.mjs', import.meta.url).href);
-  const basis = JSON.parse(readFileSync(new URL('../vendor/sovereign-enterprise/data/basis.json', import.meta.url), 'utf8'));
+  const basis = JSON.parse(readText(new URL('../vendor/sovereign-enterprise/data/basis.json', import.meta.url)));
   const picked = Object.fromEntries(BASIS_KEYS.map((k) => [k, basis[k]]));
   out = splice(out, '/* __CASE_DATA__ */', '/* __END_CASE_DATA__ */',
     '// the basis entries the case reads, from vendor/sovereign-enterprise/data/basis.json\nconst CASE_BASIS = ' + JSON.stringify(picked).replace(/</g, '\\u003c') + ';', 'case-data');
@@ -269,9 +273,9 @@ const splice = (src, open, close, body, what) => {
     ['forgecase.mjs', 'The cost case in For a business, computed from the vendored, sourced basis.'],
   ];
   const root = new URL('..', import.meta.url);
-  const yml = readFileSync(new URL('../.github/workflows/gate.yml', import.meta.url), 'utf8');
+  const yml = readText(new URL('../.github/workflows/gate.yml', import.meta.url));
   const testFiles = readdirSync(root).filter((f) => /^(test|.+\.test)\.mjs$/.test(f)).sort();
-  const testSrc = Object.fromEntries(testFiles.map((f) => [f, readFileSync(new URL('../' + f, import.meta.url), 'utf8')]));
+  const testSrc = Object.fromEntries(testFiles.map((f) => [f, readText(new URL('../' + f, import.meta.url))]));
   const counted = (src) => { const n = (src.match(/^test\(/gm) || []).length; return n ? n + ' test' + (n === 1 ? '' : 's') : 'a self-checking script'; };
   const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   // the test files a kernel's gate runs, read off the workflow: a matrix row (kernel: F, tests: …) or a step (mutate F … --test …)
@@ -285,7 +289,7 @@ const splice = (src, open, close, body, what) => {
     return m ? m[1] : 'witness.baseline.json';
   };
   const rowsB = ORGANS.map(([file, role]) => {
-    const src = readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+    const src = readText(new URL('../' + file, import.meta.url));
     const lines = src.replace(/\n$/, '').split('\n').length;
     const importers = testFiles.filter((t) => new RegExp("from '(?:\\./)+" + reEsc(file) + "'").test(testSrc[t]));
     const tests = gateTests(file).length ? gateTests(file) : importers;
@@ -295,7 +299,7 @@ const splice = (src, open, close, body, what) => {
     if (new RegExp('\\.witness/witness\\.mjs mutate ' + reEsc(file) + ' ').test(yml)) gated.push('v0.2');
     let excused = 0;
     if (gated.length) {
-      const bl = JSON.parse(readFileSync(new URL('../' + baselineFor(file), import.meta.url), 'utf8'));
+      const bl = JSON.parse(readText(new URL('../' + baselineFor(file), import.meta.url)));
       const own = new Set(src.split('\n').map((l) => l.trim().slice(0, 90)));
       excused = bl.filter((e) => e && own.has(e.snippet)).length;
     }
@@ -317,7 +321,7 @@ writeFileSync(new URL('../index.html', import.meta.url), out);
 {
   const { tallySurvival, judgeSurvival } = await import(new URL('../sealmark.mjs', import.meta.url).href);
   const RB = '<!-- ⟦SURVIVE-BEGIN⟧ generated by scripts/build-page.mjs — do not edit here -->', RE = '<!-- ⟦SURVIVE-END⟧ -->';
-  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  const readme = readText(new URL('../README.md', import.meta.url));
   const ra = readme.indexOf(RB), re = readme.indexOf(RE);
   if (ra < 0 || re < 0) throw new Error('the survive markers are missing from README.md');
   const L = [];
@@ -412,19 +416,19 @@ writeFileSync(new URL('../index.html', import.meta.url), out);
 // studio.mjs) scoped in its own block — so the reader runs the same gated code as the Forge and the CLI.
 {
   const R_OPEN = '/* __GATE_KERNEL__ */', R_CLOSE = '/* __END_GATE_KERNEL__ */';
-  const studioSrc = readFileSync(new URL('../studio.mjs', import.meta.url), 'utf8');
+  const studioSrc = readText(new URL('../studio.mjs', import.meta.url));
   const g = /^export function validateComposition\(html\) \{\n[\s\S]*?\n\}\n/m.exec(studioSrc);
   if (!g) throw new Error('validateComposition was not found whole in studio.mjs');
   const gateKernel = '// ── studio.mjs · validateComposition, verbatim ──\nconst { validateComposition } = (() => {\n'
     + g[0].replace(/^export function/, 'function') + 'return { validateComposition };\n})();';
-  let reader = readFileSync(new URL('../reader.template.html', import.meta.url), 'utf8');
+  let reader = readText(new URL('../reader.template.html', import.meta.url));
   const ra = reader.indexOf(R_OPEN), rb = reader.indexOf(R_CLOSE);
   if (ra < 0 || rb < 0) throw new Error('the gate-kernel markers are missing from reader.template.html');
   reader = reader.slice(0, ra + R_OPEN.length) + '\n' + gateKernel + '\n' + reader.slice(rb);
   // the reader's judgement and its wording — reader-core.mjs, scoped, its imports satisfied by the two blocks above
   const C_OPEN = '/* __READER_CORE__ */', C_CLOSE = '/* __END_READER_CORE__ */';
   const CORE_NAMES = ['esc', 'judge', 'verdictOf', 'factsHtml', 'keyHtml', 'tierChip'];
-  const coreBody = readFileSync(new URL('../reader-core.mjs', import.meta.url), 'utf8')
+  const coreBody = readText(new URL('../reader-core.mjs', import.meta.url))
     .replace(/^#!.*\r?\n/, '')
     .replace(/^import[^\n]*\n/gm, '')
     .replace(/^export default[\s\S]*?;\s*$/m, '')

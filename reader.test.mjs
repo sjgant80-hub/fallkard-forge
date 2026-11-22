@@ -338,18 +338,26 @@ test('which rows a judgement draws: the signature row only where the payload was
 });
 
 test('the built reader runs the same judgement: reader-core.mjs, card.mjs and the gate inlined verbatim', async () => {
-  const tpl = readFileSync(new URL('./reader.template.html', import.meta.url), 'utf8');
+  const tpl = readFileSync(new URL('./reader.template.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
   for (const mk of ['/* __CARD_KERNEL__ */\n/* __END_CARD_KERNEL__ */', '/* __GATE_KERNEL__ */\n/* __END_GATE_KERNEL__ */', '/* __READER_CORE__ */\n/* __END_READER_CORE__ */']) {
     assert.ok(tpl.includes(mk), 'the template carries empty markers: ' + mk.slice(0, 22));
   }
   // a whole top-level function: from its `export` line to the first `}` alone on a line
+  // ⚑ Both sides are compared as LF, and a lift that finds no whole function THROWS. It used to return ''
+  // when the closing `}` line was not found (a CRLF checkout), and SRC.includes('') is always true, so the
+  // check passed on a Windows clone without comparing anything.
   const fn = (file, name) => {
-    const src = readFileSync(new URL('./' + file, import.meta.url), 'utf8');
+    const src = readFileSync(new URL('./' + file, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
     const a = src.search(new RegExp('^export (async )?function ' + name + '\\(', 'm'));
-    return src.slice(a, src.indexOf('\n}\n', a) + 3).replace(/^export /, '');
+    const b = a < 0 ? -1 : src.indexOf('\n}\n', a);
+    if (a < 0 || b < 0) throw new Error(name + ' was not found whole in ' + file);
+    return src.slice(a, b + 3).replace(/^export /, '');
   };
+  const SRC_LF = SRC.replace(/\r\n/g, '\n');
   for (const [file, name] of [['card.mjs', 'signable'], ['card.mjs', 'read'], ['studio.mjs', 'validateComposition'], ['reader-core.mjs', 'judge'], ['reader-core.mjs', 'verdictOf'], ['reader-core.mjs', 'factsHtml']]) {
-    assert.ok(SRC.includes(fn(file, name)), name + ' from ' + file + ' is inlined verbatim');
+    const body = fn(file, name);
+    assert.ok(body.length > 40 && body.includes('function ' + name + '('), name + ' lifted from ' + file + ' is a real function body');
+    assert.ok(SRC_LF.includes(body), name + ' from ' + file + ' is inlined verbatim');
   }
   assert.ok(!/^export /m.test(SRC) && !/^import /m.test(SRC), 'no module syntax in the page');
   assert.match(SRC, /Powered by the Konomi architecture, created by Thomas Frumkin\./);
